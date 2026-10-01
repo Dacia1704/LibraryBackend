@@ -1,0 +1,42 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: library
+
+  datasource:
+    url: jdbc:sqlserver://localhost:1433;databaseName=library_db;encrypt=true;trustServerCertificate=true
+    username: sa
+    password: Library@12345
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate     # Hibernate chỉ kiểm tra entity khớp schema, không tự sửa DB
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: redis123
+    web:
+      pageable:
+        default-page-size: 10
+        max-page-size: 100
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin123
+
+app:
+  jwt:
+    secret: "3pHoX9WySmdbsP4vnkuM4o+Lrd/n5ejYcDYOBufMGXEVLABgSWU/TFAwYBanP6VywMIb6B/Px4KIZ/4xXmflyg=="
+    access-expiration-ms: 1800000      # 30 phút
+    refresh-expiration-ms: 604800000   # 7 ngày
