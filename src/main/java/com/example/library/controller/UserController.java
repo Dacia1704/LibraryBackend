@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class UserController {
     UserService userService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     public ApiResponse<UserResponse> createUser(
             @RequestBody @Valid UserRequest request
     ) {
@@ -32,6 +34,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     public ApiResponse<UserResponse> updateUser(
             @PathVariable Long id,
             @RequestBody @Valid UserRequest request
@@ -42,6 +45,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     public ApiResponse<UserResponse> deleteUser(
             @PathVariable String id
     ) {
@@ -51,6 +55,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ApiResponse<UserResponse> getUser(
             @PathVariable String id
     ) {
@@ -60,6 +65,7 @@ public class UserController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ApiResponse<PageResponse<UserResponse>> getUsers(
             @ModelAttribute UserFilter filter,
             @RequestParam(defaultValue = "0") int page,
@@ -78,6 +84,7 @@ public class UserController {
     }
 
     @GetMapping("/deleted/{id}")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ApiResponse<UserResponse> getUserDeleted(
             @PathVariable String id
     ) {

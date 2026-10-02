@@ -52,7 +52,6 @@ CREATE TABLE settings (
 );
 CREATE UNIQUE INDEX UX_settings_key ON settings(setting_key) WHERE is_deleted = 0;
 
--- Gia tri mac dinh (value luu dang chuoi, ung dung tu ep kieu)
 INSERT INTO settings (setting_key, setting_value, description) VALUES
  ('FINE_PER_DAY',          N'5000',  N'Tien phat moi ngay tra tre cho moi cuon sach (VND)'),
  ('MAX_BORROW_DAYS',       N'14',    N'So ngay muon toi da cho moi cuon sach'),

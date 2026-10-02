@@ -12,18 +12,25 @@ INSERT INTO roles (name, description) VALUES
 
 -- ---------- PERMISSIONS ----------
 INSERT INTO permissions (code, description) VALUES
- ('USER_MANAGE',          N'Quan ly tai khoan nguoi dung'),
- ('ROLE_MANAGE',          N'Quan ly role va permission'),
- ('BOOK_READ',            N'Xem va tim kiem sach, tac gia, the loai, nha xuat ban'),
- ('BOOK_WRITE',           N'Them, sua, xoa sach, tac gia, the loai, nha xuat ban'),
- ('MEMBER_READ',          N'Xem danh sach thanh vien'),
- ('MEMBER_WRITE',         N'Them, sua, xoa thanh vien'),
- ('BORROW_CREATE',        N'Lap phieu muon va ghi nhan tra sach'),
- ('BORROW_READ_ALL',      N'Xem tat ca phieu muon'),
- ('BORROW_READ_OWN',      N'Xem phieu muon cua chinh minh'),
- ('NOTIFICATION_READ_ALL',N'Xem tat ca thong bao'),
- ('NOTIFICATION_READ_OWN',N'Xem thong bao cua chinh minh'),
- ('REPORT_VIEW',          N'Xem bao cao thong ke');
+ ('USER_READ',                N'Quan ly tai khoan nguoi dung'),
+ ('USER_WRITE',               N'Quan ly tai khoan nguoi dung'),
+ ('ROLE_MANAGE',              N'Quan ly role va permission'),
+ ('BOOK_READ',                N'Xem va tim kiem sach, tac gia, the loai, nha xuat ban'),
+ ('BOOK_WRITE',               N'Them, sua, xoa sach, tac gia, the loai, nha xuat ban'),
+ ('MEMBER_READ',              N'Xem danh sach thanh vien'),
+ ('MEMBER_WRITE',             N'Them, sua, xoa thanh vien'),
+ ('BORROW_WRITE',            N'Lap phieu muon va ghi nhan tra sach'),
+ ('BORROW_READ',              N'Xem phieu muon'),
+ ('CATEGORY_MANAGE',          N'Quan ly danh muc'),
+ ('AUTHOR_MANAGE',           N'Quan ly tac gia'),
+ ('PUBLISHER_MANAGE',         N'Quan ly nha xuat ban'),
+ ('PERMISSION_MANAGE',         N'Quan ly quyen'),
+ ('SETTING_MANAGE',           N'Quan ly cai dat'),
+ ('FINE_READ',                N'Xem thong tin phat'),
+ ('FINE_PAYMENT_READ',        N'Xem thong tin tra tien phat'),
+ ('FINE_PAYMENT_WRITE',       N'Thu phat'),
+ ('MEMBER_PAYMENT_WRITE',        N'Mo thanh vien'),
+ ('MEMBER_PAYMENT_READ',         N'Xem hoa don mo thanh vien');
 
 -- ---------- ROLE_PERMISSIONS ----------
 -- ADMIN: toan bo permission
@@ -37,8 +44,8 @@ INSERT INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id
 FROM roles r
 JOIN permissions p ON p.code IN
- ('BOOK_READ','BOOK_WRITE','MEMBER_READ','MEMBER_WRITE',
-  'BORROW_CREATE','BORROW_READ_ALL','NOTIFICATION_READ_ALL','REPORT_VIEW')
+ ('USER_READ', 'BOOK_READ', 'BOOK_WRITE', 'MEMBER_READ', 'MEMBER_WRITE',
+ 'BORROW_CREATE', 'BORROW_READ', 'FINE_PAYMENT_WRITE', 'MEMBER_PAYMENT_READ', 'MEMBER_PAYMENT_WRITE')
 WHERE r.name = 'LIBRARIAN';
 
 -- MEMBER
@@ -46,7 +53,8 @@ INSERT INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id
 FROM roles r
 JOIN permissions p ON p.code IN
- ('BOOK_READ','BORROW_READ_OWN','NOTIFICATION_READ_OWN')
+ ('USER_READ','USER_WRITE','BOOK_READ', 'BORROW_READ',
+ 'FINE_READ','FINE_PAYMENT_READ', 'MEMBER_PAYMENT_READ')
 WHERE r.name = 'MEMBER';
 
 -- ---------- USERS DEMO (mat khau: Library@123) ----------

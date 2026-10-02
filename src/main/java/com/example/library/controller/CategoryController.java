@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class CategoryController {
     CategoryService categoryService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('CATEGORY_MANAGE')")
     public ApiResponse<CategoryResponse> createCategory(
             @RequestBody @Valid CategoryRequest request
     ) {
@@ -30,6 +32,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('CATEGORY_MANAGE')")
     public ApiResponse<CategoryResponse> updateCategory(
             @PathVariable String id,
             @RequestBody @Valid CategoryRequest request
@@ -40,6 +43,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('CATEGORY_MANAGE')")
     public ApiResponse<CategoryResponse> deleteCategory(
             @PathVariable String id
     ) {

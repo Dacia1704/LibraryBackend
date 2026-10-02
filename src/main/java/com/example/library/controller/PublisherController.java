@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,16 +23,19 @@ public class PublisherController {
     PublisherService publisherService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('PUBLISHER_MANAGE')")
     public ApiResponse<PublisherResponse> createPublisher(@RequestBody @Valid PublisherRequest request) {
         return ApiResponse.success(publisherService.createPublisher(request));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('PUBLISHER_MANAGE')")
     public ApiResponse<PublisherResponse> updatePublisher(@PathVariable Long id, @RequestBody @Valid PublisherRequest request) {
         return ApiResponse.success(publisherService.updatePublisher(id, request));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('PUBLISHER_MANAGE')")
     public ApiResponse<PublisherResponse> deletePublisher(@PathVariable String id) {
         return ApiResponse.success(publisherService.deletePublisher(id));
     }

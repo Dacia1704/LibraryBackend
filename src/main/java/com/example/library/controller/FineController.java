@@ -7,6 +7,7 @@ import com.example.library.service.FineService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class FineController {
     FineService fineService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('FINE_READ')")
     public ApiResponse<PageResponse<FineResponse>> getAll(
             @RequestParam(required = false) Long memberId,
             @RequestParam(defaultValue = "0") int page,

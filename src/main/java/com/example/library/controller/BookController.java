@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class BookController {
     BookService bookService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('BOOK_WRITE')")
     public ApiResponse<BookResponse> createBook(
             @ModelAttribute @Valid BookRequest request
     ) {
@@ -36,6 +38,7 @@ public class BookController {
             value = "/{id}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
+    @PreAuthorize("hasAuthority('BOOK_WRITE')")
     public ApiResponse<BookResponse> updateBook(
             @PathVariable Long id,
             @ModelAttribute @Valid BookRequest request
@@ -46,6 +49,7 @@ public class BookController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('BOOK_WRITE') and hasRole('ADMIN')")
     public ApiResponse<BookResponse> deleteBook(
             @PathVariable String id
     ) {
@@ -71,6 +75,7 @@ public class BookController {
     }
 
     @GetMapping("/deleted/{id}")
+    @PreAuthorize("hasAuthority('BOOK_WRITE')")
     public ApiResponse<BookResponse> getBookDeleted(
             @PathVariable String id
     ) {

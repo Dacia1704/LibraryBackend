@@ -5,6 +5,7 @@ import com.example.library.common.PageResponse;
 import com.example.library.dto.user.response.MemberPaymentResponse;
 import com.example.library.service.MemberPaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class MemberPaymentController {
     private final MemberPaymentService memberPaymentService;
 
     @GetMapping("/{memberId}")
+    @PreAuthorize("hasAuthority('MEMBER_PAYMENT_READ')")
     public ApiResponse<PageResponse<MemberPaymentResponse>> getAll(
             @PathVariable Long memberId,
             @RequestParam(required = false) Integer month,
@@ -37,6 +39,7 @@ public class MemberPaymentController {
     }
 
     @GetMapping("/me")
+    @PreAuthorize("hasAuthority('MEMBER_PAYMENT_READ')")
     public ApiResponse<List<MemberPaymentResponse>> getMe() {
 
         return ApiResponse.<List<MemberPaymentResponse>>builder()

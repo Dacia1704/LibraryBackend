@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,21 +22,25 @@ public class PermissionController {
     PermissionService permissionService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('PERMISSION_MANAGE')")
     public ApiResponse<PermissionResponse> createPermission(@RequestBody @Valid PermissionRequest request) {
         return ApiResponse.success(permissionService.createPermission(request));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERMISSION_MANAGE')")
     public ApiResponse<PermissionResponse> updatePermission(@PathVariable String id,@RequestBody @Valid PermissionRequest request) {
         return ApiResponse.success(permissionService.updatePermission(id,request));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERMISSION_MANAGE')")
     public ApiResponse<PermissionResponse> deletePermission(@PathVariable String id) {
         return ApiResponse.success(permissionService.deletePermission(id));
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('PERMISSION_MANAGE')")
     public ApiResponse<List<PermissionResponse>> getPermissions() {
         return ApiResponse.success(permissionService.getPermissions());
     }

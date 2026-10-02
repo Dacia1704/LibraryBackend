@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class AuthorController {
     AuthorService authorService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('AUTHOR_MANAGE')")
     public ApiResponse<AuthorResponse> createAuthor(
             @RequestBody @Valid AuthorRequest request
     ) {
@@ -31,6 +33,7 @@ public class AuthorController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('AUTHOR_MANAGE')")
     public ApiResponse<AuthorResponse> updateAuthor(
             @PathVariable Long id,
             @RequestBody @Valid AuthorRequest request
@@ -41,6 +44,7 @@ public class AuthorController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('AUTHOR_MANAGE')")
     public ApiResponse<AuthorResponse> deleteAuthor(
             @PathVariable String id
     ) {

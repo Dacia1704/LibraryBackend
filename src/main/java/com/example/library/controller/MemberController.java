@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class MemberController {
     MemberService memberService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('MEMBER_WRITE')")
     public ApiResponse<MemberResponse> createMember(
             @RequestBody @Valid MemberRequest request
     ) {
@@ -30,6 +32,7 @@ public class MemberController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('MEMBER_WRITE')")
     public ApiResponse<MemberResponse> updateMember(
             @PathVariable Long id,
             @RequestBody @Valid MemberRequest request
@@ -43,6 +46,7 @@ public class MemberController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('MEMBER_WRITE')")
     public ApiResponse<MemberResponse> deleteMember(
             @PathVariable String id
     ) {
@@ -52,6 +56,7 @@ public class MemberController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('MEMBER_READ')")
     public ApiResponse<MemberResponse> getMember(
             @PathVariable String id
     ) {
@@ -61,6 +66,7 @@ public class MemberController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('BOOK_READ')")
     public ApiResponse<List<MemberResponse>> getMembers() {
         return ApiResponse.success(
                 memberService.getMembers()
@@ -68,6 +74,7 @@ public class MemberController {
     }
 
     @GetMapping("/deleted/{id}")
+    @PreAuthorize("hasRole('BOOK_READ')")
     public ApiResponse<MemberResponse> getMemberDeleted(
             @PathVariable String id
     ) {

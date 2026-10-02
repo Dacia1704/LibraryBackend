@@ -6,6 +6,7 @@ import com.example.library.service.BorrowDetailService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class BorrowDetailController {
     }
 
     @PutMapping("/{id}/return")
+    @PreAuthorize("hasAuthority('BORROW_WRITE')")
     public ApiResponse<BorrowDetailResponse> returnBook(
             @PathVariable String id
     ) {

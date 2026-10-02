@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,21 +22,25 @@ public class RoleController {
     RoleService roleService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
     public ApiResponse<RoleResponse> createRole(@RequestBody @Valid RoleRequest request) {
         return ApiResponse.success(roleService.createRole(request));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
     public ApiResponse<RoleResponse> updateRole(@PathVariable String id, @RequestBody @Valid RoleRequest request) {
         return ApiResponse.success(roleService.updateRole(id,request));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
     public ApiResponse<RoleResponse> deleteRole(@PathVariable String id) {
         return ApiResponse.success(roleService.deleteRole(id));
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ROLE_MANAGE')")
     public ApiResponse<List<RoleResponse>> getRoles() {
         return ApiResponse.success(roleService.getRoles());
     }

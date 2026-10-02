@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class FinePaymentController {
     FinePaymentService finePaymentService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('FINE_PAYMENT_READ')")
     public ApiResponse<PageResponse<FinePaymentResponse>> getAll(
             @RequestParam(required = false) Long memberId,
             @RequestParam(defaultValue = "0") int page,
@@ -56,6 +58,7 @@ public class FinePaymentController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('FINE_PAYMENT_WRITE')")
     public ApiResponse<FinePaymentResponse> create(
             @RequestBody @Valid FinePaymentRequest request
     ) {

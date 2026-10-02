@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class BorrowRecordController {
     BorrowRecordService borrowRecordService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('BORROW_WRITE')")
     public ApiResponse<BorrowRecordResponse> createBorrowRecord(
             @RequestBody @Valid BorrowRecordRequest request
     ) {
@@ -32,6 +34,7 @@ public class BorrowRecordController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('BORROW_WRITE')")
     public ApiResponse<BorrowRecordResponse> updateBorrowRecord(
             @PathVariable Long id,
             @RequestBody @Valid BorrowRecordRequest request
@@ -45,6 +48,7 @@ public class BorrowRecordController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('BORROW_WRITE') and hasRole('ADMIN')")
     public ApiResponse<BorrowRecordResponse> deleteBorrowRecord(
             @PathVariable String id
     ) {
