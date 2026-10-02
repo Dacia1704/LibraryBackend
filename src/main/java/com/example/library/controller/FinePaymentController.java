@@ -1,6 +1,7 @@
 package com.example.library.controller;
 
 import com.example.library.common.ApiResponse;
+import com.example.library.common.PageResponse;
 import com.example.library.dto.book.request.FinePaymentRequest;
 import com.example.library.dto.book.response.FinePaymentResponse;
 import com.example.library.service.FinePaymentService;
@@ -21,18 +22,36 @@ public class FinePaymentController {
     FinePaymentService finePaymentService;
 
     @GetMapping
-    public ApiResponse<List<FinePaymentResponse>> getAll() {
+    public ApiResponse<PageResponse<FinePaymentResponse>> getAll(
+            @RequestParam(required = false) Long memberId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
 
-        return ApiResponse.<List<FinePaymentResponse>>builder()
-                .data(finePaymentService.getAll())
+        return ApiResponse.<PageResponse<FinePaymentResponse>>builder()
+                .data(
+                        finePaymentService.getAll(
+                                memberId,
+                                page,
+                                size
+                        )
+                )
                 .build();
     }
 
     @GetMapping("/me")
-    public ApiResponse<List<FinePaymentResponse>> getMe() {
+    public ApiResponse<PageResponse<FinePaymentResponse>> getMe(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
 
-        return ApiResponse.<List<FinePaymentResponse>>builder()
-                .data(finePaymentService.getMe())
+        return ApiResponse.<PageResponse<FinePaymentResponse>>builder()
+                .data(
+                        finePaymentService.getMe(
+                                page,
+                                size
+                        )
+                )
                 .build();
     }
 

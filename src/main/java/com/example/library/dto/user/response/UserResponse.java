@@ -17,8 +17,6 @@ public class UserResponse {
 
     private String email;
 
-    private String identityNumber;
-
     private String avatar;
 
     private Long roleId;
@@ -28,5 +26,8 @@ public class UserResponse {
     private Boolean isActive;
 
     private LocalDateTime createdAt;
+
+    private MemberResponse member;
+
 
 }

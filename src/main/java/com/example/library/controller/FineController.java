@@ -1,6 +1,7 @@
 package com.example.library.controller;
 
 import com.example.library.common.ApiResponse;
+import com.example.library.common.PageResponse;
 import com.example.library.dto.book.response.FineResponse;
 import com.example.library.service.FineService;
 import lombok.AccessLevel;
@@ -19,18 +20,23 @@ public class FineController {
     FineService fineService;
 
     @GetMapping
-    public ApiResponse<List<FineResponse>> getAll() {
-
-        return ApiResponse.<List<FineResponse>>builder()
-                .data(fineService.getAll())
+    public ApiResponse<PageResponse<FineResponse>> getAll(
+            @RequestParam(required = false) Long memberId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ApiResponse.<PageResponse<FineResponse>>builder()
+                .data(fineService.getAll(memberId, page, size))
                 .build();
     }
 
     @GetMapping("/me")
-    public ApiResponse<List<FineResponse>> getMe() {
-
-        return ApiResponse.<List<FineResponse>>builder()
-                .data(fineService.getMe())
+    public ApiResponse<PageResponse<FineResponse>> getMe(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ApiResponse.<PageResponse<FineResponse>>builder()
+                .data(fineService.getMe(page, size))
                 .build();
     }
 }

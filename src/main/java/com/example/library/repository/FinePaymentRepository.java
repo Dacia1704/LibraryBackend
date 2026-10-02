@@ -1,6 +1,8 @@
 package com.example.library.repository;
 
 import com.example.library.entity.FinePayment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,9 +13,12 @@ import java.util.List;
 @Repository
 public interface FinePaymentRepository extends JpaRepository<FinePayment, Long> {
 
-    List<FinePayment> findAllByIsDeletedFalse();
+    Page<FinePayment> findAllByIsDeletedFalse(Pageable pageable);
 
-    List<FinePayment> findAllByMemberIdAndIsDeletedFalse(Long memberId);
+    Page<FinePayment> findAllByMemberIdAndIsDeletedFalse(
+            Long memberId,
+            Pageable pageable
+    );
 
     @Query("""
         SELECT fp
@@ -23,5 +28,8 @@ public interface FinePaymentRepository extends JpaRepository<FinePayment, Long> 
         WHERE u.id = :userId
           AND fp.isDeleted = false
     """)
-    List<FinePayment> findAllByUserId(@Param("userId") Long userId);
+    Page<FinePayment> findAllByUserId(
+            @Param("userId") Long userId,
+            Pageable pageable
+    );
 }

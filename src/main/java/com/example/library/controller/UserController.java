@@ -1,6 +1,8 @@
 package com.example.library.controller;
 
 import com.example.library.common.ApiResponse;
+import com.example.library.common.PageResponse;
+import com.example.library.dto.user.request.UserFilter;
 import com.example.library.dto.user.request.UserRequest;
 import com.example.library.dto.user.response.UserResponse;
 import com.example.library.service.UserService;
@@ -58,10 +60,21 @@ public class UserController {
     }
 
     @GetMapping
-    public ApiResponse<List<UserResponse>> getUsers() {
-        return ApiResponse.success(
-                userService.getUsers()
-        );
+    public ApiResponse<PageResponse<UserResponse>> getUsers(
+            @ModelAttribute UserFilter filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        return ApiResponse.<PageResponse<UserResponse>>builder()
+                .data(
+                        userService.getUsers(
+                                filter,
+                                page,
+                                size
+                        )
+                )
+                .build();
     }
 
     @GetMapping("/deleted/{id}")

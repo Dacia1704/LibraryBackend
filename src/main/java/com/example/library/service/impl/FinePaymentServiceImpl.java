@@ -1,5 +1,6 @@
 package com.example.library.service.impl;
 
+import com.example.library.common.PageResponse;
 import com.example.library.dto.book.request.FinePaymentRequest;
 import com.example.library.dto.book.response.FinePaymentResponse;
 import com.example.library.entity.FinePayment;
@@ -13,6 +14,10 @@ import com.example.library.service.FinePaymentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -32,24 +37,99 @@ public class FinePaymentServiceImpl implements FinePaymentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<FinePaymentResponse> getAll() {
+    public PageResponse<FinePaymentResponse> getAll(
+            Long memberId,
+            int page,
+            int size
+    ) {
 
-        return finePaymentRepository.findAllByIsDeletedFalse()
+        if (page < 0) {
+            page = 0;
+        }
+
+        if (size <= 0) {
+            size = 10;
+        }
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "id")
+        );
+
+        Page<FinePayment> paymentPage;
+
+        if (memberId != null) {
+            paymentPage = finePaymentRepository
+                    .findAllByMemberIdAndIsDeletedFalse(
+                            memberId,
+                            pageable
+                    );
+        } else {
+            paymentPage = finePaymentRepository
+                    .findAllByIsDeletedFalse(pageable);
+        }
+
+        List<FinePaymentResponse> content = paymentPage.getContent()
                 .stream()
                 .map(finePaymentMapper::toResponse)
                 .toList();
+
+        return PageResponse.<FinePaymentResponse>builder()
+                .data(content)
+                .currentPage(paymentPage.getNumber())
+                .pageSize(paymentPage.getSize())
+                .totalElements(paymentPage.getTotalElements())
+                .totalPages(paymentPage.getTotalPages())
+                .build();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<FinePaymentResponse> getMe() {
+    public PageResponse<FinePaymentResponse> getMe(
+            int page,
+            int size
+    ) {
 
-        Long userId = getCurrentUserId();
+        if (page < 0) {
+            page = 0;
+        }
 
-        return finePaymentRepository.findAllByUserId(userId)
+        if (size <= 0) {
+            size = 10;
+        }
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "id")
+        );
+
+        Long userId = Long.valueOf(
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName()
+        );
+
+        Page<FinePayment> paymentPage =
+                finePaymentRepository.findAllByUserId(
+                        userId,
+                        pageable
+                );
+
+        List<FinePaymentResponse> content = paymentPage.getContent()
                 .stream()
                 .map(finePaymentMapper::toResponse)
                 .toList();
+
+        return PageResponse.<FinePaymentResponse>builder()
+                .data(content)
+                .currentPage(paymentPage.getNumber())
+                .pageSize(paymentPage.getSize())
+                .totalElements(paymentPage.getTotalElements())
+                .totalPages(paymentPage.getTotalPages())
+                .build();
     }
 
     @Override

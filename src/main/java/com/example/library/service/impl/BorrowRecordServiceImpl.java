@@ -1,5 +1,7 @@
 package com.example.library.service.impl;
 
+import com.example.library.common.PageResponse;
+import com.example.library.dto.book.request.BorrowRecordFilter;
 import com.example.library.dto.book.request.BorrowRecordRequest;
 import com.example.library.dto.book.response.BorrowRecordResponse;
 import com.example.library.entity.*;
@@ -8,10 +10,16 @@ import com.example.library.exception.AppException;
 import com.example.library.exception.ErrorCode;
 import com.example.library.mapper.BorrowRecordMapper;
 import com.example.library.repository.*;
+import com.example.library.repository.specification.BorrowRecordSpecification;
 import com.example.library.service.BorrowRecordService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -167,5 +175,48 @@ public class BorrowRecordServiceImpl
                 .stream()
                 .map(borrowRecordMapper::toBorrowRecordResponse)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<BorrowRecordResponse> getBorrowRecordsPagination(
+            BorrowRecordFilter filter,
+            int page,
+            int size
+    ) {
+
+        if (page < 0) {
+            page = 0;
+        }
+
+        if (size <= 0) {
+            size = 10;
+        }
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "id")
+        );
+
+        Specification<BorrowRecord> specification =
+                BorrowRecordSpecification.filter(filter);
+
+        Page<BorrowRecord> borrowRecordPage =
+                borrowRecordRepository.findAll(specification, pageable);
+
+        List<BorrowRecordResponse> content =
+                borrowRecordPage.getContent()
+                        .stream()
+                        .map(borrowRecordMapper::toBorrowRecordResponse)
+                        .toList();
+
+        return PageResponse.<BorrowRecordResponse>builder()
+                .data(content)
+                .currentPage(borrowRecordPage.getNumber())
+                .pageSize(borrowRecordPage.getSize())
+                .totalElements(borrowRecordPage.getTotalElements())
+                .totalPages(borrowRecordPage.getTotalPages())
+                .build();
     }
 }

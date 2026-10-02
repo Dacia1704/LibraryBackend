@@ -1,13 +1,19 @@
 package com.example.library.service;
 
 
+import com.example.library.common.PageResponse;
 import com.example.library.dto.book.response.FineResponse;
-
-import java.util.List;
 
 public interface FineService {
 
-    List<FineResponse> getAll();
+    PageResponse<FineResponse> getAll(
+            Long memberId,
+            int page,
+            int size
+    );
 
-    List<FineResponse> getMe();
+    PageResponse<FineResponse> getMe(
+            int page,
+            int size
+    );
 }

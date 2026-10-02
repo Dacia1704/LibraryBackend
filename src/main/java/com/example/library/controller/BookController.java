@@ -1,6 +1,8 @@
 package com.example.library.controller;
 
 import com.example.library.common.ApiResponse;
+import com.example.library.common.PageResponse;
+import com.example.library.dto.book.request.BookFilter;
 import com.example.library.dto.book.request.BookRequest;
 import com.example.library.dto.book.response.BookResponse;
 import com.example.library.service.BookService;
@@ -75,5 +77,23 @@ public class BookController {
         return ApiResponse.success(
                 bookService.getBookDeleted(id)
         );
+    }
+
+    @GetMapping("/")
+    public ApiResponse<PageResponse<BookResponse>> getBooksPagination(
+            @ModelAttribute BookFilter filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        return ApiResponse.<PageResponse<BookResponse>>builder()
+                .data(
+                        bookService.getBooksPagination(
+                                filter,
+                                page,
+                                size
+                        )
+                )
+                .build();
     }
 }

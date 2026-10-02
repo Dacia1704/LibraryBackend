@@ -1,5 +1,7 @@
 package com.example.library.service.impl;
 
+import com.example.library.common.PageResponse;
+import com.example.library.dto.user.request.UserFilter;
 import com.example.library.dto.user.request.UserRequest;
 import com.example.library.dto.user.response.UserResponse;
 import com.example.library.entity.Role;
@@ -9,11 +11,17 @@ import com.example.library.exception.ErrorCode;
 import com.example.library.mapper.UserMapper;
 import com.example.library.repository.RoleRepository;
 import com.example.library.repository.UserRepository;
+import com.example.library.repository.specification.UserSpecification;
 import com.example.library.service.UserService;
 import com.example.library.utils.TextUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -206,13 +214,44 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponse> getUsers() {
+    public PageResponse<UserResponse> getUsers(
+            UserFilter filter,
+            int page,
+            int size
+    ) {
 
-        return userRepository
-                .findAllByIsDeletedFalse()
+        if (page < 0) {
+            page = 0;
+        }
+
+        if (size <= 0) {
+            size = 10;
+        }
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "id")
+        );
+
+        Specification<User> specification =
+                UserSpecification.filter(filter);
+
+        Page<User> userPage =
+                userRepository.findAll(specification, pageable);
+
+        List<UserResponse> content = userPage.getContent()
                 .stream()
                 .map(userMapper::toUserResponse)
                 .toList();
+
+        return PageResponse.<UserResponse>builder()
+                .data(content)
+                .currentPage(userPage.getNumber())
+                .pageSize(userPage.getSize())
+                .totalElements(userPage.getTotalElements())
+                .totalPages(userPage.getTotalPages())
+                .build();
     }
 
     @Override

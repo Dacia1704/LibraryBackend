@@ -1,5 +1,7 @@
 package com.example.library.service.impl;
 
+import com.example.library.common.PageResponse;
+import com.example.library.dto.book.request.BookFilter;
 import com.example.library.dto.book.request.BookRequest;
 import com.example.library.dto.book.response.BookResponse;
 import com.example.library.entity.Author;
@@ -13,11 +15,17 @@ import com.example.library.repository.AuthorRepository;
 import com.example.library.repository.BookRepository;
 import com.example.library.repository.CategoryRepository;
 import com.example.library.repository.PublisherRepository;
+import com.example.library.repository.specification.BookSpecification;
 import com.example.library.service.BookService;
 import com.example.library.utils.TextUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -168,5 +176,34 @@ public class BookServiceImpl implements BookService {
                         new AppException(ErrorCode.BOOK_NOT_FOUND)
                 );
         return bookMapper.toBookResponse(book);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<BookResponse> getBooksPagination(
+            BookFilter filter,
+            int page,
+            int size
+    ) {
+        if (page < 0) page = 0;
+
+        if (size <= 0) size = 10;
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+
+        Specification<Book> specification = BookSpecification.filter(filter);
+
+        Page<Book> bookPage = bookRepository.findAll(specification, pageable);
+
+        List<BookResponse> content =
+                bookPage.getContent().stream().map(bookMapper::toBookResponse).toList();
+
+        return PageResponse.<BookResponse>builder()
+                .data(content)
+                .currentPage(bookPage.getNumber())
+                .pageSize(bookPage.getSize())
+                .totalElements(bookPage.getTotalElements())
+                .totalPages(bookPage.getTotalPages())
+                .build();
     }
 }

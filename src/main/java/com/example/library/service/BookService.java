@@ -1,6 +1,8 @@
 package com.example.library.service;
 
 
+import com.example.library.common.PageResponse;
+import com.example.library.dto.book.request.BookFilter;
 import com.example.library.dto.book.request.BookRequest;
 import com.example.library.dto.book.response.BookResponse;
 
@@ -19,4 +21,10 @@ public interface BookService {
     List<BookResponse> getBooks();
 
     BookResponse getBookDeleted(String id);
+
+    PageResponse<BookResponse> getBooksPagination(
+            BookFilter filter,
+            int page,
+            int size
+    );
 }

@@ -1,6 +1,7 @@
 package com.example.library.controller;
 
 import com.example.library.common.ApiResponse;
+import com.example.library.common.PageResponse;
 import com.example.library.dto.category_author_publisher.request.PublisherRequest;
 import com.example.library.dto.category_author_publisher.response.PublisherResponse;
 import com.example.library.service.PublisherService;
@@ -36,7 +37,20 @@ public class PublisherController {
     }
 
     @GetMapping
-    public ApiResponse<List<PublisherResponse>> getPublishers() {
-        return ApiResponse.success(publisherService.getPublishers());
+    public ApiResponse<PageResponse<PublisherResponse>> getPublishers(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        return ApiResponse.<PageResponse<PublisherResponse>>builder()
+                .data(
+                        publisherService.getPublishers(
+                                keyword,
+                                page,
+                                size
+                        )
+                )
+                .build();
     }
 }

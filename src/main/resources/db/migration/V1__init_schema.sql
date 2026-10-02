@@ -46,7 +46,6 @@ CREATE TABLE users (
     failed_attempts INT           NOT NULL CONSTRAINT DF_users_failed  DEFAULT 0,
     created_at      DATETIME2     NOT NULL CONSTRAINT DF_users_created DEFAULT SYSDATETIME(),
     is_deleted      BIT           NOT NULL CONSTRAINT DF_users_deleted DEFAULT 0,
-    identity_number VARCHAR(12)   NOT NULL,
     CONSTRAINT FK_users_role FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 CREATE UNIQUE INDEX UX_users_username ON users(username) WHERE is_deleted = 0;
@@ -71,6 +70,7 @@ CREATE TABLE members (
     user_id     BIGINT        NOT NULL,
     member_code VARCHAR(20)   NOT NULL,
     phone       VARCHAR(15)   NULL,
+    identity_number VARCHAR(12)   NOT NULL,
     address     NVARCHAR(255) NULL,
     card_expiry DATE          NOT NULL,
     is_deleted  BIT           NOT NULL CONSTRAINT DF_members_deleted DEFAULT 0,

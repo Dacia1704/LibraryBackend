@@ -1,16 +1,23 @@
 package com.example.library.service.impl;
 
+import com.example.library.common.PageResponse;
 import com.example.library.dto.category_author_publisher.request.AuthorRequest;
 import com.example.library.dto.category_author_publisher.response.AuthorResponse;
 import com.example.library.entity.Author;
 import com.example.library.mapper.AuthorMapper;
 import com.example.library.repository.AuthorRepository;
+import com.example.library.repository.specification.AuthorSpecification;
 import com.example.library.service.AuthorService;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
 import java.util.List;
@@ -77,6 +84,39 @@ public class AuthorServiceImpl implements AuthorService {
                 .toList();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<AuthorResponse> getAuthorsPagination(
+            String keyword,
+            int page,
+            int size
+    ) {
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "id")
+        );
+
+        Specification<Author> specification = Specification
+                .where(AuthorSpecification.isNotDeleted())
+                .and(AuthorSpecification.hasKeyword(keyword));
+
+        Page<Author> authorPage = authorRepository.findAll(specification, pageable);
+
+        List<AuthorResponse> content = authorPage.getContent()
+                .stream()
+                .map(authorMapper::toAuthorResponse)
+                .toList();
+
+        return PageResponse.<AuthorResponse>builder()
+                .data(content)
+                .currentPage(authorPage.getNumber())
+                .pageSize(authorPage.getSize())
+                .totalElements(authorPage.getTotalElements())
+                .totalPages(authorPage.getTotalPages())
+                .build();
+    }
     private String removeAccent(String value) {
 
         if (value == null) {

@@ -35,9 +35,6 @@ public class User {
     @Column(nullable = false, length = 100)
     private String email;
 
-    @Column(name = "identity_number", nullable = false, length = 12)
-    private String identityNumber;
-
     @Column(columnDefinition = "VARCHAR(MAX)")
     private String avatar;
 

@@ -1,16 +1,22 @@
 package com.example.library.service;
 
 
+import com.example.library.common.PageResponse;
 import com.example.library.dto.book.request.FinePaymentRequest;
 import com.example.library.dto.book.response.FinePaymentResponse;
 
-import java.util.List;
-
 public interface FinePaymentService {
 
-    List<FinePaymentResponse> getAll();
+    PageResponse<FinePaymentResponse> getAll(
+            Long memberId,
+            int page,
+            int size
+    );
 
-    List<FinePaymentResponse> getMe();
+    PageResponse<FinePaymentResponse> getMe(
+            int page,
+            int size
+    );
 
     FinePaymentResponse create(FinePaymentRequest request);
 }

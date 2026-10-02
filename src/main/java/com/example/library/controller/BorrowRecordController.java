@@ -1,6 +1,8 @@
 package com.example.library.controller;
 
 import com.example.library.common.ApiResponse;
+import com.example.library.common.PageResponse;
+import com.example.library.dto.book.request.BorrowRecordFilter;
 import com.example.library.dto.book.request.BorrowRecordRequest;
 import com.example.library.dto.book.response.BorrowRecordResponse;
 import com.example.library.service.BorrowRecordService;
@@ -65,5 +67,23 @@ public class BorrowRecordController {
         return ApiResponse.success(
                 borrowRecordService.getBorrowRecords()
         );
+    }
+
+    @GetMapping("/pagination")
+    public ApiResponse<PageResponse<BorrowRecordResponse>> getPagination(
+            @ModelAttribute BorrowRecordFilter filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        return ApiResponse.<PageResponse<BorrowRecordResponse>>builder()
+                .data(
+                        borrowRecordService.getBorrowRecordsPagination(
+                                filter,
+                                page,
+                                size
+                        )
+                )
+                .build();
     }
 }

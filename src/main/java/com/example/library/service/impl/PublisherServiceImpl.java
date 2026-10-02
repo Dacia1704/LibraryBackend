@@ -1,14 +1,21 @@
 package com.example.library.service.impl;
 
+import com.example.library.common.PageResponse;
 import com.example.library.dto.category_author_publisher.request.PublisherRequest;
 import com.example.library.dto.category_author_publisher.response.PublisherResponse;
 import com.example.library.entity.Publisher;
 import com.example.library.mapper.PublisherMapper;
 import com.example.library.repository.PublisherRepository;
+import com.example.library.repository.specification.PublisherSpecification;
 import com.example.library.service.PublisherService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,12 +76,45 @@ public class PublisherServiceImpl implements PublisherService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PublisherResponse> getPublishers() {
+    public PageResponse<PublisherResponse> getPublishers(
+            String keyword,
+            int page,
+            int size
+    ) {
 
-        return publisherRepository.findAllByIsDeletedFalse()
-                .stream()
-                .map(publisherMapper::toPublisherResponse)
-                .toList();
+        if (page < 0) {
+            page = 0;
+        }
+
+        if (size <= 0) {
+            size = 10;
+        }
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "id")
+        );
+
+        Specification<Publisher> specification =
+                PublisherSpecification.filter(keyword);
+
+        Page<Publisher> publisherPage =
+                publisherRepository.findAll(specification, pageable);
+
+        List<PublisherResponse> content =
+                publisherPage.getContent()
+                        .stream()
+                        .map(publisherMapper::toPublisherResponse)
+                        .toList();
+
+        return PageResponse.<PublisherResponse>builder()
+                .data(content)
+                .currentPage(publisherPage.getNumber())
+                .pageSize(publisherPage.getSize())
+                .totalElements(publisherPage.getTotalElements())
+                .totalPages(publisherPage.getTotalPages())
+                .build();
     }
 
     private String removeAccent(String value) {

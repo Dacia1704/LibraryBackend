@@ -1,6 +1,8 @@
 package com.example.library.service;
 
 
+import com.example.library.common.PageResponse;
+import com.example.library.dto.book.request.BorrowRecordFilter;
 import com.example.library.dto.book.request.BorrowRecordRequest;
 import com.example.library.dto.book.response.BorrowRecordResponse;
 import com.example.library.dto.category_author_publisher.request.PublisherRequest;
@@ -20,5 +22,9 @@ public interface BorrowRecordService {
 
     List<BorrowRecordResponse> getBorrowRecords();
 
-
+    PageResponse<BorrowRecordResponse> getBorrowRecordsPagination(
+            BorrowRecordFilter filter,
+            int page,
+            int size
+    );
 }

@@ -50,6 +50,6 @@ JOIN permissions p ON p.code IN
 WHERE r.name = 'MEMBER';
 
 -- ---------- USERS DEMO (mat khau: Library@123) ----------
-INSERT INTO users (username, password_hash, full_name, no_accent, email, role_id, identity_number)
-SELECT 'admin', '$2a$10$oBtQmWU9wIIEqhe8n5FS1.NcukW5XEGg.T/51Sgmap.RpTZozW3va', N'Quản trị viên', 'quan tri vien', 'admin@library.local', r.id, '111111111111'
+INSERT INTO users (username, password_hash, full_name, no_accent, email, role_id)
+SELECT 'admin', '$2a$10$oBtQmWU9wIIEqhe8n5FS1.NcukW5XEGg.T/51Sgmap.RpTZozW3va', N'Quản trị viên', 'quan tri vien', 'admin@library.local', r.id
 FROM roles r WHERE r.name = 'ADMIN';

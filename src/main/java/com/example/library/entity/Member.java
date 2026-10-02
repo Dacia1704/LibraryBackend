@@ -33,6 +33,9 @@ public class Member {
     @Column(length = 255)
     private String address;
 
+    @Column(name = "identity_number", nullable = false, length = 12)
+    private String identityNumber;
+
     @Column(name = "card_expiry", nullable = false)
     private LocalDate cardExpiry;
 

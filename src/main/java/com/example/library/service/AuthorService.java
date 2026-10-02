@@ -1,6 +1,7 @@
 package com.example.library.service;
 
 
+import com.example.library.common.PageResponse;
 import com.example.library.dto.category_author_publisher.request.AuthorRequest;
 import com.example.library.dto.category_author_publisher.response.AuthorResponse;
 
@@ -15,4 +16,6 @@ public interface AuthorService {
     AuthorResponse deleteAuthor(String id);
 
     List<AuthorResponse> getAuthors();
+
+    PageResponse<AuthorResponse> getAuthorsPagination(String keyword, int page, int size);
 }

@@ -1,5 +1,7 @@
 package com.example.library.service;
 
+import com.example.library.common.PageResponse;
+import com.example.library.dto.user.request.UserFilter;
 import com.example.library.dto.user.request.UserRequest;
 import com.example.library.dto.user.response.UserResponse;
 
@@ -15,7 +17,11 @@ public interface UserService {
 
     UserResponse getUser(String id);
 
-    List<UserResponse> getUsers();
+    PageResponse<UserResponse> getUsers(
+            UserFilter filter,
+            int page,
+            int size
+    );
 
     UserResponse getUserDeleted(String id);
 }

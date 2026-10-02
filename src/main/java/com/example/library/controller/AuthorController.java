@@ -1,6 +1,7 @@
 package com.example.library.controller;
 
 import com.example.library.common.ApiResponse;
+import com.example.library.common.PageResponse;
 import com.example.library.dto.category_author_publisher.request.AuthorRequest;
 import com.example.library.dto.category_author_publisher.response.AuthorResponse;
 import com.example.library.service.AuthorService;
@@ -48,10 +49,28 @@ public class AuthorController {
         );
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ApiResponse<List<AuthorResponse>> getAuthors() {
         return ApiResponse.success(
                 authorService.getAuthors()
         );
+    }
+
+    @GetMapping("/")
+    public ApiResponse<PageResponse<AuthorResponse>> getAuthorsPagination(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        return ApiResponse.<PageResponse<AuthorResponse>>builder()
+                .data(
+                        authorService.getAuthorsPagination(
+                                keyword,
+                                page,
+                                size
+                        )
+                )
+                .build();
     }
 }
