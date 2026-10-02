@@ -15,7 +15,9 @@ public interface PublisherService {
 
     PublisherResponse deletePublisher(String id);
 
-    PageResponse<PublisherResponse> getPublishers(
+    List<PublisherResponse> getPublishers(String keyword);
+
+    PageResponse<PublisherResponse> getPublishersPagination(
             String keyword,
             int page,
             int size

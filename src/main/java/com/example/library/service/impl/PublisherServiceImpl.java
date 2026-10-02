@@ -11,6 +11,8 @@ import com.example.library.service.PublisherService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,7 @@ public class PublisherServiceImpl implements PublisherService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "publishers", allEntries = true)
     public PublisherResponse createPublisher(PublisherRequest request) {
 
         Publisher publisher = publisherMapper.toPublisher(request);
@@ -46,6 +49,7 @@ public class PublisherServiceImpl implements PublisherService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "publishers", allEntries = true)
     public PublisherResponse updatePublisher(Long id, PublisherRequest request) {
 
         Publisher publisher = publisherRepository.findById(id)
@@ -62,6 +66,7 @@ public class PublisherServiceImpl implements PublisherService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "publishers", allEntries = true)
     public PublisherResponse deletePublisher(String id) {
 
         Publisher publisher = publisherRepository.findById(Long.valueOf(id))
@@ -75,8 +80,29 @@ public class PublisherServiceImpl implements PublisherService {
     }
 
     @Override
+    @Transactional
+    @Cacheable(value = "publishers", key = "'all'")
+    public List<PublisherResponse> getPublishers(String keyword) {
+
+        Specification<Publisher> specification =
+                PublisherSpecification.filter(keyword);
+
+        List<Publisher> publisherPage =
+                publisherRepository.findAll(specification);
+
+        return publisherPage.stream()
+                        .map(publisherMapper::toPublisherResponse)
+                        .toList();
+    }
+
+    @Override
     @Transactional(readOnly = true)
-    public PageResponse<PublisherResponse> getPublishers(
+    @Cacheable(
+            value = "publishers",
+            key = "'page:' + #page + ':size:' + #size",
+            condition = "#keyword == null || #keyword.trim().isEmpty()"
+    )
+    public PageResponse<PublisherResponse> getPublishersPagination(
             String keyword,
             int page,
             int size

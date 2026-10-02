@@ -36,6 +36,20 @@ public class PublisherController {
         return ApiResponse.success(publisherService.deletePublisher(id));
     }
 
+    @GetMapping("/all")
+    public ApiResponse<List<PublisherResponse>> getPublishers(
+            @RequestParam(required = false) String keyword
+    ) {
+
+        return ApiResponse.<List<PublisherResponse>>builder()
+                .data(
+                        publisherService.getPublishers(
+                                keyword
+                        )
+                )
+                .build();
+    }
+
     @GetMapping
     public ApiResponse<PageResponse<PublisherResponse>> getPublishers(
             @RequestParam(required = false) String keyword,
@@ -45,7 +59,7 @@ public class PublisherController {
 
         return ApiResponse.<PageResponse<PublisherResponse>>builder()
                 .data(
-                        publisherService.getPublishers(
+                        publisherService.getPublishersPagination(
                                 keyword,
                                 page,
                                 size

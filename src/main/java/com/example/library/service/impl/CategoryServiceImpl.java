@@ -10,6 +10,8 @@ import com.example.library.utils.TextUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "categories", allEntries = true)
     public CategoryResponse createCategory(CategoryRequest request) {
 
         Category category = categoryMapper.toCategory(request);
@@ -39,6 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "categories", allEntries = true)
     public CategoryResponse updateCategory(String id, CategoryRequest request) {
 
         Category category = categoryRepository
@@ -57,6 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "categories", allEntries = true)
     public CategoryResponse deleteCategory(String id) {
 
         Category category = categoryRepository
@@ -74,6 +79,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "categories", key = "'all'")
     public List<CategoryResponse> getCategories() {
 
         return categoryRepository.findAllByIsDeletedFalse()

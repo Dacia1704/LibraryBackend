@@ -11,6 +11,8 @@ import com.example.library.service.AuthorService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +34,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "authors", allEntries = true)
     public AuthorResponse createAuthor(AuthorRequest request) {
 
         Author author = authorMapper.toAuthor(request);
@@ -46,6 +49,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "authors", allEntries = true)
     public AuthorResponse updateAuthor(Long id, AuthorRequest request) {
 
         Author author = authorRepository.findById(id)
@@ -62,6 +66,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "authors", allEntries = true)
     public AuthorResponse deleteAuthor(String id) {
 
         Author author = authorRepository.findById(Long.valueOf(id))
@@ -76,6 +81,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     @Transactional
+    @Cacheable(value = "authors", key = "'all'")
     public List<AuthorResponse> getAuthors() {
 
         return authorRepository.findAllByIsDeletedFalse()
@@ -86,6 +92,11 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = "authors",
+            key = "'page:' + #page + ':size:' + #size",
+            condition = "#keyword == null || #keyword.trim().isEmpty()"
+    )
     public PageResponse<AuthorResponse> getAuthorsPagination(
             String keyword,
             int page,
