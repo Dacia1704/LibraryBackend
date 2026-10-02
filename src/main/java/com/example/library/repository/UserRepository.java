@@ -1,5 +1,6 @@
 package com.example.library.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.example.library.entity.User;
@@ -15,4 +16,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsernameAndIsDeletedFalse(String username);
 
     boolean existsByEmailAndIsDeletedFalse(String email);
+
+    Optional<User> findByUsername(String username);
+
+    Optional<User> findByEmail(String email);
+
+    List<User> findAllByIsDeletedFalse();
+
+    Optional<User> findByIdAndIsDeletedFalse(Long id);
 }

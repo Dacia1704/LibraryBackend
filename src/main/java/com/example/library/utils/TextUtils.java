@@ -2,9 +2,9 @@ package com.example.library.utils;
 
 import java.text.Normalizer;
 
-public final class TextUtil {
+public final class TextUtils {
 
-    private TextUtil() {
+    private TextUtils() {
     }
 
     public static String removeAccent(String text) {

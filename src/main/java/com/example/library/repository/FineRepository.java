@@ -1,0 +1,26 @@
+package com.example.library.repository;
+
+import com.example.library.entity.Fine;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface FineRepository extends JpaRepository<Fine, Long> {
+
+    List<Fine> findAllByIsDeletedFalse();
+
+    @Query("""
+        SELECT f
+        FROM Fine f
+        JOIN f.borrowRecord br
+        JOIN br.member m
+        JOIN m.user u
+        WHERE u.id = :userId
+          AND f.isDeleted = false
+    """)
+    List<Fine> findAllByUserId(@Param("userId") Long userId);
+}

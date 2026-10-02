@@ -6,14 +6,13 @@ import com.example.library.entity.Category;
 import com.example.library.mapper.CategoryMapper;
 import com.example.library.repository.CategoryRepository;
 import com.example.library.service.CategoryService;
-import com.example.library.utils.TextUtil;
+import com.example.library.utils.TextUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.Normalizer;
 import java.util.List;
 
 @Service
@@ -30,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category category = categoryMapper.toCategory(request);
 
-        category.setNoAccent(TextUtil.removeAccent(request.getName()));
+        category.setNoAccent(TextUtils.removeAccent(request.getName()));
         category.setIsDeleted(false);
 
         categoryRepository.save(category);
@@ -49,7 +48,7 @@ public class CategoryServiceImpl implements CategoryService {
                 );
 
         category.setName(request.getName());
-        category.setNoAccent(TextUtil.removeAccent(request.getName()));
+        category.setNoAccent(TextUtils.removeAccent(request.getName()));
 
         categoryRepository.save(category);
 

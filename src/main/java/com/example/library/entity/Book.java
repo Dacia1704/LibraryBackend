@@ -14,7 +14,6 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class Book {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,7 +24,7 @@ public class Book {
     @Column(name = "no_accent", nullable = false, length = 255)
     private String noAccent;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false,unique = true, length = 20)
     private String isbn;
 
     @Column(name = "publish_year")

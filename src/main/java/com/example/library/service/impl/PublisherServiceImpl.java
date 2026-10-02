@@ -1,0 +1,93 @@
+package com.example.library.service.impl;
+
+import com.example.library.dto.category_author_publisher.request.PublisherRequest;
+import com.example.library.dto.category_author_publisher.response.PublisherResponse;
+import com.example.library.entity.Publisher;
+import com.example.library.mapper.PublisherMapper;
+import com.example.library.repository.PublisherRepository;
+import com.example.library.service.PublisherService;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.text.Normalizer;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class PublisherServiceImpl implements PublisherService {
+
+    PublisherRepository publisherRepository;
+    PublisherMapper publisherMapper;
+
+    @Override
+    @Transactional
+    public PublisherResponse createPublisher(PublisherRequest request) {
+
+        Publisher publisher = publisherMapper.toPublisher(request);
+
+        publisher.setNoAccent(removeAccent(request.getName()));
+        publisher.setIsDeleted(false);
+
+        publisherRepository.save(publisher);
+
+        return publisherMapper.toPublisherResponse(publisher);
+    }
+
+    @Override
+    @Transactional
+    public PublisherResponse updatePublisher(Long id, PublisherRequest request) {
+
+        Publisher publisher = publisherRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Publisher không tồn tại"));
+
+        publisher.setName(request.getName());
+        publisher.setNoAccent(removeAccent(request.getName()));
+        publisher.setAddress(request.getAddress());
+
+        publisherRepository.save(publisher);
+
+        return publisherMapper.toPublisherResponse(publisher);
+    }
+
+    @Override
+    @Transactional
+    public PublisherResponse deletePublisher(String id) {
+
+        Publisher publisher = publisherRepository.findById(Long.valueOf(id))
+                .orElseThrow(() -> new RuntimeException("Publisher không tồn tại"));
+
+        publisher.setIsDeleted(true);
+
+        publisherRepository.save(publisher);
+
+        return publisherMapper.toPublisherResponse(publisher);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PublisherResponse> getPublishers() {
+
+        return publisherRepository.findAllByIsDeletedFalse()
+                .stream()
+                .map(publisherMapper::toPublisherResponse)
+                .toList();
+    }
+
+    private String removeAccent(String value) {
+
+        if (value == null) {
+            return null;
+        }
+
+        return Normalizer.normalize(value, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .replace('đ', 'd')
+                .replace('Đ', 'D')
+                .toLowerCase()
+                .trim();
+    }
+}

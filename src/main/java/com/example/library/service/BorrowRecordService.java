@@ -1,0 +1,24 @@
+package com.example.library.service;
+
+
+import com.example.library.dto.book.request.BorrowRecordRequest;
+import com.example.library.dto.book.response.BorrowRecordResponse;
+import com.example.library.dto.category_author_publisher.request.PublisherRequest;
+import com.example.library.dto.category_author_publisher.response.PublisherResponse;
+
+import java.util.List;
+
+public interface BorrowRecordService {
+
+    BorrowRecordResponse createBorrowRecord(BorrowRecordRequest request);
+
+    BorrowRecordResponse updateBorrowRecord(Long id, BorrowRecordRequest request);
+
+    BorrowRecordResponse deleteBorrowRecord(String id);
+
+    BorrowRecordResponse getBorrowRecord(String id);
+
+    List<BorrowRecordResponse> getBorrowRecords();
+
+
+}

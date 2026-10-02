@@ -10,4 +10,6 @@ import java.util.List;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     List<Category> findAllByIsDeletedFalse();
+
+    List<Category> findAllByIdInAndIsDeletedFalse(List<Long> ids);
 }
