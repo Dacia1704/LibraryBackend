@@ -28,10 +28,16 @@ public class PublisherController {
         return ApiResponse.success(publisherService.createPublisher(request));
     }
 
+    @PutMapping("/{id}/restore")
+    @PreAuthorize("hasAuthority('PUBLISHER_MANAGE')")
+    public ApiResponse<PublisherResponse> restorePublisher(@PathVariable Long id, @RequestBody @Valid PublisherRequest request) {
+        return ApiResponse.success(publisherService.updatePublisher(id, request, true));
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('PUBLISHER_MANAGE')")
     public ApiResponse<PublisherResponse> updatePublisher(@PathVariable Long id, @RequestBody @Valid PublisherRequest request) {
-        return ApiResponse.success(publisherService.updatePublisher(id, request));
+        return ApiResponse.success(publisherService.updatePublisher(id, request, false));
     }
 
     @DeleteMapping("/{id}")

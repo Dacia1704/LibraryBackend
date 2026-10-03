@@ -12,9 +12,11 @@ import com.example.library.mapper.BorrowRecordMapper;
 import com.example.library.repository.*;
 import com.example.library.repository.specification.BorrowRecordSpecification;
 import com.example.library.service.BorrowRecordService;
+import com.example.library.service.FineService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,26 +25,42 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class BorrowRecordServiceImpl
         implements BorrowRecordService {
 
-    BorrowRecordRepository borrowRecordRepository;
+     final BorrowRecordRepository borrowRecordRepository;
 
-    BorrowDetailRepository borrowDetailRepository;
+     final BorrowDetailRepository borrowDetailRepository;
 
-    MemberRepository memberRepository;
+     final MemberRepository memberRepository;
 
-    UserRepository userRepository;
+     final UserRepository userRepository;
 
-    BookRepository bookRepository;
+     final BookRepository bookRepository;
 
-    BorrowRecordMapper borrowRecordMapper;
+     final BorrowRecordMapper borrowRecordMapper;
+
+     final SettingRepository settingRepository;
+
+     final FineService fineService;
+
+    @Value("${app.setting-key.max-borrow-days}")
+    String max_borrow_days;
+
+    @Value("${app.setting-key.max-book-borrow}")
+    String max_book_borrow;
+
+    @Value("${app.setting-key.max-fine-before-block}")
+    String max_fine_before_block;
 
     @Override
     @Transactional
@@ -59,12 +77,36 @@ public class BorrowRecordServiceImpl
                 userRepository.findById(Long.valueOf(request.getLibrarianId()))
                         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
+        List<String> settingKeys = List.of(
+                max_borrow_days,
+                max_book_borrow,
+                max_fine_before_block
+        );
+
+        Map<String, Long> borrowSetting = settingRepository
+                .findAllBySettingKeyInAndIsDeletedFalse(settingKeys)
+                .stream()
+                .collect(Collectors.toMap(
+                        Setting::getSettingKey,
+                        setting -> Long.parseLong(setting.getSettingValue())
+                ));
+        if(request.getDayBorrow() > borrowSetting.get(max_borrow_days)) {
+            throw new AppException(ErrorCode.CANT_BORROW_OVER_DAY_IN_SETTING, String.format("Không thể mượn quá số ngày quy định. Số ngày quy định hiện tại là %s", borrowSetting.get(max_borrow_days)));
+        }
+        if(request.getBookIds().size() > borrowSetting.get(max_book_borrow)) {
+            throw new AppException(ErrorCode.CANT_BORROW_OVER_DAY_IN_SETTING, String.format("Không thể mượn quá số sách quy định. Số ngày quy định hiện tại là %s", borrowSetting.get(max_book_borrow)));
+        }
+        BigDecimal totleFine = fineService.getTotalByMember(Long.parseLong(request.getMemberId()));
+        if(fineService.getTotalByMember(Long.parseLong(request.getMemberId())).compareTo(new BigDecimal(borrowSetting.get(max_book_borrow))) > 0) {
+            throw new AppException(ErrorCode.CANT_BORROW, String.format("Không thể mượn sách do hiện tại bạn đang nơ tiền phạt quá mức quy định: %s/%s",totleFine, borrowSetting.get(max_fine_before_block)));
+        }
+
         // 3. Tạo BorrowRecord
         BorrowRecord borrowRecord = BorrowRecord.builder()
                         .member(member)
                         .librarian(librarian)
                         .borrowDate(request.getBorrowDate())
-                        .dueDate(request.getDueDate())
+                        .dueDate(request.getBorrowDate().plusDays(request.getDayBorrow()))
                         .status(request.getStatus() != null ? request.getStatus() : BorrowStatus.BORROWING)
                         .note(request.getNote())
                         .build();
@@ -132,7 +174,7 @@ public class BorrowRecordServiceImpl
         borrowRecord.setMember(member);
         borrowRecord.setLibrarian(librarian);
         borrowRecord.setBorrowDate(request.getBorrowDate());
-        borrowRecord.setDueDate(request.getDueDate());
+        borrowRecord.setDueDate(request.getBorrowDate().plusDays(request.getDayBorrow()));
         borrowRecord.setStatus(request.getStatus());
         borrowRecord.setNote(request.getNote());
 

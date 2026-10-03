@@ -41,3 +41,14 @@ app:
     secret: "3pHoX9WySmdbsP4vnkuM4o+Lrd/n5ejYcDYOBufMGXEVLABgSWU/TFAwYBanP6VywMIb6B/Px4KIZ/4xXmflyg=="
     access-expiration-ms: 1800000      # 30 phút
     refresh-expiration-ms: 604800000   # 7 ngày
+  setting-key:
+    fine-overdue-per-day: "FINE_OVERDUE_PER_DAY"
+    fine-lost-rate: "FINE_LOST_RATE"
+    fine-damaged-light-rate: "FINE_DAMAGED_LIGHT_RATE"
+    fine-damaged-heavy-repairable-rate: "FINE_DAMAGED_HEAVY_REPAIRABLE_RATE"
+    fine-damaged-heavy-irreparable-rate: "FINE_DAMAGED_HEAVY_IRREPARABLE_RATE"
+    max-borrow-days: "MAX_BORROW_DAYS"
+    max-book-borrow: "MAX_BOOKS_BORROW"
+    max-fine-before-block: "MAX_FINE_BEFORE_BLOCK"
+    due-reminder-days: "DUE_REMINDER_DAYS"
+    member-payment-month: "MEMBER_PAYMENT_MONTH"

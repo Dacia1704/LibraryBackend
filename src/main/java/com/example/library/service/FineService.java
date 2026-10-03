@@ -4,6 +4,8 @@ package com.example.library.service;
 import com.example.library.common.PageResponse;
 import com.example.library.dto.book.response.FineResponse;
 
+import java.math.BigDecimal;
+
 public interface FineService {
 
     PageResponse<FineResponse> getAll(
@@ -16,4 +18,6 @@ public interface FineService {
             int page,
             int size
     );
+
+    BigDecimal getTotalByMember(Long id);
 }

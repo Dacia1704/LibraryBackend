@@ -51,6 +51,7 @@ public class BookServiceImpl implements BookService {
 
         Book book = bookMapper.toBook(request);
         book.setNoAccent(TextUtils.removeAccent(book.getTitle()));
+        book.setPrice(request.getPrice());
 
         if(request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
             List<Category> categories =  categoryRepository.findAllByIdInAndIsDeletedFalse(request.getCategoryIds().stream().toList());
@@ -83,7 +84,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookResponse updateBook(Long id, BookRequest request) {
+    public BookResponse updateBook(Long id, BookRequest request, Boolean isRestore) {
         // 1. Tìm Book
         Book book = bookRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
 
@@ -100,6 +101,7 @@ public class BookServiceImpl implements BookService {
         // 3. Cập nhật thông tin cơ bản
         bookMapper.updateBook(book, request);
         book.setNoAccent(TextUtils.removeAccent(request.getTitle()));
+        book.setPrice(request.getPrice());
 
         if(request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
             List<Category> categories =  categoryRepository.findAllByIdInAndIsDeletedFalse(request.getCategoryIds().stream().toList());
@@ -126,6 +128,8 @@ public class BookServiceImpl implements BookService {
                 throw new AppException(ErrorCode.FILE_UPLOAD_FAILED);
             }
         }
+
+        if(isRestore) book.setIsDeleted(false);
 
         // 8. Save
         bookRepository.save(book);
@@ -172,9 +176,7 @@ public class BookServiceImpl implements BookService {
     public BookResponse getBookDeleted(String id) {
         Book book = bookRepository
                 .findById(Long.valueOf(id))
-                .orElseThrow(() ->
-                        new AppException(ErrorCode.BOOK_NOT_FOUND)
-                );
+                .orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
         return bookMapper.toBookResponse(book);
     }
 
@@ -206,4 +208,6 @@ public class BookServiceImpl implements BookService {
                 .totalPages(bookPage.getTotalPages())
                 .build();
     }
+
+
 }

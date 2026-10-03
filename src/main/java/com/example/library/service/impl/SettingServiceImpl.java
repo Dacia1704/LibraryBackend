@@ -3,6 +3,8 @@ package com.example.library.service.impl;
 import com.example.library.dto.book.request.SettingRequest;
 import com.example.library.dto.book.response.SettingResponse;
 import com.example.library.entity.Setting;
+import com.example.library.exception.AppException;
+import com.example.library.exception.ErrorCode;
 import com.example.library.mapper.SettingMapper;
 import com.example.library.repository.SettingRepository;
 import com.example.library.service.SettingService;
@@ -30,9 +32,7 @@ public class SettingServiceImpl implements SettingService {
         if (settingRepository.existsBySettingKeyAndIsDeletedFalse(
                 request.getSettingKey()
         )) {
-            throw new IllegalArgumentException(
-                    "Setting key already exists"
-            );
+            throw new AppException(ErrorCode.SETTING_NOT_FOUND);
         }
 
         Setting setting = settingMapper.toSetting(request);
@@ -54,21 +54,7 @@ public class SettingServiceImpl implements SettingService {
 
         Setting setting = settingRepository
                 .findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Setting not found"
-                        ));
-
-        if (settingRepository
-                .existsBySettingKeyAndIdNotAndIsDeletedFalse(
-                        request.getSettingKey(),
-                        id
-                )) {
-
-            throw new IllegalArgumentException(
-                    "Setting key already exists"
-            );
-        }
+                .orElseThrow(() -> new AppException(ErrorCode.SETTING_NOT_FOUND));
 
         settingMapper.updateSetting(setting, request);
 
@@ -85,10 +71,7 @@ public class SettingServiceImpl implements SettingService {
 
         Setting setting = settingRepository
                 .findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Setting not found"
-                        ));
+                .orElseThrow(() -> new AppException(ErrorCode.SETTING_NOT_FOUND));
 
         setting.setIsDeleted(true);
 
@@ -106,9 +89,7 @@ public class SettingServiceImpl implements SettingService {
         Setting setting = settingRepository
                 .findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                "Setting not found"
-                        ));
+                        new AppException(ErrorCode.SETTING_NOT_FOUND));
 
         return settingMapper.toResponse(setting);
     }
@@ -122,4 +103,11 @@ public class SettingServiceImpl implements SettingService {
                 .map(settingMapper::toResponse)
                 .toList();
     }
+
+    @Override
+    public Setting getSetiingById(Long id) {
+        return settingRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new AppException(ErrorCode.SETTING_NOT_FOUND));
+    }
+
 }

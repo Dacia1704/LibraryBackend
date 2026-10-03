@@ -32,25 +32,30 @@ public class AuthorController {
         );
     }
 
+    @PutMapping("/{id}/restore")
+    @PreAuthorize("hasAuthority('AUTHOR_MANAGE')")
+    public ApiResponse<AuthorResponse> restoreAuthor(
+            @PathVariable Long id,
+            @RequestBody @Valid AuthorRequest request
+    ) {
+        return ApiResponse.success(authorService.updateAuthor(id, request, true));
+    }
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('AUTHOR_MANAGE')")
     public ApiResponse<AuthorResponse> updateAuthor(
             @PathVariable Long id,
             @RequestBody @Valid AuthorRequest request
     ) {
-        return ApiResponse.success(
-                authorService.updateAuthor(id, request)
-        );
+        return ApiResponse.success(authorService.updateAuthor(id, request, false));
     }
+
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('AUTHOR_MANAGE')")
     public ApiResponse<AuthorResponse> deleteAuthor(
             @PathVariable String id
     ) {
-        return ApiResponse.success(
-                authorService.deleteAuthor(id)
-        );
+        return ApiResponse.success(authorService.deleteAuthor(id));
     }
 
     @GetMapping("/all")

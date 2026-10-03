@@ -10,7 +10,7 @@ public interface CategoryService {
 
     CategoryResponse createCategory(CategoryRequest request);
 
-    CategoryResponse updateCategory(String id,CategoryRequest request);
+    CategoryResponse updateCategory(String id,CategoryRequest request, Boolean isRestore);
 
     CategoryResponse deleteCategory(String id);
 

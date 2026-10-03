@@ -16,6 +16,7 @@ CREATE TABLE fines (
     note             NVARCHAR(255) NULL,
     created_at       DATETIME2     NOT NULL CONSTRAINT DF_fines_created DEFAULT SYSDATETIME(),
     is_deleted       BIT           NOT NULL CONSTRAINT DF_fines_deleted DEFAULT 0,
+    attachment       VARCHAR(MAX)  NULL,
     CONSTRAINT FK_fines_borrow FOREIGN KEY (borrow_id)        REFERENCES borrow_records(id),
     CONSTRAINT FK_fines_detail FOREIGN KEY (borrow_detail_id) REFERENCES borrow_details(id),
     CONSTRAINT CK_fines_amount CHECK (amount > 0),
@@ -53,8 +54,12 @@ CREATE TABLE settings (
 CREATE UNIQUE INDEX UX_settings_key ON settings(setting_key) WHERE is_deleted = 0;
 
 INSERT INTO settings (setting_key, setting_value, description) VALUES
- ('FINE_PER_DAY',          N'5000',  N'Tien phat moi ngay tra tre cho moi cuon sach (VND)'),
- ('MAX_BORROW_DAYS',       N'14',    N'So ngay muon toi da cho moi cuon sach'),
- ('MAX_BOOKS_BORROW',      N'5',     N'So sach toi da duoc muon'),
- ('MAX_FINE_BEFORE_BLOCK', N'50000', N'Tong tien phat con no toi da; vuot qua se khong duoc muon them (VND)'),
- ('DUE_REMINDER_DAYS',     N'1',     N'So ngay truoc han tra de gui thong bao nhac');
+ ('FINE_OVERDUE_PER_DAY',          N'5000',  N'Tien phat moi ngay tra tre cho moi cuon sach (VND)'),
+ ('FINE_LOST_RATE',                N'2',     N'Trọng số phạt cho cho sách làm mất'),
+ ('FINE_DAMAGED_LIGHT_RATE',       N'0.5',   N'Trọng số phạt cho làm sách hư nhẹ'),
+ ('FINE_DAMAGED_HEAVY_REPAIRABLE_RATE',       N'1',     N'Trọng số phạt cho làm sách hư nặng có thể phục hồi'),
+ ('FINE_DAMAGED_HEAVY_IRREPARABLE_RATE',       N'1.5',     N'Trọng số phạt cho làm sách hư nặng, ko thể phục hồi'),
+ ('MAX_BORROW_DAYS',               N'14',    N'So ngay muon toi da cho moi cuon sach'),
+ ('MAX_BOOKS_BORROW',              N'5',     N'So sach toi da duoc muon'),
+ ('MAX_FINE_BEFORE_BLOCK',         N'50000', N'Tong tien phat con no toi da; vuot qua se khong duoc muon them (VND)'),
+ ('DUE_REMINDER_DAYS',             N'1',     N'So ngay truoc han tra de gui thong bao nhac');

@@ -4,10 +4,13 @@ import com.example.library.common.PageResponse;
 import com.example.library.dto.category_author_publisher.request.AuthorRequest;
 import com.example.library.dto.category_author_publisher.response.AuthorResponse;
 import com.example.library.entity.Author;
+import com.example.library.exception.AppException;
+import com.example.library.exception.ErrorCode;
 import com.example.library.mapper.AuthorMapper;
 import com.example.library.repository.AuthorRepository;
 import com.example.library.repository.specification.AuthorSpecification;
 import com.example.library.service.AuthorService;
+import com.example.library.utils.TextUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -39,7 +42,7 @@ public class AuthorServiceImpl implements AuthorService {
 
         Author author = authorMapper.toAuthor(request);
 
-        author.setNoAccent(removeAccent(request.getName()));
+        author.setNoAccent(TextUtils.removeAccent(request.getName()));
         author.setIsDeleted(false);
 
         authorRepository.save(author);
@@ -50,14 +53,16 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     @Transactional
     @CacheEvict(value = "authors", allEntries = true)
-    public AuthorResponse updateAuthor(Long id, AuthorRequest request) {
+    public AuthorResponse updateAuthor(Long id, AuthorRequest request, Boolean isRestore) {
 
         Author author = authorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Author không tồn tại"));
+                .orElseThrow(() -> new AppException(ErrorCode.AUTHOR_NOT_FOUND));
 
         author.setName(request.getName());
-        author.setNoAccent(removeAccent(request.getName()));
+        author.setNoAccent(TextUtils.removeAccent(request.getName()));
         author.setBio(request.getBio());
+
+        if(isRestore) author.setIsDeleted(false);
 
         authorRepository.save(author);
 
@@ -70,7 +75,7 @@ public class AuthorServiceImpl implements AuthorService {
     public AuthorResponse deleteAuthor(String id) {
 
         Author author = authorRepository.findById(Long.valueOf(id))
-                .orElseThrow(() -> new RuntimeException("Author không tồn tại"));
+                .orElseThrow(() -> new AppException(ErrorCode.AUTHOR_NOT_FOUND));
 
         author.setIsDeleted(true);
 
@@ -127,18 +132,5 @@ public class AuthorServiceImpl implements AuthorService {
                 .totalElements(authorPage.getTotalElements())
                 .totalPages(authorPage.getTotalPages())
                 .build();
-    }
-    private String removeAccent(String value) {
-
-        if (value == null) {
-            return null;
-        }
-
-        return Normalizer.normalize(value, Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "")
-                .replace('đ', 'd')
-                .replace('Đ', 'D')
-                .toLowerCase()
-                .trim();
     }
 }

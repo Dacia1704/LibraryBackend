@@ -41,6 +41,9 @@ public class Fine {
     @Column(length = 255)
     private String note;
 
+    @Column(columnDefinition = "VARCHAR(MAX)")
+    private String attachment;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

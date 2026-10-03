@@ -31,6 +31,17 @@ public class CategoryController {
         );
     }
 
+    @PutMapping("/{id}/restore")
+    @PreAuthorize("hasAuthority('CATEGORY_MANAGE')")
+    public ApiResponse<CategoryResponse> restoreCategory(
+            @PathVariable String id,
+            @RequestBody @Valid CategoryRequest request
+    ) {
+        return ApiResponse.success(
+                categoryService.updateCategory(id, request, true)
+        );
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('CATEGORY_MANAGE')")
     public ApiResponse<CategoryResponse> updateCategory(
@@ -38,7 +49,7 @@ public class CategoryController {
             @RequestBody @Valid CategoryRequest request
     ) {
         return ApiResponse.success(
-                categoryService.updateCategory(id, request)
+                categoryService.updateCategory(id, request, false)
         );
     }
 

@@ -11,7 +11,7 @@ public interface PublisherService {
 
     PublisherResponse createPublisher(PublisherRequest request);
 
-    PublisherResponse updatePublisher(Long id, PublisherRequest request);
+    PublisherResponse updatePublisher(Long id, PublisherRequest request, Boolean isRestore);
 
     PublisherResponse deletePublisher(String id);
 

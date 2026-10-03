@@ -3,6 +3,7 @@ package com.example.library.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,6 +30,9 @@ public class Book {
 
     @Column(name = "publish_year")
     private Integer publishYear;
+
+    @Column(name = "price", precision = 15, scale = 2)
+    private BigDecimal price;
 
     @Column(nullable = false)
     @Builder.Default

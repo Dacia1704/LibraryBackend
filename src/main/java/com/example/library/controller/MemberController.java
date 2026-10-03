@@ -1,6 +1,8 @@
 package com.example.library.controller;
 
 import com.example.library.common.ApiResponse;
+import com.example.library.dto.user.request.MemberCreateRequest;
+import com.example.library.dto.user.request.MemberRenewRequest;
 import com.example.library.dto.user.request.MemberRequest;
 import com.example.library.dto.user.response.MemberResponse;
 import com.example.library.service.MemberService;
@@ -11,6 +13,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -24,10 +27,21 @@ public class MemberController {
     @PostMapping
     @PreAuthorize("hasAuthority('MEMBER_WRITE')")
     public ApiResponse<MemberResponse> createMember(
-            @RequestBody @Valid MemberRequest request
+            @RequestBody @Valid MemberCreateRequest request
     ) {
         return ApiResponse.success(
                 memberService.createMember(request)
+        );
+    }
+
+    @PostMapping("/{id}/renew")
+    @PreAuthorize("hasAuthority('MEMBER_WRITE')")
+    public ApiResponse<MemberResponse> renewMember(
+            @PathVariable Long id,
+            @RequestBody @Valid MemberRenewRequest request
+    ) {
+        return ApiResponse.success(
+                memberService.renewMember(id,request)
         );
     }
 
@@ -63,6 +77,12 @@ public class MemberController {
         return ApiResponse.success(
                 memberService.getMember(id)
         );
+    }
+
+    @GetMapping("/fee")
+    @PreAuthorize("hasAuthority('MEMBER_READ')")
+    public ApiResponse<BigDecimal> getFeeMonth() {
+        return ApiResponse.success(memberService.getMemberFeeMonth());
     }
 
     @GetMapping

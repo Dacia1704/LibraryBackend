@@ -4,6 +4,7 @@ import com.example.library.entity.Setting;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,4 +23,6 @@ public interface SettingRepository extends JpaRepository<Setting, Long> {
             String settingKey,
             Long id
     );
+
+    List<Setting> findAllBySettingKeyInAndIsDeletedFalse(Collection<String> settingKeys);
 }

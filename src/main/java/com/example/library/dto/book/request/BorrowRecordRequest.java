@@ -26,7 +26,7 @@ public class BorrowRecordRequest {
     LocalDate borrowDate;
 
     @NotNull
-    LocalDate dueDate;
+    Long dayBorrow;
 
     BorrowStatus status;
 

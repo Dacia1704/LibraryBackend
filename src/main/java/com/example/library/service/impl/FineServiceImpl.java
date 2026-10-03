@@ -4,6 +4,7 @@ import com.example.library.common.PageResponse;
 import com.example.library.dto.book.response.FineResponse;
 import com.example.library.entity.Fine;
 import com.example.library.mapper.FineMapper;
+import com.example.library.repository.FinePaymentRepository;
 import com.example.library.repository.FineRepository;
 import com.example.library.service.FineService;
 import lombok.AccessLevel;
@@ -18,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -27,6 +29,7 @@ public class FineServiceImpl implements FineService {
 
     FineRepository fineRepository;
     FineMapper fineMapper;
+    FinePaymentRepository finePaymentRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -120,5 +123,17 @@ public class FineServiceImpl implements FineService {
                 .totalElements(finePage.getTotalElements())
                 .totalPages(finePage.getTotalPages())
                 .build();
+    }
+
+    @Override
+    public BigDecimal getTotalByMember(Long id) {
+
+        BigDecimal totalFine =
+                fineRepository.getTotalFineByMember(id);
+
+        BigDecimal totalPayment =
+                finePaymentRepository.getTotalPaymentByMember(id);
+
+        return totalFine.subtract(totalPayment);
     }
 }

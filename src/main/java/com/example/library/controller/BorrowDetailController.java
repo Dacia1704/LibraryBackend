@@ -1,8 +1,11 @@
 package com.example.library.controller;
 
 import com.example.library.common.ApiResponse;
+import com.example.library.dto.book.request.ReturnBookRequest;
 import com.example.library.dto.book.response.BorrowDetailResponse;
+import com.example.library.dto.category_author_publisher.request.AuthorRequest;
 import com.example.library.service.BorrowDetailService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -38,10 +41,11 @@ public class BorrowDetailController {
     @PutMapping("/{id}/return")
     @PreAuthorize("hasAuthority('BORROW_WRITE')")
     public ApiResponse<BorrowDetailResponse> returnBook(
-            @PathVariable String id
+            @PathVariable String id,
+            @ModelAttribute @Valid ReturnBookRequest request
     ) {
         return ApiResponse.success(
-                borrowDetailService.returnBook(id)
+                borrowDetailService.returnBook(id, request )
         );
     }
 }

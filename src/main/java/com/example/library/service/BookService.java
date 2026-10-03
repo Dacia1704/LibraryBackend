@@ -12,7 +12,7 @@ public interface BookService {
 
     BookResponse createBook(BookRequest request);
 
-    BookResponse updateBook(Long id, BookRequest request);
+    BookResponse updateBook(Long id, BookRequest request, Boolean isRestore);
 
     BookResponse deleteBook(String id);
 

@@ -6,6 +6,7 @@ import com.example.library.dto.category_author_publisher.response.PublisherRespo
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Data
@@ -21,6 +22,7 @@ public class BookResponse {
     Integer quantity;
     Integer available;
     String cover;
+    BigDecimal price;
     Set<CategoryResponse> categories;
     Set<AuthorResponse> authors;
     Set<PublisherResponse> publishers;

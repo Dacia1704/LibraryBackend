@@ -12,9 +12,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByMemberCode(String memberCode);
 
+    Optional<Member> findByPhone(String phone);
+
     Optional<Member> findByUserId(Long userId);
 
     Optional<Member> findByIdAndIsDeletedFalse(Long id);
+    Optional<Member> findByPhoneAndIsDeletedFalse(Long phone);
 
     List<Member> findAllByIsDeletedFalse();
 }

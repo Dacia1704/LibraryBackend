@@ -110,14 +110,15 @@ CREATE INDEX IX_publishers_no_accent ON publishers(no_accent);
 
 CREATE TABLE books (
     id           BIGINT IDENTITY(1,1) PRIMARY KEY,
-    title        NVARCHAR(255) NOT NULL,
-    no_accent    VARCHAR(255)  NOT NULL,        -- title khong dau, de tim kiem
-    isbn         VARCHAR(20)   NOT NULL,
-    publish_year INT           NULL,
-    quantity     INT           NOT NULL CONSTRAINT DF_books_quantity  DEFAULT 0,
-    available    INT           NOT NULL CONSTRAINT DF_books_available DEFAULT 0,
-    cover        VARCHAR(MAX)  NULL,            -- base64 (data URI) anh bia
-    is_deleted   BIT           NOT NULL CONSTRAINT DF_books_deleted DEFAULT 0,
+    title        NVARCHAR(255)        NOT NULL,
+    no_accent    VARCHAR(255)         NOT NULL,        -- title khong dau, de tim kiem
+    isbn         VARCHAR(20)          NOT NULL,
+    publish_year INT                  NULL,
+    price        DECIMAL(15,2)        NOT NULL,
+    quantity     INT                  NOT NULL CONSTRAINT DF_books_quantity  DEFAULT 0,
+    available    INT                  NOT NULL CONSTRAINT DF_books_available DEFAULT 0,
+    cover        VARCHAR(MAX)         NULL,            -- base64 (data URI) anh bia
+    is_deleted   BIT                  NOT NULL CONSTRAINT DF_books_deleted DEFAULT 0,
     CONSTRAINT CK_books_quantity  CHECK (quantity >= 0),
     CONSTRAINT CK_books_available CHECK (available >= 0 AND available <= quantity)
 );

@@ -50,7 +50,7 @@ public class PublisherServiceImpl implements PublisherService {
     @Override
     @Transactional
     @CacheEvict(value = "publishers", allEntries = true)
-    public PublisherResponse updatePublisher(Long id, PublisherRequest request) {
+    public PublisherResponse updatePublisher(Long id, PublisherRequest request, Boolean isRestore) {
 
         Publisher publisher = publisherRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Publisher không tồn tại"));
@@ -58,6 +58,8 @@ public class PublisherServiceImpl implements PublisherService {
         publisher.setName(request.getName());
         publisher.setNoAccent(removeAccent(request.getName()));
         publisher.setAddress(request.getAddress());
+
+        if(isRestore) publisher.setIsDeleted(false);
 
         publisherRepository.save(publisher);
 

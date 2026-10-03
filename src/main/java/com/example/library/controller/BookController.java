@@ -35,6 +35,21 @@ public class BookController {
     }
 
     @PutMapping(
+            value = "/{id}/restore",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @PreAuthorize("hasAuthority('BOOK_WRITE')")
+    public ApiResponse<BookResponse> restoreBook(
+            @PathVariable Long id,
+            @ModelAttribute @Valid BookRequest request
+    ) {
+        return ApiResponse.success(
+                bookService.updateBook(id, request, true)
+        );
+    }
+
+
+    @PutMapping(
             value = "/{id}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
@@ -44,7 +59,7 @@ public class BookController {
             @ModelAttribute @Valid BookRequest request
     ) {
         return ApiResponse.success(
-                bookService.updateBook(id, request)
+                bookService.updateBook(id, request, false)
         );
     }
 

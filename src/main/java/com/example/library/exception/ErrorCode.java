@@ -13,6 +13,7 @@ public enum ErrorCode {
     UNAUTHENTICATED(HttpStatus.UNAUTHORIZED, "Xác minh người dùng thất bại"),
     USER_NOT_ACTIVE(HttpStatus.BAD_REQUEST, "Tài khoản người dùng không hoạt động"),
     ROLE_NOT_FOUND(HttpStatus.NOT_FOUND, "Role không tồn tại"),
+    SETTING_NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy cài đặt"),
     PERMISSION_NOT_FOUND(HttpStatus.NOT_FOUND, "Quyền ko tồn tại"),
     BOOK_EXISTED(HttpStatus.CONFLICT, "Sách đã tồn tại"),
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "Danh mục không tồn tại"),
@@ -26,6 +27,8 @@ public enum ErrorCode {
     BOOK_ALREADY_RETURNED(HttpStatus.BAD_REQUEST, "Sách đã được hoàn trả"),
     BOOK_NOT_AVAILABLE(HttpStatus.BAD_REQUEST, "Sách đã được mượn hết"),
     BORROW_RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy bản ghi mượn sách"),
+    CANT_BORROW_OVER_DAY_IN_SETTING(HttpStatus.BAD_REQUEST, "Không thể mượn sách quá số ngày quy định"),
+    CANT_BORROW(HttpStatus.BAD_REQUEST, "Không thể mượn sách"),
     MEMBER_EXISTED(HttpStatus.BAD_REQUEST, "User này đã có thông tin Member");
 
 

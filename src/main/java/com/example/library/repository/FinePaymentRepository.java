@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
@@ -32,4 +33,12 @@ public interface FinePaymentRepository extends JpaRepository<FinePayment, Long> 
             @Param("userId") Long userId,
             Pageable pageable
     );
+
+    @Query("""
+        SELECT COALESCE(SUM(fp.amount), 0)
+        FROM FinePayment fp
+        WHERE fp.member.id = :memberId
+          AND fp.isDeleted = false
+    """)
+    BigDecimal getTotalPaymentByMember(Long memberId);
 }

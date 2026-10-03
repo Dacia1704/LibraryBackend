@@ -11,7 +11,7 @@ public interface AuthorService {
 
     AuthorResponse createAuthor(AuthorRequest request);
 
-    AuthorResponse updateAuthor(Long id, AuthorRequest request);
+    AuthorResponse updateAuthor(Long id, AuthorRequest request, Boolean isRestore);
 
     AuthorResponse deleteAuthor(String id);
 

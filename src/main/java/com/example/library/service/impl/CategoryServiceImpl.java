@@ -43,16 +43,16 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     @CacheEvict(value = "categories", allEntries = true)
-    public CategoryResponse updateCategory(String id, CategoryRequest request) {
+    public CategoryResponse updateCategory(String id, CategoryRequest request, Boolean isRestore) {
 
         Category category = categoryRepository
                 .findById(Long.valueOf(id))
-                .orElseThrow(() ->
-                        new RuntimeException("Category không tồn tại")
-                );
+                .orElseThrow(() -> new RuntimeException("Category không tồn tại"));
 
         category.setName(request.getName());
         category.setNoAccent(TextUtils.removeAccent(request.getName()));
+
+        if(isRestore) category.setIsDeleted(false);
 
         categoryRepository.save(category);
 
