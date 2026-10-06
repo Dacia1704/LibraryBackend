@@ -5,8 +5,6 @@ import com.example.library.common.PageResponse;
 import com.example.library.dto.book.request.BorrowRecordFilter;
 import com.example.library.dto.book.request.BorrowRecordRequest;
 import com.example.library.dto.book.response.BorrowRecordResponse;
-import com.example.library.dto.category_author_publisher.request.PublisherRequest;
-import com.example.library.dto.category_author_publisher.response.PublisherResponse;
 
 import java.util.List;
 

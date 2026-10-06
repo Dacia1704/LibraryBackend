@@ -17,6 +17,7 @@ import com.example.library.repository.MemberRepository;
 import com.example.library.repository.SettingRepository;
 import com.example.library.repository.UserRepository;
 import com.example.library.service.MemberService;
+import com.example.library.utils.TextUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -225,6 +226,14 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public MemberResponse getMe() {
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        Member member = memberRepository
+                .findByUserId(userId).orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+        return memberMapper.toMemberResponse(member);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<MemberResponse> getMembers() {
 
@@ -253,15 +262,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     public String generateMemberCode() {
-        String date = LocalDate.now()
-                .format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-
-        String random = UUID.randomUUID()
-                .toString()
-                .replace("-", "")
-                .substring(0, 6)
-                .toUpperCase();
-
-        return "MB-" + date + "-" + random;
+        return TextUtils.generateCode("MB");
     }
 }

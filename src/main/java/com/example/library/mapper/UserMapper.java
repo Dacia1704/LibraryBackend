@@ -7,10 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring",
-uses = {
-        MemberMapper.class
-})
+@Mapper(componentModel = "spring")
 public interface UserMapper {
 
     @Mapping(target = "passwordHash", ignore = true)

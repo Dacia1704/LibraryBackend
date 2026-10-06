@@ -1,4 +1,4 @@
-package com.example.library.dto.category_author_publisher.request;
+package com.example.library.dto.book_info.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,10 +10,13 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CategoryRequest {
+public class ShelfRequest {
 
     @NotNull
     @NotBlank
     String name;
+
+    @NotBlank
+    String location;
 
 }

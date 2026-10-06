@@ -15,12 +15,14 @@ import com.example.library.security.PasswordEncoderConfig;
 import com.example.library.service.AuthenticationService;
 import com.example.library.service.JwtTokenService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -67,6 +69,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public RefreshTokenResponse refreshToken(RefreshTokenRequest request) {
+        System.out.println(request.getRefreshToken());
         RefreshToken refreshToken = refreshTokenRepository.findByTokenAndRevokedFalse(request.getRefreshToken()).orElse(null);
         assert refreshToken != null;
         if(Boolean.FALSE.equals(refreshToken.getRevoked())) throw new AppException(ErrorCode.UNAUTHENTICATED);

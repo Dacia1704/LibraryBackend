@@ -3,7 +3,6 @@ package com.example.library.controller;
 import com.example.library.common.ApiResponse;
 import com.example.library.dto.book.request.ReturnBookRequest;
 import com.example.library.dto.book.response.BorrowDetailResponse;
-import com.example.library.dto.category_author_publisher.request.AuthorRequest;
 import com.example.library.service.BorrowDetailService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;

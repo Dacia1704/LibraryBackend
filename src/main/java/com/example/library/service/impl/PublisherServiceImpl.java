@@ -1,8 +1,8 @@
 package com.example.library.service.impl;
 
 import com.example.library.common.PageResponse;
-import com.example.library.dto.category_author_publisher.request.PublisherRequest;
-import com.example.library.dto.category_author_publisher.response.PublisherResponse;
+import com.example.library.dto.book_info.request.PublisherRequest;
+import com.example.library.dto.book_info.response.PublisherResponse;
 import com.example.library.entity.Publisher;
 import com.example.library.mapper.PublisherMapper;
 import com.example.library.repository.PublisherRepository;

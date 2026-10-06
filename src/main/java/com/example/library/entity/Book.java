@@ -1,5 +1,7 @@
 package com.example.library.entity;
 
+import com.example.library.entity.enums.BorrowStatus;
+import com.example.library.entity.enums.Language;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,6 +20,9 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "book_code", nullable = false, length = 20)
+    private String bookCode;
 
     @Column(nullable = false, length = 255)
     private String title;
@@ -41,6 +46,24 @@ public class Book {
     @Column(nullable = false)
     @Builder.Default
     private Integer available = 0;
+
+    private BigDecimal width;
+
+    private BigDecimal height;
+
+    private Integer pages;
+
+    @Column(columnDefinition = "VARCHAR(MAX)")
+    private String synopsis;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private Language language = Language.VI;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shelf_id")
+    private Shelf shelf;
 
     @Column(columnDefinition = "VARCHAR(MAX)")
     private String cover;

@@ -35,7 +35,11 @@ spring:
     port: 5672
     username: admin
     password: admin123
-
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
 app:
   jwt:
     secret: "3pHoX9WySmdbsP4vnkuM4o+Lrd/n5ejYcDYOBufMGXEVLABgSWU/TFAwYBanP6VywMIb6B/Px4KIZ/4xXmflyg=="

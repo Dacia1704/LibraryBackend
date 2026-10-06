@@ -24,6 +24,17 @@ public class BookController {
 
     BookService bookService;
 
+    @PostMapping("/pagination")
+    public ApiResponse<PageResponse<BookResponse>> getBooksPagination(
+            @ModelAttribute BookFilter filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        return ApiResponse.<PageResponse<BookResponse>>builder()
+                .data(bookService.getBooksPagination(filter, page, size)).build();
+    }
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('BOOK_WRITE')")
     public ApiResponse<BookResponse> createBook(
@@ -99,21 +110,5 @@ public class BookController {
         );
     }
 
-    @GetMapping("/")
-    public ApiResponse<PageResponse<BookResponse>> getBooksPagination(
-            @ModelAttribute BookFilter filter,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
 
-        return ApiResponse.<PageResponse<BookResponse>>builder()
-                .data(
-                        bookService.getBooksPagination(
-                                filter,
-                                page,
-                                size
-                        )
-                )
-                .build();
-    }
 }

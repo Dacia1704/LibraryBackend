@@ -2,8 +2,8 @@ package com.example.library.controller;
 
 import com.example.library.common.ApiResponse;
 import com.example.library.common.PageResponse;
-import com.example.library.dto.category_author_publisher.request.AuthorRequest;
-import com.example.library.dto.category_author_publisher.response.AuthorResponse;
+import com.example.library.dto.book_info.request.AuthorRequest;
+import com.example.library.dto.book_info.response.AuthorResponse;
 import com.example.library.service.AuthorService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;

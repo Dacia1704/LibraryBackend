@@ -69,6 +69,12 @@ public class MemberController {
         );
     }
 
+    @GetMapping("/me")
+    @PreAuthorize("hasAuthority('MEMBER_READ')")
+    public ApiResponse<MemberResponse> getMe() {
+        return ApiResponse.success(memberService.getMe());
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('MEMBER_READ')")
     public ApiResponse<MemberResponse> getMember(

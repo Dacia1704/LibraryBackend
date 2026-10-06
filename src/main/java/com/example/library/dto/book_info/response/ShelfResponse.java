@@ -1,4 +1,4 @@
-package com.example.library.dto.category_author_publisher.response;
+package com.example.library.dto.book_info.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,8 +8,9 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AuthorResponse {
+public class ShelfResponse {
     Long id;
+    String code;
     String name;
-    String bio;
+    String location;
 }

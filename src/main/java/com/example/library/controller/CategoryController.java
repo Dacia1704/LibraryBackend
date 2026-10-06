@@ -1,8 +1,8 @@
 package com.example.library.controller;
 
 import com.example.library.common.ApiResponse;
-import com.example.library.dto.category_author_publisher.request.CategoryRequest;
-import com.example.library.dto.category_author_publisher.response.CategoryResponse;
+import com.example.library.dto.book_info.request.CategoryRequest;
+import com.example.library.dto.book_info.response.CategoryResponse;
 import com.example.library.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -65,8 +65,6 @@ public class CategoryController {
 
     @GetMapping
     public ApiResponse<List<CategoryResponse>> getCategories() {
-        return ApiResponse.success(
-                categoryService.getCategories()
-        );
+        return ApiResponse.success(categoryService.getCategories());
     }
 }

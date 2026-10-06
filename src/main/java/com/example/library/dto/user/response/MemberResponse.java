@@ -11,11 +11,7 @@ public class MemberResponse {
 
     private Long id;
 
-    private Long userId;
-
-    private String username;
-
-    private String fullName;
+    private UserResponse user;
 
     private String memberCode;
 

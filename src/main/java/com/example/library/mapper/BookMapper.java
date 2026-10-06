@@ -9,7 +9,8 @@ import org.mapstruct.*;
         uses = {
                 CategoryMapper.class,
                 AuthorMapper.class,
-                PublisherMapper.class
+                PublisherMapper.class,
+                ShelfMapper.class
         })
 public interface BookMapper {
 

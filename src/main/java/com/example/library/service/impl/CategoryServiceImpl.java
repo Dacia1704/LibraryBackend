@@ -1,7 +1,7 @@
 package com.example.library.service.impl;
 
-import com.example.library.dto.category_author_publisher.request.CategoryRequest;
-import com.example.library.dto.category_author_publisher.response.CategoryResponse;
+import com.example.library.dto.book_info.request.CategoryRequest;
+import com.example.library.dto.book_info.response.CategoryResponse;
 import com.example.library.entity.Category;
 import com.example.library.mapper.CategoryMapper;
 import com.example.library.repository.CategoryRepository;

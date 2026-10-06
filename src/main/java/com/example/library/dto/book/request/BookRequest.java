@@ -1,5 +1,6 @@
 package com.example.library.dto.book.request;
 
+import com.example.library.entity.enums.Language;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -24,13 +25,25 @@ public class BookRequest {
 
     Integer publishYear;
 
+    BigDecimal price;
+
     @NotNull
     Integer quantity;
 
     @NotNull
     Integer available;
 
-    BigDecimal price;
+    BigDecimal width;
+
+    BigDecimal height;
+
+    Integer pages;
+
+    String sysnopsis;
+
+    Language language;
+
+    Long shelfId;
 
     MultipartFile cover;
 

@@ -1,0 +1,379 @@
+﻿{
+  "info": {
+    "_postman_id": "library-api-collection",
+    "name": "Library Management System API",
+    "description": "Complete API collection for Library Management System - Spring Boot",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
+    { "key": "accessToken", "value": "", "type": "string" },
+    { "key": "refreshToken", "value": "", "type": "string" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "event": [{ "listen": "test", "script": { "exec": ["if (pm.response.code === 200) {", "  const data = pm.response.json().data;", "  pm.collectionVariables.set('accessToken', data.accessToken);", "  pm.collectionVariables.set('refreshToken', data.refreshToken);", "}"], "type": "text/javascript" } }],
+          "request": { "auth": { "type": "noauth" }, "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@library.com\",\n  \"password\": \"123456\"\n}" }, "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] } }
+        },
+        {
+          "name": "Refresh Token",
+          "request": { "auth": { "type": "noauth" }, "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}" }, "url": { "raw": "{{baseUrl}}/api/auth/refresh", "host": ["{{baseUrl}}"], "path": ["api", "auth", "refresh"] } }
+        },
+        {
+          "name": "Logout",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}" }, "url": { "raw": "{{baseUrl}}/api/auth/logout", "host": ["{{baseUrl}}"], "path": ["api", "auth", "logout"] } }
+        }
+      ]
+    },
+    {
+      "name": "2. Users",
+      "item": [
+        {
+          "name": "Create User",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"username\": \"johndoe\",\n  \"password\": \"password123\",\n  \"fullName\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"identityNumber\": \"123456789012\",\n  \"avatar\": \"\",\n  \"roleId\": 1,\n  \"isActive\": true\n}" }, "url": { "raw": "{{baseUrl}}/api/users", "host": ["{{baseUrl}}"], "path": ["api", "users"] } }
+        },
+        {
+          "name": "Update User",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"username\": \"johndoe\",\n  \"password\": \"password123\",\n  \"fullName\": \"John Doe Updated\",\n  \"email\": \"john@example.com\",\n  \"identityNumber\": \"123456789012\",\n  \"avatar\": \"\",\n  \"roleId\": 1,\n  \"isActive\": true\n}" }, "url": { "raw": "{{baseUrl}}/api/users/1", "host": ["{{baseUrl}}"], "path": ["api", "users", "1"] } }
+        },
+        {
+          "name": "Delete User",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/users/1", "host": ["{{baseUrl}}"], "path": ["api", "users", "1"] } }
+        },
+        {
+          "name": "Get User By ID",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/users/1", "host": ["{{baseUrl}}"], "path": ["api", "users", "1"] } }
+        },
+        {
+          "name": "Get Users (Pagination)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/users?page=0&size=10&keyword=&email=&roleId=&isMember=&phone=", "host": ["{{baseUrl}}"], "path": ["api", "users"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "10" }, { "key": "keyword", "value": "" }, { "key": "email", "value": "" }, { "key": "roleId", "value": "", "disabled": true }, { "key": "isMember", "value": "", "disabled": true }, { "key": "phone", "value": "", "disabled": true }] } }
+        },
+        {
+          "name": "Get Deleted User",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/users/deleted/1", "host": ["{{baseUrl}}"], "path": ["api", "users", "deleted", "1"] } }
+        }
+      ]
+    },
+    {
+      "name": "3. Members",
+      "item": [
+        {
+          "name": "Create Member",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"userId\": 5,\n  \"phone\": \"0901234567\",\n  \"address\": \"123 Nguyen Van A, TPHCM\",\n  \"amount\": 50000.00\n}" }, "url": { "raw": "{{baseUrl}}/api/members", "host": ["{{baseUrl}}"], "path": ["api", "members"] } }
+        },
+        {
+          "name": "Renew Member",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"amount\": 50000.00\n}" }, "url": { "raw": "{{baseUrl}}/api/members/1/renew", "host": ["{{baseUrl}}"], "path": ["api", "members", "1", "renew"] } }
+        },
+        {
+          "name": "Update Member",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"userId\": 5,\n  \"memberCode\": \"MBR-2026-001\",\n  \"phone\": \"0901234567\",\n  \"address\": \"456 Le Loi, TPHCM\",\n  \"cardExpiry\": \"2028-01-01\"\n}" }, "url": { "raw": "{{baseUrl}}/api/members/1", "host": ["{{baseUrl}}"], "path": ["api", "members", "1"] } }
+        },
+        {
+          "name": "Delete Member",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/members/1", "host": ["{{baseUrl}}"], "path": ["api", "members", "1"] } }
+        },
+        {
+          "name": "Get Member By ID",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/members/1", "host": ["{{baseUrl}}"], "path": ["api", "members", "1"] } }
+        },
+        {
+          "name": "Get Member Fee Month",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/members/fee", "host": ["{{baseUrl}}"], "path": ["api", "members", "fee"] } }
+        },
+        {
+          "name": "Get All Members",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/members", "host": ["{{baseUrl}}"], "path": ["api", "members"] } }
+        },
+        {
+          "name": "Get Deleted Member",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/members/deleted/1", "host": ["{{baseUrl}}"], "path": ["api", "members", "deleted", "1"] } }
+        }
+      ]
+    },
+    {
+      "name": "4. Books",
+      "item": [
+        {
+          "name": "Create Book",
+          "request": { "method": "POST", "header": [], "body": { "mode": "formdata", "formdata": [{ "key": "title", "value": "Clean Code", "type": "text" }, { "key": "isbn", "value": "978-0132350884", "type": "text" }, { "key": "publishYear", "value": "2008", "type": "text" }, { "key": "quantity", "value": "10", "type": "text" }, { "key": "available", "value": "10", "type": "text" }, { "key": "price", "value": "350000", "type": "text" }, { "key": "cover", "type": "file", "src": "" }, { "key": "categoryIds", "value": "1", "type": "text" }, { "key": "authorIds", "value": "1", "type": "text" }, { "key": "publisherIds", "value": "1", "type": "text" }] }, "url": { "raw": "{{baseUrl}}/api/books", "host": ["{{baseUrl}}"], "path": ["api", "books"] } }
+        },
+        {
+          "name": "Update Book",
+          "request": { "method": "PUT", "header": [], "body": { "mode": "formdata", "formdata": [{ "key": "title", "value": "Clean Code Updated", "type": "text" }, { "key": "isbn", "value": "978-0132350884", "type": "text" }, { "key": "quantity", "value": "10", "type": "text" }, { "key": "available", "value": "8", "type": "text" }] }, "url": { "raw": "{{baseUrl}}/api/books/1", "host": ["{{baseUrl}}"], "path": ["api", "books", "1"] } }
+        },
+        {
+          "name": "Restore Book",
+          "request": { "method": "PUT", "header": [], "body": { "mode": "formdata", "formdata": [{ "key": "title", "value": "Clean Code", "type": "text" }, { "key": "isbn", "value": "978-0132350884", "type": "text" }, { "key": "quantity", "value": "10", "type": "text" }, { "key": "available", "value": "10", "type": "text" }] }, "url": { "raw": "{{baseUrl}}/api/books/1/restore", "host": ["{{baseUrl}}"], "path": ["api", "books", "1", "restore"] } }
+        },
+        {
+          "name": "Delete Book",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/books/1", "host": ["{{baseUrl}}"], "path": ["api", "books", "1"] } }
+        },
+        {
+          "name": "Get Book By ID",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/books/1", "host": ["{{baseUrl}}"], "path": ["api", "books", "1"] } }
+        },
+        {
+          "name": "Get All Books",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/books", "host": ["{{baseUrl}}"], "path": ["api", "books"] } }
+        },
+        {
+          "name": "Get Books Pagination",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/books/?page=0&size=10", "host": ["{{baseUrl}}"], "path": ["api", "books", ""], "query": [{ "key": "keyword", "value": "", "disabled": true }, { "key": "isbn", "value": "", "disabled": true }, { "key": "minPublishYear", "value": "", "disabled": true }, { "key": "maxPublishYear", "value": "", "disabled": true }, { "key": "minQuantity", "value": "", "disabled": true }, { "key": "maxQuantity", "value": "", "disabled": true }, { "key": "categoryIds", "value": "", "disabled": true }, { "key": "authorIds", "value": "", "disabled": true }, { "key": "publisherIds", "value": "", "disabled": true }, { "key": "page", "value": "0" }, { "key": "size", "value": "10" }] } }
+        },
+        {
+          "name": "Get Deleted Book",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/books/deleted/1", "host": ["{{baseUrl}}"], "path": ["api", "books", "deleted", "1"] } }
+        }
+      ]
+    },
+    {
+      "name": "5. Categories",
+      "item": [
+        {
+          "name": "Create Category",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Khoa hoc may tinh\"\n}" }, "url": { "raw": "{{baseUrl}}/api/categories", "host": ["{{baseUrl}}"], "path": ["api", "categories"] } }
+        },
+        {
+          "name": "Update Category",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"CNTT\"\n}" }, "url": { "raw": "{{baseUrl}}/api/categories/1", "host": ["{{baseUrl}}"], "path": ["api", "categories", "1"] } }
+        },
+        {
+          "name": "Restore Category",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Khoa hoc may tinh\"\n}" }, "url": { "raw": "{{baseUrl}}/api/categories/1/restore", "host": ["{{baseUrl}}"], "path": ["api", "categories", "1", "restore"] } }
+        },
+        {
+          "name": "Delete Category",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/categories/1", "host": ["{{baseUrl}}"], "path": ["api", "categories", "1"] } }
+        },
+        {
+          "name": "Get All Categories",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/categories", "host": ["{{baseUrl}}"], "path": ["api", "categories"] } }
+        }
+      ]
+    },
+    {
+      "name": "6. Authors",
+      "item": [
+        {
+          "name": "Create Author",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Robert C. Martin\",\n  \"bio\": \"Tac gia noi tieng trong linh vuc phan mem\"\n}" }, "url": { "raw": "{{baseUrl}}/api/authors", "host": ["{{baseUrl}}"], "path": ["api", "authors"] } }
+        },
+        {
+          "name": "Update Author",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Robert C. Martin\",\n  \"bio\": \"Bio cap nhat\"\n}" }, "url": { "raw": "{{baseUrl}}/api/authors/1", "host": ["{{baseUrl}}"], "path": ["api", "authors", "1"] } }
+        },
+        {
+          "name": "Restore Author",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Robert C. Martin\",\n  \"bio\": \"Tac gia noi tieng\"\n}" }, "url": { "raw": "{{baseUrl}}/api/authors/1/restore", "host": ["{{baseUrl}}"], "path": ["api", "authors", "1", "restore"] } }
+        },
+        {
+          "name": "Delete Author",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/authors/1", "host": ["{{baseUrl}}"], "path": ["api", "authors", "1"] } }
+        },
+        {
+          "name": "Get All Authors",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/authors/all", "host": ["{{baseUrl}}"], "path": ["api", "authors", "all"] } }
+        },
+        {
+          "name": "Get Authors Pagination",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/authors/?page=0&size=10&keyword=", "host": ["{{baseUrl}}"], "path": ["api", "authors", ""], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "10" }, { "key": "keyword", "value": "" }] } }
+        }
+      ]
+    },
+    {
+      "name": "7. Publishers",
+      "item": [
+        {
+          "name": "Create Publisher",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"NXB Kim Dong\",\n  \"address\": \"55 Quang Trung, Ha Noi\"\n}" }, "url": { "raw": "{{baseUrl}}/api/publishers", "host": ["{{baseUrl}}"], "path": ["api", "publishers"] } }
+        },
+        {
+          "name": "Update Publisher",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"NXB Kim Dong\",\n  \"address\": \"100 Le Loi, Ha Noi\"\n}" }, "url": { "raw": "{{baseUrl}}/api/publishers/1", "host": ["{{baseUrl}}"], "path": ["api", "publishers", "1"] } }
+        },
+        {
+          "name": "Restore Publisher",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"NXB Kim Dong\",\n  \"address\": \"55 Quang Trung, Ha Noi\"\n}" }, "url": { "raw": "{{baseUrl}}/api/publishers/1/restore", "host": ["{{baseUrl}}"], "path": ["api", "publishers", "1", "restore"] } }
+        },
+        {
+          "name": "Delete Publisher",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/publishers/1", "host": ["{{baseUrl}}"], "path": ["api", "publishers", "1"] } }
+        },
+        {
+          "name": "Get All Publishers",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/publishers/all?keyword=", "host": ["{{baseUrl}}"], "path": ["api", "publishers", "all"], "query": [{ "key": "keyword", "value": "" }] } }
+        },
+        {
+          "name": "Get Publishers Pagination",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/publishers?page=0&size=10&keyword=", "host": ["{{baseUrl}}"], "path": ["api", "publishers"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "10" }, { "key": "keyword", "value": "" }] } }
+        }
+      ]
+    },
+    {
+      "name": "8. Borrow Records",
+      "item": [
+        {
+          "name": "Create Borrow Record",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"memberId\": \"1\",\n  \"librarianId\": \"2\",\n  \"borrowDate\": \"2026-10-03\",\n  \"dayBorrow\": 14,\n  \"status\": \"BORROWING\",\n  \"note\": \"Ghi chu them\",\n  \"bookIds\": [\"1\", \"2\"]\n}" }, "url": { "raw": "{{baseUrl}}/api/borrow-records", "host": ["{{baseUrl}}"], "path": ["api", "borrow-records"] } }
+        },
+        {
+          "name": "Update Borrow Record",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"memberId\": \"1\",\n  \"librarianId\": \"2\",\n  \"borrowDate\": \"2026-10-03\",\n  \"dayBorrow\": 14,\n  \"status\": \"BORROWING\",\n  \"note\": \"Cap nhat ghi chu\",\n  \"bookIds\": [\"1\"]\n}" }, "url": { "raw": "{{baseUrl}}/api/borrow-records/1", "host": ["{{baseUrl}}"], "path": ["api", "borrow-records", "1"] } }
+        },
+        {
+          "name": "Delete Borrow Record",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/borrow-records/1", "host": ["{{baseUrl}}"], "path": ["api", "borrow-records", "1"] } }
+        },
+        {
+          "name": "Get Borrow Record By ID",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/borrow-records/1", "host": ["{{baseUrl}}"], "path": ["api", "borrow-records", "1"] } }
+        },
+        {
+          "name": "Get All Borrow Records",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/borrow-records", "host": ["{{baseUrl}}"], "path": ["api", "borrow-records"] } }
+        },
+        {
+          "name": "Get Borrow Records Pagination",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/borrow-records/pagination?page=0&size=10", "host": ["{{baseUrl}}"], "path": ["api", "borrow-records", "pagination"], "query": [{ "key": "memberId", "value": "", "disabled": true }, { "key": "borrowDate", "value": "", "disabled": true }, { "key": "status", "value": "", "disabled": true }, { "key": "bookId", "value": "", "disabled": true }, { "key": "page", "value": "0" }, { "key": "size", "value": "10" }] } }
+        }
+      ]
+    },
+    {
+      "name": "9. Borrow Details",
+      "item": [
+        {
+          "name": "Get Borrow Detail By ID",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/borrow-details/1", "host": ["{{baseUrl}}"], "path": ["api", "borrow-details", "1"] } }
+        },
+        {
+          "name": "Get All Borrow Details",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/borrow-details", "host": ["{{baseUrl}}"], "path": ["api", "borrow-details"] } }
+        },
+        {
+          "name": "Return Book",
+          "request": { "method": "PUT", "header": [], "body": { "mode": "formdata", "formdata": [{ "key": "fineRequests[0].reason", "value": "OVERDUE", "type": "text" }, { "key": "fineRequests[0].note", "value": "Tra tre 3 ngay", "type": "text" }, { "key": "fineRequests[0].attachment", "type": "file", "src": "" }] }, "url": { "raw": "{{baseUrl}}/api/borrow-details/1/return", "host": ["{{baseUrl}}"], "path": ["api", "borrow-details", "1", "return"] } }
+        }
+      ]
+    },
+    {
+      "name": "10. Fines",
+      "item": [
+        {
+          "name": "Get All Fines",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/fines?page=0&size=10", "host": ["{{baseUrl}}"], "path": ["api", "fines"], "query": [{ "key": "memberId", "value": "", "disabled": true }, { "key": "page", "value": "0" }, { "key": "size", "value": "10" }] } }
+        },
+        {
+          "name": "Get My Fines",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/fines/me?page=0&size=10", "host": ["{{baseUrl}}"], "path": ["api", "fines", "me"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "10" }] } }
+        }
+      ]
+    },
+    {
+      "name": "11. Fine Payments",
+      "item": [
+        {
+          "name": "Get All Fine Payments",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/fine-payments?page=0&size=10", "host": ["{{baseUrl}}"], "path": ["api", "fine-payments"], "query": [{ "key": "memberId", "value": "", "disabled": true }, { "key": "page", "value": "0" }, { "key": "size", "value": "10" }] } }
+        },
+        {
+          "name": "Get My Fine Payments",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/fine-payments/me?page=0&size=10", "host": ["{{baseUrl}}"], "path": ["api", "fine-payments", "me"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "10" }] } }
+        },
+        {
+          "name": "Create Fine Payment",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"memberId\": 5,\n  \"amount\": 150000.00,\n  \"note\": \"Thanh toan phat thang 10\"\n}" }, "url": { "raw": "{{baseUrl}}/api/fine-payments", "host": ["{{baseUrl}}"], "path": ["api", "fine-payments"] } }
+        }
+      ]
+    },
+    {
+      "name": "12. Member Payments",
+      "item": [
+        {
+          "name": "Get Member Payments By MemberID",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/member-payments/1?page=0&size=10", "host": ["{{baseUrl}}"], "path": ["api", "member-payments", "1"], "query": [{ "key": "month", "value": "", "disabled": true }, { "key": "page", "value": "0" }, { "key": "size", "value": "10" }] } }
+        },
+        {
+          "name": "Get My Member Payments",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/member-payments/me", "host": ["{{baseUrl}}"], "path": ["api", "member-payments", "me"] } }
+        }
+      ]
+    },
+    {
+      "name": "13. Roles",
+      "item": [
+        {
+          "name": "Create Role",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"LIBRARIAN\",\n  \"description\": \"Thu thu quan ly sach va muon tra\",\n  \"permissionIds\": [1, 2, 3]\n}" }, "url": { "raw": "{{baseUrl}}/api/roles", "host": ["{{baseUrl}}"], "path": ["api", "roles"] } }
+        },
+        {
+          "name": "Update Role",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"LIBRARIAN\",\n  \"description\": \"Mo ta cap nhat\",\n  \"permissionIds\": [1, 2, 3, 4]\n}" }, "url": { "raw": "{{baseUrl}}/api/roles/1", "host": ["{{baseUrl}}"], "path": ["api", "roles", "1"] } }
+        },
+        {
+          "name": "Delete Role",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/roles/1", "host": ["{{baseUrl}}"], "path": ["api", "roles", "1"] } }
+        },
+        {
+          "name": "Get All Roles",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/roles", "host": ["{{baseUrl}}"], "path": ["api", "roles"] } }
+        }
+      ]
+    },
+    {
+      "name": "14. Permissions",
+      "item": [
+        {
+          "name": "Create Permission",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"code\": \"BOOK_WRITE\",\n  \"description\": \"Quyen them/sua/xoa sach\"\n}" }, "url": { "raw": "{{baseUrl}}/api/permissions", "host": ["{{baseUrl}}"], "path": ["api", "permissions"] } }
+        },
+        {
+          "name": "Update Permission",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"code\": \"BOOK_WRITE\",\n  \"description\": \"Mo ta quyen cap nhat\"\n}" }, "url": { "raw": "{{baseUrl}}/api/permissions/1", "host": ["{{baseUrl}}"], "path": ["api", "permissions", "1"] } }
+        },
+        {
+          "name": "Delete Permission",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/permissions/1", "host": ["{{baseUrl}}"], "path": ["api", "permissions", "1"] } }
+        },
+        {
+          "name": "Get All Permissions",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/permissions", "host": ["{{baseUrl}}"], "path": ["api", "permissions"] } }
+        }
+      ]
+    },
+    {
+      "name": "15. Settings",
+      "item": [
+        {
+          "name": "Create Setting",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"settingKey\": \"FINE_OVERDUE_PER_DAY\",\n  \"settingValue\": \"5000\",\n  \"description\": \"Tien phat qua han moi ngay (VND)\"\n}" }, "url": { "raw": "{{baseUrl}}/api/settings", "host": ["{{baseUrl}}"], "path": ["api", "settings"] } }
+        },
+        {
+          "name": "Update Setting",
+          "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"settingKey\": \"FINE_OVERDUE_PER_DAY\",\n  \"settingValue\": \"10000\",\n  \"description\": \"Tien phat qua han moi ngay (VND) - cap nhat\"\n}" }, "url": { "raw": "{{baseUrl}}/api/settings/1", "host": ["{{baseUrl}}"], "path": ["api", "settings", "1"] } }
+        },
+        {
+          "name": "Delete Setting",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/settings/1", "host": ["{{baseUrl}}"], "path": ["api", "settings", "1"] } }
+        },
+        {
+          "name": "Get Setting By ID",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/settings/1", "host": ["{{baseUrl}}"], "path": ["api", "settings", "1"] } }
+        },
+        {
+          "name": "Get All Settings",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/settings", "host": ["{{baseUrl}}"], "path": ["api", "settings"] } }
+        }
+      ]
+    }
+  ]
+}

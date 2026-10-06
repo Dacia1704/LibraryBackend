@@ -19,6 +19,7 @@ public interface MemberService {
     MemberResponse deleteMember(String id);
 
     MemberResponse getMember(String id);
+    MemberResponse getMe();
 
     List<MemberResponse> getMembers();
 

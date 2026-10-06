@@ -8,7 +8,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {
+        UserMapper.class
+})
 public interface MemberMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -26,9 +28,6 @@ public interface MemberMapper {
     @Mapping(target = "notifications", ignore = true)
     Member toMember(MemberCreateRequest request);
 
-    @Mapping(target = "userId", source = "user.id")
-    @Mapping(target = "username", source = "user.username")
-    @Mapping(target = "fullName", source = "user.fullName")
     MemberResponse toMemberResponse(Member member);
 
     @Mapping(target = "id", ignore = true)

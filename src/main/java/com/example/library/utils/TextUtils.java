@@ -1,6 +1,9 @@
 package com.example.library.utils;
 
 import java.text.Normalizer;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 
 public final class TextUtils {
 
@@ -18,5 +21,19 @@ public final class TextUtils {
                 .replaceAll("\\p{M}", "")
                 .replace("đ", "d")
                 .replace("Đ", "D");
+    }
+
+    public static String generateCode(String prefix) {
+
+        String date = LocalDate.now()
+                .format(DateTimeFormatter.ofPattern("yyMMdd"));
+
+        String random = UUID.randomUUID()
+                .toString()
+                .replace("-", "")
+                .substring(0, 3)
+                .toUpperCase();
+
+        return prefix + "-" + date + "-" + random;
     }
 }

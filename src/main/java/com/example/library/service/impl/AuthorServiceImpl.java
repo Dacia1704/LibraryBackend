@@ -1,8 +1,8 @@
 package com.example.library.service.impl;
 
 import com.example.library.common.PageResponse;
-import com.example.library.dto.category_author_publisher.request.AuthorRequest;
-import com.example.library.dto.category_author_publisher.response.AuthorResponse;
+import com.example.library.dto.book_info.request.AuthorRequest;
+import com.example.library.dto.book_info.response.AuthorResponse;
 import com.example.library.entity.Author;
 import com.example.library.exception.AppException;
 import com.example.library.exception.ErrorCode;
@@ -24,7 +24,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.Normalizer;
 import java.util.List;
 
 @Service

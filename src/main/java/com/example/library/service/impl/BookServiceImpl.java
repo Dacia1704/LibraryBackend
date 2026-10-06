@@ -4,17 +4,11 @@ import com.example.library.common.PageResponse;
 import com.example.library.dto.book.request.BookFilter;
 import com.example.library.dto.book.request.BookRequest;
 import com.example.library.dto.book.response.BookResponse;
-import com.example.library.entity.Author;
-import com.example.library.entity.Book;
-import com.example.library.entity.Category;
-import com.example.library.entity.Publisher;
+import com.example.library.entity.*;
 import com.example.library.exception.AppException;
 import com.example.library.exception.ErrorCode;
 import com.example.library.mapper.BookMapper;
-import com.example.library.repository.AuthorRepository;
-import com.example.library.repository.BookRepository;
-import com.example.library.repository.CategoryRepository;
-import com.example.library.repository.PublisherRepository;
+import com.example.library.repository.*;
 import com.example.library.repository.specification.BookSpecification;
 import com.example.library.service.BookService;
 import com.example.library.utils.TextUtils;
@@ -41,6 +35,7 @@ public class BookServiceImpl implements BookService {
     CategoryRepository categoryRepository;
     AuthorRepository authorRepository;
     PublisherRepository publisherRepository;
+    ShelfRepository shelfRepository;
 
     BookMapper bookMapper;
 
@@ -52,6 +47,12 @@ public class BookServiceImpl implements BookService {
         Book book = bookMapper.toBook(request);
         book.setNoAccent(TextUtils.removeAccent(book.getTitle()));
         book.setPrice(request.getPrice());
+        book.setBookCode(generateBookCode());
+
+        if(request.getShelfId() != null) {
+            Shelf shelf = shelfRepository.findByIdAndIsDeletedFalse(request.getShelfId()).orElseThrow(() ->  new AppException(ErrorCode.SHELF_NOT_FOUND));
+            book.setShelf(shelf);
+        }
 
         if(request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
             List<Category> categories =  categoryRepository.findAllByIdInAndIsDeletedFalse(request.getCategoryIds().stream().toList());
@@ -209,5 +210,8 @@ public class BookServiceImpl implements BookService {
                 .build();
     }
 
+    private String generateBookCode() {
+        return TextUtils.generateCode("BK");
+    }
 
 }

@@ -21,6 +21,7 @@ public enum ErrorCode {
     PUBLISHER_NOT_FOUND(HttpStatus.NOT_FOUND, "Nhà phát hành không tồn tại"),
     BOOK_NOT_FOUND(HttpStatus.NOT_FOUND, "Sách không tồn tại"),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "Thành viên không tồn tại"),
+    SHELF_NOT_FOUND(HttpStatus.NOT_FOUND, "Kệ không tồn tại"),
     BORROW_DETAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "Dự liệu mượn không tồn tại"),
     FILE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "Không thể đọc file ảnh"),
     EMAIL_EXISTED(HttpStatus.BAD_REQUEST, "Email đã tồn tại"),

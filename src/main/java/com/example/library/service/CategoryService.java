@@ -1,8 +1,8 @@
 package com.example.library.service;
 
 
-import com.example.library.dto.category_author_publisher.request.CategoryRequest;
-import com.example.library.dto.category_author_publisher.response.CategoryResponse;
+import com.example.library.dto.book_info.request.CategoryRequest;
+import com.example.library.dto.book_info.response.CategoryResponse;
 
 import java.util.List;
 
