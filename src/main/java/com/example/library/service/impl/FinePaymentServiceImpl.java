@@ -23,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -159,6 +160,18 @@ public class FinePaymentServiceImpl implements FinePaymentService {
         payment = finePaymentRepository.save(payment);
 
         return finePaymentMapper.toResponse(payment);
+    }
+
+    @Override
+    public BigDecimal getTotalByUserId(Long userId) {
+
+        return finePaymentRepository.getTotalPaymentByUserId(userId);
+    }
+
+    @Override
+    public BigDecimal getMyTotal() {
+
+        return getTotalByUserId(getCurrentUserId());
     }
 
     private Long getCurrentUserId() {

@@ -7,11 +7,14 @@ import org.mapstruct.Mapping;
 
 @Mapper(
         componentModel = "spring",
-        uses = BookMapper.class
+        uses = {
+                BookMapper.class,
+                BorrowRecordMapper.class
+        }
 )
 public interface BorrowDetailMapper {
 
-    @Mapping(target = "bookResponse", source = "book")
+    @Mapping(target = "book", source = "book")
     @Mapping(target = "borrowRecord", source = "borrowRecord")
     @Mapping(target = "borrowStatus", source = "status")
     BorrowDetailResponse toBorrowDetailResponse(BorrowDetail borrowDetail);

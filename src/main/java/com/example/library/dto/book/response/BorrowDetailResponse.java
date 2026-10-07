@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BorrowDetailResponse {
     Long id;
-    BookResponse bookResponse;
+    BookResponse book;
     LocalDate returnDate;
     BigDecimal fineAmount;
     BorrowStatus borrowStatus;

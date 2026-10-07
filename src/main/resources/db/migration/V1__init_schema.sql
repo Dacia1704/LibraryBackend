@@ -251,7 +251,7 @@ CREATE TABLE fines (
     borrow_id        BIGINT        NOT NULL,                 -- phat den tu phieu muon nao
     borrow_detail_id BIGINT        NULL,                     -- cuon sach nao (NULL neu phat chung ca phieu)
     amount           DECIMAL(10,2) NOT NULL,
-    reason           VARCHAR(20)   NOT NULL,                 -- OVERDUE / LOST / DAMAGED
+    reason           VARCHAR(50)   NOT NULL,                 -- OVERDUE / LOST / DAMAGED
     overdue_days     INT           NULL,                     -- so ngay tre (chi dung khi reason = OVERDUE)
     note             NVARCHAR(255) NULL,
     created_at       DATETIME2     NOT NULL CONSTRAINT DF_fines_created DEFAULT SYSDATETIME(),
@@ -260,7 +260,7 @@ CREATE TABLE fines (
     CONSTRAINT FK_fines_borrow FOREIGN KEY (borrow_id)        REFERENCES borrow_records(id),
     CONSTRAINT FK_fines_detail FOREIGN KEY (borrow_detail_id) REFERENCES borrow_details(id),
     CONSTRAINT CK_fines_amount CHECK (amount > 0),
-    CONSTRAINT CK_fines_reason CHECK (reason IN ('OVERDUE','LOST','DAMAGED'))
+    CONSTRAINT CK_fines_reason CHECK (reason IN ('OVERDUE','LOST','DAMAGED', 'DAMAGED_LIGHT', 'DAMAGED_HEAVY_REPAIRABLE', 'DAMAGED_HEAVY_IRREPARABLE'))
 );
 CREATE INDEX IX_fines_borrow_id ON fines(borrow_id);
 CREATE INDEX IX_fines_detail_id ON fines(borrow_detail_id);

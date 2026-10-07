@@ -5,6 +5,7 @@ import com.example.library.common.PageResponse;
 import com.example.library.dto.book.request.BorrowDetailFilter;
 import com.example.library.dto.book.request.ReturnBookRequest;
 import com.example.library.dto.book.response.BorrowDetailResponse;
+import com.example.library.dto.book.response.BorrowDetailSummaryResponse;
 import com.example.library.service.BorrowDetailService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -40,19 +41,38 @@ public class BorrowDetailController {
     @GetMapping("/pagination")
     public ApiResponse<PageResponse<BorrowDetailResponse>> getPagination(
             @ModelAttribute BorrowDetailFilter filter,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        return ApiResponse.<PageResponse<BorrowDetailResponse>>builder()
+                .data(borrowDetailService.getBorrowDetailsPagination(filter, page, size))
+                .build();
+    }
+
+    @GetMapping("/pagination/me")
+    public ApiResponse<PageResponse<BorrowDetailResponse>> getMyPagination(
+            @ModelAttribute BorrowDetailFilter filter,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
 
         return ApiResponse.<PageResponse<BorrowDetailResponse>>builder()
                 .data(
-                        borrowDetailService.getBorrowDetailsPagination(
+                        borrowDetailService.getMyBorrowDetailsPagination(
                                 filter,
                                 page,
                                 size
                         )
                 )
                 .build();
+    }
+
+    @GetMapping("/summary/me")
+    public ApiResponse<BorrowDetailSummaryResponse> getMySummary() {
+        return ApiResponse.success(
+                borrowDetailService.getMySummary()
+        );
     }
 
     @PutMapping("/{id}/return")

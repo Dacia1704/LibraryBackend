@@ -41,4 +41,14 @@ public interface FinePaymentRepository extends JpaRepository<FinePayment, Long> 
           AND fp.isDeleted = false
     """)
     BigDecimal getTotalPaymentByMember(Long memberId);
+
+    @Query("""
+        SELECT COALESCE(SUM(fp.amount), 0)
+        FROM FinePayment fp
+        JOIN fp.member m
+        JOIN m.user u
+        WHERE u.id = :userId
+          AND fp.isDeleted = false
+    """)
+    BigDecimal getTotalPaymentByUserId(@Param("userId") Long userId);
 }

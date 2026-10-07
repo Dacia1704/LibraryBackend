@@ -12,6 +12,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -55,6 +56,21 @@ public class FinePaymentController {
                         )
                 )
                 .build();
+    }
+
+    @GetMapping("/total/me")
+    public ApiResponse<BigDecimal> getMyTotal() {
+        return ApiResponse.success(finePaymentService.getMyTotal());
+    }
+
+    @GetMapping("/total")
+    @PreAuthorize("hasAuthority('FINE_PAYMENT_READ')")
+    public ApiResponse<BigDecimal> getTotalByUserId(
+            @RequestParam Long userId
+    ) {
+        return ApiResponse.success(
+                finePaymentService.getTotalByUserId(userId)
+        );
     }
 
     @PostMapping

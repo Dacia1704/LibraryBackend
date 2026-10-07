@@ -5,6 +5,7 @@ import com.example.library.common.PageResponse;
 import com.example.library.dto.book.request.BorrowDetailFilter;
 import com.example.library.dto.book.request.ReturnBookRequest;
 import com.example.library.dto.book.response.BorrowDetailResponse;
+import com.example.library.dto.book.response.BorrowDetailSummaryResponse;
 
 import java.util.List;
 
@@ -19,6 +20,14 @@ public interface BorrowDetailService {
             int page,
             int size
     );
+
+    PageResponse<BorrowDetailResponse> getMyBorrowDetailsPagination(
+            BorrowDetailFilter filter,
+            int page,
+            int size
+    );
+
+    BorrowDetailSummaryResponse getMySummary();
 
     BorrowDetailResponse returnBook(String id, ReturnBookRequest request);
 }

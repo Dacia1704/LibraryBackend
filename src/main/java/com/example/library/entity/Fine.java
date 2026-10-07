@@ -32,7 +32,7 @@ public class Fine {
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 50)
     private FineReason reason;
 
     @Column(name = "overdue_days")

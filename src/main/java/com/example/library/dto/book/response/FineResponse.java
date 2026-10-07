@@ -19,6 +19,8 @@ public class FineResponse {
 
     private Long borrowDetailId;
 
+    private BorrowDetailResponse borrowDetail;
+
     private BigDecimal amount;
 
     private FineReason reason;
