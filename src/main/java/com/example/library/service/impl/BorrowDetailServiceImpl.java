@@ -1,5 +1,7 @@
 package com.example.library.service.impl;
 
+import com.example.library.common.PageResponse;
+import com.example.library.dto.book.request.BorrowDetailFilter;
 import com.example.library.dto.book.request.FineRequest;
 import com.example.library.dto.book.request.ReturnBookRequest;
 import com.example.library.dto.book.response.BorrowDetailResponse;
@@ -7,6 +9,7 @@ import com.example.library.entity.Book;
 import com.example.library.entity.BorrowDetail;
 import com.example.library.entity.Fine;
 import com.example.library.entity.Setting;
+import com.example.library.entity.enums.BorrowStatus;
 import com.example.library.entity.enums.FineReason;
 import com.example.library.exception.AppException;
 import com.example.library.exception.ErrorCode;
@@ -14,11 +17,17 @@ import com.example.library.mapper.BorrowDetailMapper;
 import com.example.library.repository.BorrowDetailRepository;
 import com.example.library.repository.FineRepository;
 import com.example.library.repository.SettingRepository;
+import com.example.library.repository.specification.BorrowDetailSpecification;
 import com.example.library.service.BorrowDetailService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,6 +99,49 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public PageResponse<BorrowDetailResponse> getBorrowDetailsPagination(
+            BorrowDetailFilter filter,
+            int page,
+            int size
+    ) {
+
+        if (page < 0) {
+            page = 0;
+        }
+
+        if (size <= 0) {
+            size = 10;
+        }
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "id")
+        );
+
+        Specification<BorrowDetail> specification =
+                BorrowDetailSpecification.filter(filter);
+
+        Page<BorrowDetail> borrowDetailPage =
+                borrowDetailRepository.findAll(specification, pageable);
+
+        List<BorrowDetailResponse> content =
+                borrowDetailPage.getContent()
+                        .stream()
+                        .map(borrowDetailMapper::toBorrowDetailResponse)
+                        .toList();
+
+        return PageResponse.<BorrowDetailResponse>builder()
+                .data(content)
+                .currentPage(borrowDetailPage.getNumber())
+                .pageSize(borrowDetailPage.getSize())
+                .totalElements(borrowDetailPage.getTotalElements())
+                .totalPages(borrowDetailPage.getTotalPages())
+                .build();
+    }
+
+    @Override
     @Transactional
     public BorrowDetailResponse returnBook(String id, ReturnBookRequest request) {
 
@@ -107,6 +159,7 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
         LocalDate returnDate = LocalDate.now();
 
         borrowDetail.setReturnDate(returnDate);
+        borrowDetail.setStatus(BorrowStatus.RETURNED);
 
         // Tính tiền phạt
         List<String> settingKeys = List.of(

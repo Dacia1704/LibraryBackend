@@ -28,10 +28,6 @@ public class UserRequest {
     @Size(max = 100)
     private String email;
 
-    @NotBlank
-    @Size(max = 12)
-    private String identityNumber;
-
     private String avatar;
 
     @NotNull

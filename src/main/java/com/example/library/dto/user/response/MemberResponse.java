@@ -1,5 +1,8 @@
 package com.example.library.dto.user.response;
 
+import com.example.library.entity.enums.CardStatus;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,5 +24,9 @@ public class MemberResponse {
 
     private LocalDate cardExpiry;
 
+    private CardStatus cardStatus;
+
     private Boolean isDeleted;
+
+    private String identityNumber;
 }

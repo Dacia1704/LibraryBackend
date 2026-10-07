@@ -1,5 +1,7 @@
 package com.example.library.entity;
 
+import com.example.library.entity.enums.CardStatus;
+import com.example.library.entity.enums.PaymentType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,6 +40,10 @@ public class Member {
 
     @Column(name = "card_expiry", nullable = false)
     private LocalDate cardExpiry;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "card_status", nullable = false)
+    CardStatus cardStatus;
 
     @Column(name = "is_deleted", nullable = false)
     @Builder.Default

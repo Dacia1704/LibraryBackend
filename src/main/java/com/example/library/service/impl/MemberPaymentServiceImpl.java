@@ -50,21 +50,9 @@ public class MemberPaymentServiceImpl implements MemberPaymentService {
             );
         }
 
-        Pageable pageable = PageRequest.of(
-                page,
-                size,
-                Sort.by(
-                        Sort.Direction.DESC,
-                        "paidAt"
-                )
-        );
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "paidAt"));
 
-        Page<MemberPayment> paymentPage =
-                memberPaymentRepository.findAllByMemberId(
-                        memberId,
-                        month,
-                        pageable
-                );
+        Page<MemberPayment> paymentPage = memberPaymentRepository.findAllByMemberId(memberId, month, pageable);
 
         List<MemberPaymentResponse> content =
                 paymentPage.getContent()
@@ -82,20 +70,38 @@ public class MemberPaymentServiceImpl implements MemberPaymentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<MemberPaymentResponse> getMe() {
+    public PageResponse<MemberPaymentResponse> getMe(Integer month, int page, int size) {
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
+        if (page < 0) {
+            page = 0;
+        }
 
-        Long userId = Long.valueOf(
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getName()
-        );
+        if (size <= 0) {
+            size = 10;
+        }
 
-        return memberPaymentRepository
-                .findAllByUserId(userId)
-                .stream()
-                .map(memberPaymentMapper::toResponse)
-                .toList();
+        if (month != null && (month < 1 || month > 12)) {
+            throw new IllegalArgumentException(
+                    "Month must be between 1 and 12"
+            );
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<MemberPayment> paymentPage = memberPaymentRepository.findAllByUserId(userId, month, pageable);
+
+        List<MemberPaymentResponse> content =
+                paymentPage.getContent()
+                        .stream()
+                        .map(memberPaymentMapper::toResponse)
+                        .toList();
+
+        return PageResponse.<MemberPaymentResponse>builder()
+                .data(content)
+                .currentPage(paymentPage.getNumber())
+                .pageSize(paymentPage.getSize())
+                .totalElements(paymentPage.getTotalElements())
+                .totalPages(paymentPage.getTotalPages())
+                .build();
     }
 }

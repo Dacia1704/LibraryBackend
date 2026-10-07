@@ -11,11 +11,8 @@ import org.mapstruct.Mapping;
 )
 public interface BorrowDetailMapper {
 
-    @Mapping(
-            target = "bookResponse",
-            source = "book"
-    )
-    BorrowDetailResponse toBorrowDetailResponse(
-            BorrowDetail borrowDetail
-    );
+    @Mapping(target = "bookResponse", source = "book")
+    @Mapping(target = "borrowRecord", source = "borrowRecord")
+    @Mapping(target = "borrowStatus", source = "status")
+    BorrowDetailResponse toBorrowDetailResponse(BorrowDetail borrowDetail);
 }

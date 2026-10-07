@@ -1,6 +1,8 @@
 package com.example.library.controller;
 
 import com.example.library.common.ApiResponse;
+import com.example.library.common.PageResponse;
+import com.example.library.dto.book.request.BorrowDetailFilter;
 import com.example.library.dto.book.request.ReturnBookRequest;
 import com.example.library.dto.book.response.BorrowDetailResponse;
 import com.example.library.service.BorrowDetailService;
@@ -32,9 +34,25 @@ public class BorrowDetailController {
 
     @GetMapping
     public ApiResponse<List<BorrowDetailResponse>> getBorrowDetails() {
-        return ApiResponse.success(
-                borrowDetailService.getBorrowDetails()
-        );
+        return ApiResponse.success(borrowDetailService.getBorrowDetails());
+    }
+
+    @GetMapping("/pagination")
+    public ApiResponse<PageResponse<BorrowDetailResponse>> getPagination(
+            @ModelAttribute BorrowDetailFilter filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        return ApiResponse.<PageResponse<BorrowDetailResponse>>builder()
+                .data(
+                        borrowDetailService.getBorrowDetailsPagination(
+                                filter,
+                                page,
+                                size
+                        )
+                )
+                .build();
     }
 
     @PutMapping("/{id}/return")

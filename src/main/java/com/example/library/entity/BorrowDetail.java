@@ -1,5 +1,6 @@
 package com.example.library.entity;
 
+import com.example.library.entity.enums.BorrowStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,6 +27,11 @@ public class BorrowDetail {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private BorrowStatus status = BorrowStatus.BORROWING;
 
     @Column(name = "return_date")
     private LocalDate returnDate;

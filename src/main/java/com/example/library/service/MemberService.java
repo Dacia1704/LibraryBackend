@@ -24,6 +24,4 @@ public interface MemberService {
     List<MemberResponse> getMembers();
 
     MemberResponse getMemberDeleted(String id);
-
-    BigDecimal getMemberFeeMonth();
 }

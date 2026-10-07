@@ -24,6 +24,7 @@ public interface UserMapper {
 
     @Mapping(target = "roleId", source = "role.id")
     @Mapping(target = "roleName", source = "role.name")
+    @Mapping(target= "member", ignore = true)
     UserResponse toUserResponse(User user);
 
     @Mapping(target = "passwordHash", ignore = true)
