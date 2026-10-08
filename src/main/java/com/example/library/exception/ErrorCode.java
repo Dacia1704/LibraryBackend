@@ -30,7 +30,9 @@ public enum ErrorCode {
     BORROW_RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy bản ghi mượn sách"),
     CANT_BORROW_OVER_DAY_IN_SETTING(HttpStatus.BAD_REQUEST, "Không thể mượn sách quá số ngày quy định"),
     CANT_BORROW(HttpStatus.BAD_REQUEST, "Không thể mượn sách"),
-    MEMBER_EXISTED(HttpStatus.BAD_REQUEST, "User này đã có thông tin Member");
+    MEMBER_EXISTED(HttpStatus.BAD_REQUEST, "User này đã có thông tin Member"),
+    PAYMENT_AMOUNT_NOT_ENOUGH(HttpStatus.BAD_REQUEST, "Số tiền thanh toán không đủ"),
+    INVALID_REQUEST(HttpStatus.BAD_REQUEST, "Yêu cầu không hợp lệ");
 
 
 

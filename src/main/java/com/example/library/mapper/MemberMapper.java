@@ -16,6 +16,7 @@ public interface MemberMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "isDeleted", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "borrowRecords", ignore = true)
     @Mapping(target = "notifications", ignore = true)
     Member toMember(MemberRequest request);
@@ -24,18 +25,19 @@ public interface MemberMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "memberCode", ignore = true)
     @Mapping(target = "isDeleted", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "borrowRecords", ignore = true)
     @Mapping(target = "notifications", ignore = true)
     Member toMember(MemberCreateRequest request);
 
-    @Mapping(target="identityNumber", source = "identityNumber")
-    @Mapping(target="cardStatus", source = "cardStatus")
-    @Mapping(target = "isDeleted", ignore = true)
+    @Mapping(target = "identityNumber", source = "identityNumber")
+    @Mapping(target = "cardStatus", source = "cardStatus")
     MemberResponse toMemberResponse(Member member);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "isDeleted", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "borrowRecords", ignore = true)
     @Mapping(target = "notifications", ignore = true)
     void updateMember(

@@ -1,7 +1,10 @@
 package com.example.library.controller;
 
 import com.example.library.common.ApiResponse;
+import com.example.library.common.PageResponse;
+import com.example.library.dto.user.request.CreateUserMemberRequest;
 import com.example.library.dto.user.request.MemberCreateRequest;
+import com.example.library.dto.user.request.MemberFilter;
 import com.example.library.dto.user.request.MemberRenewRequest;
 import com.example.library.dto.user.request.MemberRequest;
 import com.example.library.dto.user.response.MemberResponse;
@@ -32,6 +35,16 @@ public class MemberController {
         );
     }
 
+    @PostMapping("/register")
+    @PreAuthorize("hasAuthority('MEMBER_WRITE')")
+    public ApiResponse<MemberResponse> createUserAndMember(
+            @RequestBody @Valid CreateUserMemberRequest request
+    ) {
+        return ApiResponse.success(
+                memberService.createUserAndMember(request)
+        );
+    }
+
     @PostMapping("/{id}/renew")
     @PreAuthorize("hasAuthority('MEMBER_WRITE')")
     public ApiResponse<MemberResponse> renewMember(
@@ -40,6 +53,69 @@ public class MemberController {
     ) {
         return ApiResponse.success(
                 memberService.renewMember(id,request)
+        );
+    }
+
+
+
+    @GetMapping("/me")
+    public ApiResponse<MemberResponse> getMe() {
+        return ApiResponse.success(memberService.getMe());
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAuthority('MEMBER_READ')")
+    public ApiResponse<List<MemberResponse>> getMembers() {
+        return ApiResponse.success(
+                memberService.getMembers()
+        );
+    }
+
+    @GetMapping("/pagination")
+    @PreAuthorize("hasAuthority('MEMBER_READ')")
+    public ApiResponse<PageResponse<MemberResponse>> getPagination(
+            @ModelAttribute MemberFilter filter,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ApiResponse.<PageResponse<MemberResponse>>builder()
+                .data(
+                        memberService.getMembersPagination(
+                                filter,
+                                page,
+                                size
+                        )
+                )
+                .build();
+    }
+
+    @GetMapping("/deleted/{id}")
+    @PreAuthorize("hasRole('MEMBER_READ')")
+    public ApiResponse<MemberResponse> getMemberDeleted(
+            @PathVariable String id
+    ) {
+        return ApiResponse.success(
+                memberService.getMemberDeleted(id)
+        );
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('MEMBER_READ')")
+    public ApiResponse<MemberResponse> getMember(
+            @PathVariable String id
+    ) {
+        return ApiResponse.success(
+                memberService.getMember(id)
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('MEMBER_WRITE')")
+    public ApiResponse<MemberResponse> deleteMember(
+            @PathVariable String id
+    ) {
+        return ApiResponse.success(
+                memberService.deleteMember(id)
         );
     }
 
@@ -54,49 +130,6 @@ public class MemberController {
                         id,
                         request
                 )
-        );
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('MEMBER_WRITE')")
-    public ApiResponse<MemberResponse> deleteMember(
-            @PathVariable String id
-    ) {
-        return ApiResponse.success(
-                memberService.deleteMember(id)
-        );
-    }
-
-    @GetMapping("/me")
-    public ApiResponse<MemberResponse> getMe() {
-        return ApiResponse.success(memberService.getMe());
-    }
-
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('MEMBER_READ')")
-    public ApiResponse<MemberResponse> getMember(
-            @PathVariable String id
-    ) {
-        return ApiResponse.success(
-                memberService.getMember(id)
-        );
-    }
-
-    @GetMapping
-    @PreAuthorize("hasAuthority('BOOK_READ')")
-    public ApiResponse<List<MemberResponse>> getMembers() {
-        return ApiResponse.success(
-                memberService.getMembers()
-        );
-    }
-
-    @GetMapping("/deleted/{id}")
-    @PreAuthorize("hasRole('BOOK_READ')")
-    public ApiResponse<MemberResponse> getMemberDeleted(
-            @PathVariable String id
-    ) {
-        return ApiResponse.success(
-                memberService.getMemberDeleted(id)
         );
     }
 }

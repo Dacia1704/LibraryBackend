@@ -1,5 +1,6 @@
 package com.example.library.mapper;
 
+import com.example.library.dto.user.request.CreateUserMemberRequest;
 import com.example.library.dto.user.request.UserRequest;
 import com.example.library.dto.user.response.UserResponse;
 import com.example.library.entity.User;
@@ -21,6 +22,18 @@ public interface UserMapper {
     @Mapping(target = "member", ignore = true)
     @Mapping(target = "borrowRecords", ignore = true)
     User toUser(UserRequest request);
+
+    @Mapping(target = "passwordHash", ignore = true)
+    @Mapping(target = "noAccent", ignore = true)
+    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "failedAttempts", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "isDeleted", ignore = true)
+    @Mapping(target = "refreshTokens", ignore = true)
+    @Mapping(target = "member", ignore = true)
+    @Mapping(target = "borrowRecords", ignore = true)
+    User toUser(CreateUserMemberRequest request);
 
     @Mapping(target = "roleId", source = "role.id")
     @Mapping(target = "roleName", source = "role.name")

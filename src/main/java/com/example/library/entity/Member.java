@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -49,6 +50,9 @@ public class Member {
     @Builder.Default
     private Boolean isDeleted = false;
 
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
     @OneToMany(mappedBy = "member")
     @Builder.Default
     private Set<BorrowRecord> borrowRecords = new HashSet<>();
@@ -56,4 +60,11 @@ public class Member {
     @OneToMany(mappedBy = "member")
     @Builder.Default
     private Set<Notification> notifications = new HashSet<>();
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }
