@@ -1,15 +1,10 @@
 package com.example.library.dto.book.response;
 
-import com.example.library.entity.BorrowDetail;
-import com.example.library.entity.Member;
-import com.example.library.entity.User;
-import com.example.library.entity.enums.BorrowStatus;
+import com.example.library.dto.user.response.MemberResponse;
+import com.example.library.dto.user.response.UserResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @Builder
@@ -19,17 +14,14 @@ import java.util.List;
 public class BorrowRecordResponse {
     Long id;
 
-    Member member;
+    MemberResponse member;
 
-    User librarian;
+    UserResponse librarian;
 
     LocalDate borrowDate;
 
     LocalDate dueDate;
 
-    BorrowStatus status;
-
     String note;
 
-    List<BorrowDetailResponse> borrowDetails;
 }

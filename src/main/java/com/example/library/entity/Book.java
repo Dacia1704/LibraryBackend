@@ -1,6 +1,5 @@
 package com.example.library.entity;
 
-import com.example.library.entity.enums.BorrowStatus;
 import com.example.library.entity.enums.Language;
 import jakarta.persistence.*;
 import lombok.*;

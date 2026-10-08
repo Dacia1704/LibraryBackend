@@ -46,11 +46,6 @@ public class MemberServiceImpl implements MemberService {
 
     final MemberPaymentRepository memberPaymentRepository;
 
-    final SettingRepository settingRepository;
-
-    @Value("${app.setting-key.member-payment-month}")
-    String member_payment_month;
-
     @Override
     @Transactional
     public MemberResponse createMember(
@@ -253,12 +248,6 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
 
         return memberMapper.toMemberResponse(member);
-    }
-
-    @Override
-    public BigDecimal getMemberFeeMonth() {
-        Setting setting = settingRepository.findBySettingKeyAndIsDeletedFalse(member_payment_month).orElseThrow(() -> new AppException(ErrorCode.SETTING_NOT_FOUND));
-        return new BigDecimal(setting.getSettingValue());
     }
 
     public String generateMemberCode() {

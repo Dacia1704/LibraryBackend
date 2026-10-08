@@ -97,7 +97,7 @@ public class BorrowRecordServiceImpl
             throw new AppException(ErrorCode.CANT_BORROW_OVER_DAY_IN_SETTING, String.format("Không thể mượn quá số sách quy định. Số ngày quy định hiện tại là %s", borrowSetting.get(max_book_borrow)));
         }
         BigDecimal totleFine = fineService.getTotalByMember(Long.parseLong(request.getMemberId()));
-        if(fineService.getTotalByMember(Long.parseLong(request.getMemberId())).compareTo(new BigDecimal(borrowSetting.get(max_book_borrow))) > 0) {
+        if(totleFine.compareTo(new BigDecimal(borrowSetting.get(max_fine_before_block))) > 0) {
             throw new AppException(ErrorCode.CANT_BORROW, String.format("Không thể mượn sách do hiện tại bạn đang nơ tiền phạt quá mức quy định: %s/%s",totleFine, borrowSetting.get(max_fine_before_block)));
         }
 
@@ -107,7 +107,6 @@ public class BorrowRecordServiceImpl
                         .librarian(librarian)
                         .borrowDate(request.getBorrowDate())
                         .dueDate(request.getBorrowDate().plusDays(request.getDayBorrow()))
-                        .status(request.getStatus() != null ? request.getStatus() : BorrowStatus.BORROWING)
                         .note(request.getNote())
                         .build();
 
@@ -136,6 +135,7 @@ public class BorrowRecordServiceImpl
                             .borrowRecord(borrowRecord)
                             .book(book)
                             .fineAmount(java.math.BigDecimal.ZERO)
+                            .status(BorrowStatus.BORROWING)
                             .isDeleted(false)
                             .build();
 
@@ -175,7 +175,6 @@ public class BorrowRecordServiceImpl
         borrowRecord.setLibrarian(librarian);
         borrowRecord.setBorrowDate(request.getBorrowDate());
         borrowRecord.setDueDate(request.getBorrowDate().plusDays(request.getDayBorrow()));
-        borrowRecord.setStatus(request.getStatus());
         borrowRecord.setNote(request.getNote());
 
         borrowRecordRepository.save(borrowRecord);

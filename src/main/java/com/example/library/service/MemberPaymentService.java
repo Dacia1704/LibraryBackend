@@ -15,5 +15,5 @@ public interface MemberPaymentService {
             int size
     );
 
-    List<MemberPaymentResponse> getMe();
+    PageResponse<MemberPaymentResponse> getMe(Integer month, int page, int size);
 }

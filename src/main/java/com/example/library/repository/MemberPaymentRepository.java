@@ -39,4 +39,20 @@ public interface MemberPaymentRepository
     List<MemberPayment> findAllByUserId(
             @Param("userId") Long userId
     );
+
+    @Query("""
+        SELECT mp
+        FROM MemberPayment mp
+        JOIN mp.member m
+        JOIN m.user u
+        WHERE u.id = :userId
+          AND mp.isDeleted = false
+          AND (:month IS NULL OR MONTH(mp.paidAt) = :month)
+        ORDER BY mp.paidAt DESC
+    """)
+    Page<MemberPayment> findAllByUserId(
+            @Param("userId") Long userId,
+            @Param("month") Integer month,
+            Pageable pageable
+    );
 }

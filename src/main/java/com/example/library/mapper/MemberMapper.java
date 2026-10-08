@@ -28,6 +28,9 @@ public interface MemberMapper {
     @Mapping(target = "notifications", ignore = true)
     Member toMember(MemberCreateRequest request);
 
+    @Mapping(target="identityNumber", source = "identityNumber")
+    @Mapping(target="cardStatus", source = "cardStatus")
+    @Mapping(target = "isDeleted", ignore = true)
     MemberResponse toMemberResponse(Member member);
 
     @Mapping(target = "id", ignore = true)

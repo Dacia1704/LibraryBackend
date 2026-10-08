@@ -19,6 +19,5 @@ public interface SettingService {
 
     List<SettingResponse> getAll();
 
-    Setting getSetiingById(Long id);
-
+    Setting getSettingById(Long id);
 }

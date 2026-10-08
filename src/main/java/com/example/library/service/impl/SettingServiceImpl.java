@@ -10,6 +10,7 @@ import com.example.library.repository.SettingRepository;
 import com.example.library.service.SettingService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -105,9 +106,11 @@ public class SettingServiceImpl implements SettingService {
     }
 
     @Override
-    public Setting getSetiingById(Long id) {
+    public Setting getSettingById(Long id) {
         return settingRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new AppException(ErrorCode.SETTING_NOT_FOUND));
     }
+
+
 
 }

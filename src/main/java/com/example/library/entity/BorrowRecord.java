@@ -35,11 +35,6 @@ public class BorrowRecord {
     @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    @Builder.Default
-    private BorrowStatus status = BorrowStatus.BORROWING;
-
     @Column(length = 255)
     private String note;
 

@@ -28,8 +28,6 @@ public class BorrowRecordRequest {
     @NotNull
     Long dayBorrow;
 
-    BorrowStatus status;
-
     String note;
 
     @NotEmpty

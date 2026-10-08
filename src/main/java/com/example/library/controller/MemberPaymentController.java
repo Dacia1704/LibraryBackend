@@ -40,12 +40,14 @@ public class MemberPaymentController {
 
     @GetMapping("/me")
     @PreAuthorize("hasAuthority('MEMBER_PAYMENT_READ')")
-    public ApiResponse<List<MemberPaymentResponse>> getMe() {
+    public ApiResponse<PageResponse<MemberPaymentResponse>> getMe(
+            @RequestParam(required = false) Integer month,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
 
-        return ApiResponse.<List<MemberPaymentResponse>>builder()
-                .data(
-                        memberPaymentService.getMe()
-                )
+        return ApiResponse.<PageResponse<MemberPaymentResponse>>builder()
+                .data(memberPaymentService.getMe(month, page, size))
                 .build();
     }
 }

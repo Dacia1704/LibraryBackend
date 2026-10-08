@@ -23,10 +23,6 @@ public interface BorrowRecordMapper {
             target = "librarian",
             source = "librarian"
     )
-    @Mapping(
-            target = "borrowDetails",
-            source = "borrowDetails"
-    )
     BorrowRecordResponse toBorrowRecordResponse(
             BorrowRecord borrowRecord
     );

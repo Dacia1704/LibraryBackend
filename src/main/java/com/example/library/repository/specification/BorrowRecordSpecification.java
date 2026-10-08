@@ -2,7 +2,6 @@ package com.example.library.repository.specification;
 
 import com.example.library.dto.book.request.BorrowRecordFilter;
 import com.example.library.entity.BorrowRecord;
-import com.example.library.entity.enums.BorrowStatus;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,7 +17,6 @@ public class BorrowRecordSpecification {
                 .where(isNotDeleted())
                 .and(hasMemberId(filter.getMemberId()))
                 .and(hasBorrowDate(filter.getBorrowDate()))
-                .and(hasStatus(filter.getStatus()))
                 .and(hasBookId(filter.getBookId()));
     }
 
@@ -53,19 +51,6 @@ public class BorrowRecordSpecification {
                 );
     }
 
-    private static Specification<BorrowRecord> hasStatus(BorrowStatus status) {
-
-        if (status == null) {
-            return null;
-        }
-
-        return (root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(
-                        root.get("status"),
-                        status
-                );
-    }
-
     private static Specification<BorrowRecord> hasBookId(Long bookId) {
 
         if (bookId == null) {
@@ -76,6 +61,8 @@ public class BorrowRecordSpecification {
 
             Join<Object, Object> borrowDetails =
                     root.join("borrowDetails", JoinType.INNER);
+
+            query.distinct(true);
 
             return criteriaBuilder.equal(
                     borrowDetails.get("book").get("id"),

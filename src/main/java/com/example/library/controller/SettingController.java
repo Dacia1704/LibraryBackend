@@ -67,7 +67,6 @@ public class SettingController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('SETTING_MANAGE')")
     public ApiResponse<List<SettingResponse>> getAll() {
 
         return ApiResponse.<List<SettingResponse>>builder()

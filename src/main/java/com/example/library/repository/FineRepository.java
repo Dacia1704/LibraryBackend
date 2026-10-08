@@ -42,4 +42,15 @@ public interface FineRepository extends JpaRepository<Fine, Long> {
           AND f.isDeleted = false
     """)
     BigDecimal getTotalFineByMember(Long memberId);
+
+    @Query("""
+        SELECT COALESCE(SUM(f.amount), 0)
+        FROM Fine f
+        JOIN f.borrowRecord br
+        JOIN br.member m
+        JOIN m.user u
+        WHERE u.id = :userId
+          AND f.isDeleted = false
+    """)
+    BigDecimal getTotalFineByUserId(@Param("userId") Long userId);
 }

@@ -1,12 +1,16 @@
 package com.example.library.service.impl;
 
+import com.example.library.common.PageResponse;
+import com.example.library.dto.book.request.BorrowDetailFilter;
 import com.example.library.dto.book.request.FineRequest;
 import com.example.library.dto.book.request.ReturnBookRequest;
 import com.example.library.dto.book.response.BorrowDetailResponse;
+import com.example.library.dto.book.response.BorrowDetailSummaryResponse;
 import com.example.library.entity.Book;
 import com.example.library.entity.BorrowDetail;
 import com.example.library.entity.Fine;
 import com.example.library.entity.Setting;
+import com.example.library.entity.enums.BorrowStatus;
 import com.example.library.entity.enums.FineReason;
 import com.example.library.exception.AppException;
 import com.example.library.exception.ErrorCode;
@@ -14,11 +18,18 @@ import com.example.library.mapper.BorrowDetailMapper;
 import com.example.library.repository.BorrowDetailRepository;
 import com.example.library.repository.FineRepository;
 import com.example.library.repository.SettingRepository;
+import com.example.library.repository.specification.BorrowDetailSpecification;
 import com.example.library.service.BorrowDetailService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,6 +101,132 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public PageResponse<BorrowDetailResponse> getBorrowDetailsPagination(
+            BorrowDetailFilter filter,
+            int page,
+            int size
+    ) {
+
+        return paginate(
+                BorrowDetailSpecification.filter(filter),
+                normalizePage(page),
+                normalizeSize(size)
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PageResponse<BorrowDetailResponse> getMyBorrowDetailsPagination(
+            BorrowDetailFilter filter,
+            int page,
+            int size
+    ) {
+
+        Long userId = Long.valueOf(
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName()
+        );
+
+        Specification<BorrowDetail> specification =
+                BorrowDetailSpecification
+                        .filter(filter)
+                        .and(BorrowDetailSpecification.belongsToUser(userId));
+
+        return paginate(
+                specification,
+                normalizePage(page),
+                normalizeSize(size)
+        );
+    }
+
+    private int normalizePage(int page) {
+        return page < 0 ? 0 : page;
+    }
+
+    private int normalizeSize(int size) {
+        return size <= 0 ? 10 : size;
+    }
+
+    private PageResponse<BorrowDetailResponse> paginate(
+            Specification<BorrowDetail> specification,
+            int page,
+            int size
+    ) {
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(Sort.Direction.DESC, "id")
+        );
+
+        Page<BorrowDetail> borrowDetailPage =
+                borrowDetailRepository.findAll(specification, pageable);
+
+        List<BorrowDetailResponse> content =
+                borrowDetailPage.getContent()
+                        .stream()
+                        .map(borrowDetailMapper::toBorrowDetailResponse)
+                        .toList();
+
+        return PageResponse.<BorrowDetailResponse>builder()
+                .data(content)
+                .currentPage(borrowDetailPage.getNumber())
+                .pageSize(borrowDetailPage.getSize())
+                .totalElements(borrowDetailPage.getTotalElements())
+                .totalPages(borrowDetailPage.getTotalPages())
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BorrowDetailSummaryResponse getMySummary() {
+
+        Long userId = Long.valueOf(
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName()
+        );
+
+        List<Object[]> rows = borrowDetailRepository.getMyBorrowSummary(userId);
+
+        long total = 0L;
+        long borrowing = 0L;
+        long overdue = 0L;
+        long returned = 0L;
+
+        if (rows != null && !rows.isEmpty() && rows.get(0) != null) {
+            Object[] row = rows.get(0);
+            // MySQL driver may return the aggregate columns either as scalars
+            // (Object[]) or wrapped in another Object[]; handle both shapes.
+            Object[] cells = (row.length == 1 && row[0] instanceof Object[] inner)
+                    ? inner
+                    : row;
+
+            if (cells.length >= 1) total     = toLong(cells[0]);
+            if (cells.length >= 2) borrowing = toLong(cells[1]);
+            if (cells.length >= 3) overdue   = toLong(cells[2]);
+            if (cells.length >= 4) returned  = toLong(cells[3]);
+        }
+
+        return BorrowDetailSummaryResponse.builder()
+                .total(total)
+                .borrowing(borrowing)
+                .overdue(overdue)
+                .returned(returned)
+                .build();
+    }
+
+    private long toLong(Object value) {
+        if (value == null) return 0L;
+        if (value instanceof Number number) return number.longValue();
+        return Long.parseLong(value.toString());
+    }
+
+    @Override
     @Transactional
     public BorrowDetailResponse returnBook(String id, ReturnBookRequest request) {
 
@@ -107,6 +244,7 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
         LocalDate returnDate = LocalDate.now();
 
         borrowDetail.setReturnDate(returnDate);
+        borrowDetail.setStatus(BorrowStatus.RETURNED);
 
         // Tính tiền phạt
         List<String> settingKeys = List.of(

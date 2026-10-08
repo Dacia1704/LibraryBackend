@@ -70,11 +70,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public RefreshTokenResponse refreshToken(RefreshTokenRequest request) {
         System.out.println(request.getRefreshToken());
-        RefreshToken refreshToken = refreshTokenRepository.findByTokenAndRevokedFalse(request.getRefreshToken()).orElse(null);
-        assert refreshToken != null;
-        if(Boolean.FALSE.equals(refreshToken.getRevoked())) throw new AppException(ErrorCode.UNAUTHENTICATED);
+        RefreshToken refreshToken = refreshTokenRepository.findByTokenAndRevokedFalse(request.getRefreshToken()).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+        if(Boolean.TRUE.equals(refreshToken.getRevoked())) throw new AppException(ErrorCode.UNAUTHENTICATED);
         User user = refreshToken.getUser();
-        if(Boolean.TRUE.equals(user.getIsActive())) throw new AppException(ErrorCode.USER_NOT_ACTIVE);
+        if(Boolean.FALSE.equals(user.getIsActive())) throw new AppException(ErrorCode.USER_NOT_ACTIVE);
         if(Boolean.TRUE.equals(user.getIsDeleted())) throw new AppException(ErrorCode.USER_NOT_FOUND);
 
         refreshToken.setRevoked(true);
@@ -95,8 +94,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public void logout(LogoutRequest request) {
-        RefreshToken refreshToken = refreshTokenRepository.findByTokenAndRevokedFalse(request.getRefreshToken()).orElse(null);
-        assert refreshToken != null;
+        RefreshToken refreshToken = refreshTokenRepository.findByTokenAndRevokedFalse(request.getRefreshToken()).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
         if(Boolean.TRUE.equals(refreshToken.getRevoked())) {
             refreshToken.setRevoked(true);
             refreshTokenRepository.save(refreshToken);

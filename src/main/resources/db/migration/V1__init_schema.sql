@@ -77,9 +77,12 @@ CREATE TABLE members (
     phone           VARCHAR(15)   NULL,
     identity_number VARCHAR(12)   NOT NULL,
     address         NVARCHAR(255) NULL,
-    card_expiry     DATE          NOT NULL,
+    card_expiry     DATE          NOT NULL,   -- PENDING: han du kien, tinh lai khi cap the
+    card_status     VARCHAR(10)   NOT NULL CONSTRAINT DF_members_card_status DEFAULT 'ISSUED',
+                                              -- ISSUED = da cap the, PENDING = doi cap the
     is_deleted      BIT           NOT NULL CONSTRAINT DF_members_deleted DEFAULT 0,
-    CONSTRAINT FK_members_user FOREIGN KEY (user_id) REFERENCES users(id)
+    CONSTRAINT FK_members_user FOREIGN KEY (user_id) REFERENCES users(id),
+    CONSTRAINT CK_members_card_status CHECK (card_status IN ('ISSUED','PENDING'))
 );
 CREATE UNIQUE INDEX UX_members_user_id     ON members(user_id)     WHERE is_deleted = 0;
 CREATE UNIQUE INDEX UX_members_member_code ON members(member_code) WHERE is_deleted = 0;
@@ -89,7 +92,7 @@ CREATE TABLE member_payments (
     id           BIGINT IDENTITY(1,1) PRIMARY KEY,
     member_id    BIGINT        NOT NULL,
     amount       DECIMAL(10,2) NOT NULL,                    -- so tien da nop
-    payment_type VARCHAR(10)   NOT NULL CONSTRAINT DF_mp_type DEFAULT 'REGISTER',   -- REGISTER / RENEW
+    payment_type VARCHAR(10)   NOT NULL CONSTRAINT DF_mp_type DEFAULT 'REGISTER',   -- REGISTER (dang ky) / RENEW (gia han) / REISSUE (cap lai the)
     paid_at      DATETIME2     NOT NULL CONSTRAINT DF_mp_paid DEFAULT SYSDATETIME(),
     received_by  BIGINT        NOT NULL,                    -- users.id cua thu thu thu tien
     note         NVARCHAR(255) NULL,
@@ -97,7 +100,7 @@ CREATE TABLE member_payments (
     CONSTRAINT FK_mp_member   FOREIGN KEY (member_id)   REFERENCES members(id),
     CONSTRAINT FK_mp_receiver FOREIGN KEY (received_by) REFERENCES users(id),
     CONSTRAINT CK_mp_amount   CHECK (amount >= 0),
-    CONSTRAINT CK_mp_type     CHECK (payment_type IN ('REGISTER','RENEW'))
+    CONSTRAINT CK_mp_type     CHECK (payment_type IN ('REGISTER','RENEW','REISSUE'))
 );
 CREATE INDEX IX_mp_member_id   ON member_payments(member_id);
 CREATE INDEX IX_mp_received_by ON member_payments(received_by);
@@ -213,31 +216,32 @@ CREATE TABLE borrow_records (
     librarian_id BIGINT        NOT NULL,        -- users.id cua thu thu lap phieu
     borrow_date  DATE          NOT NULL,
     due_date     DATE          NOT NULL,
-    status       VARCHAR(20)   NOT NULL CONSTRAINT DF_br_status DEFAULT 'BORROWING',
     note         NVARCHAR(255) NULL,
     is_deleted   BIT           NOT NULL CONSTRAINT DF_br_deleted DEFAULT 0,
     CONSTRAINT FK_br_member    FOREIGN KEY (member_id)    REFERENCES members(id),
     CONSTRAINT FK_br_librarian FOREIGN KEY (librarian_id) REFERENCES users(id),
-    CONSTRAINT CK_br_status    CHECK (status IN ('BORROWING','RETURNED','OVERDUE')),
     CONSTRAINT CK_br_dates     CHECK (due_date >= borrow_date)
 );
 CREATE INDEX IX_br_member_id    ON borrow_records(member_id);
 CREATE INDEX IX_br_librarian_id ON borrow_records(librarian_id);
-CREATE INDEX IX_br_status_due   ON borrow_records(status, due_date);
+CREATE INDEX IX_br_due_date     ON borrow_records(due_date);
 
 CREATE TABLE borrow_details (
     id          BIGINT IDENTITY(1,1) PRIMARY KEY,
     borrow_id   BIGINT        NOT NULL,
     book_id     BIGINT        NOT NULL,
     return_date DATE          NULL,
+    status      VARCHAR(20)   NOT NULL CONSTRAINT DF_bd_status  DEFAULT 'BORROWING',  -- trang thai TUNG cuon: BORROWING / RETURNED / OVERDUE
     fine_amount DECIMAL(10,2) NOT NULL CONSTRAINT DF_bd_fine    DEFAULT 0,
     is_deleted  BIT           NOT NULL CONSTRAINT DF_bd_deleted DEFAULT 0,
     CONSTRAINT FK_bd_borrow FOREIGN KEY (borrow_id) REFERENCES borrow_records(id),
     CONSTRAINT FK_bd_book   FOREIGN KEY (book_id)   REFERENCES books(id),
-    CONSTRAINT CK_bd_fine   CHECK (fine_amount >= 0)
+    CONSTRAINT CK_bd_fine   CHECK (fine_amount >= 0),
+    CONSTRAINT CK_bd_status CHECK (status IN ('BORROWING','RETURNED','OVERDUE'))
 );
 CREATE INDEX IX_bd_borrow_id ON borrow_details(borrow_id);
 CREATE INDEX IX_bd_book_id   ON borrow_details(book_id);
+CREATE INDEX IX_bd_status    ON borrow_details(status);
 
 -- =====================================================================
 -- 5. TIEN PHAT / THANH TOAN PHAT
@@ -247,7 +251,7 @@ CREATE TABLE fines (
     borrow_id        BIGINT        NOT NULL,                 -- phat den tu phieu muon nao
     borrow_detail_id BIGINT        NULL,                     -- cuon sach nao (NULL neu phat chung ca phieu)
     amount           DECIMAL(10,2) NOT NULL,
-    reason           VARCHAR(20)   NOT NULL,                 -- OVERDUE / LOST / DAMAGED
+    reason           VARCHAR(50)   NOT NULL,                 -- OVERDUE / LOST / DAMAGED
     overdue_days     INT           NULL,                     -- so ngay tre (chi dung khi reason = OVERDUE)
     note             NVARCHAR(255) NULL,
     created_at       DATETIME2     NOT NULL CONSTRAINT DF_fines_created DEFAULT SYSDATETIME(),
@@ -256,7 +260,7 @@ CREATE TABLE fines (
     CONSTRAINT FK_fines_borrow FOREIGN KEY (borrow_id)        REFERENCES borrow_records(id),
     CONSTRAINT FK_fines_detail FOREIGN KEY (borrow_detail_id) REFERENCES borrow_details(id),
     CONSTRAINT CK_fines_amount CHECK (amount > 0),
-    CONSTRAINT CK_fines_reason CHECK (reason IN ('OVERDUE','LOST','DAMAGED'))
+    CONSTRAINT CK_fines_reason CHECK (reason IN ('OVERDUE','LOST','DAMAGED', 'DAMAGED_LIGHT', 'DAMAGED_HEAVY_REPAIRABLE', 'DAMAGED_HEAVY_IRREPARABLE'))
 );
 CREATE INDEX IX_fines_borrow_id ON fines(borrow_id);
 CREATE INDEX IX_fines_detail_id ON fines(borrow_detail_id);
@@ -319,13 +323,15 @@ INSERT INTO settings (setting_key, setting_value, description) VALUES
  ('MAX_BOOKS_BORROW',                    N'5',      N'Số sách tối đa được mượn'),
  ('MAX_FINE_BEFORE_BLOCK',               N'50000',  N'Tổng tiền phạt còn nợ tối đa; vượt quá sẽ không được mượn thêm (VND)'),
  ('DUE_REMINDER_DAYS',                   N'1',      N'Số ngày trước hạn trả để gửi thông báo nhắc'),
- ('MEMBERSHIP_FEE',                      N'100000', N'Phí đăng ký thẻ thành viên (VND)');
+ ('MEMBERSHIP_FEE',                      N'100000', N'Phí đăng ký thẻ thành viên (VND)'),
+ ('CARD_MAKER_FEE',                      N'50000',  N'Phí làm thẻ cứng thành viên (VND)');
 
 -- ---------- ROLES ----------
 INSERT INTO roles (name, description) VALUES
  ('ADMIN',     N'Quản trị hệ thống'),
  ('LIBRARIAN', N'Thủ thư'),
- ('MEMBER',    N'Độc giả');
+ ('MEMBER',    N'Thành viên thư viện (có thẻ mượn sách)'),
+ ('READER',    N'Độc giả (chưa có thẻ thành viên, chỉ xem)');
 
 -- ---------- PERMISSIONS ----------
 INSERT INTO permissions (code, description) VALUES
@@ -375,6 +381,15 @@ JOIN permissions p ON p.code IN
   'FINE_READ', 'FINE_PAYMENT_READ', 'MEMBER_PAYMENT_READ')
 WHERE r.name = 'MEMBER';
 
+-- READER: xem sach, xem phieu muon / tien phat / hoa don cua minh, quan ly tai khoan ca nhan
+INSERT INTO role_permissions (role_id, permission_id)
+SELECT r.id, p.id
+FROM roles r
+JOIN permissions p ON p.code IN
+ ('USER_READ', 'USER_WRITE', 'BOOK_READ', 'BORROW_READ',
+  'FINE_READ', 'FINE_PAYMENT_READ', 'MEMBER_PAYMENT_READ')
+WHERE r.name = 'READER';
+
 -- ---------- USERS DEMO ----------
 -- Mat khau chung cua ca 3 tai khoan: Library@123  (BCrypt, doi sau khi chay that)
 INSERT INTO users (username, password_hash, full_name, no_accent, email, role_id)
@@ -393,7 +408,7 @@ SELECT 'user', '$2a$10$oBtQmWU9wIIEqhe8n5FS1.NcukW5XEGg.T/51Sgmap.RpTZozW3va',
 FROM roles r WHERE r.name = 'MEMBER';
 
 -- Ho so thanh vien cho tai khoan 'user' (de dang nhap duoc chuc nang doc gia)
-INSERT INTO members (user_id, member_code, phone, identity_number, address, card_expiry)
+INSERT INTO members (user_id, member_code, phone, identity_number, address, card_expiry, card_status)
 SELECT u.id, 'TV000001', '0900000001', '012345678901', N'Hà Nội',
-       DATEADD(YEAR, 1, CAST(SYSDATETIME() AS DATE))
+       DATEADD(YEAR, 1, CAST(SYSDATETIME() AS DATE)), 'ISSUED'
 FROM users u WHERE u.username = 'user';

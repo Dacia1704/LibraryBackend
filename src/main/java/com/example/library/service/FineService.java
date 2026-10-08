@@ -20,4 +20,8 @@ public interface FineService {
     );
 
     BigDecimal getTotalByMember(Long id);
+
+    BigDecimal getTotalByUserId(Long userId);
+
+    BigDecimal getMyTotal();
 }
