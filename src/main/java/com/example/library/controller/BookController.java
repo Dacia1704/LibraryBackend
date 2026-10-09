@@ -5,6 +5,7 @@ import com.example.library.common.PageResponse;
 import com.example.library.dto.book.request.BookFilter;
 import com.example.library.dto.book.request.BookRequest;
 import com.example.library.dto.book.response.BookResponse;
+import com.example.library.dto.book.response.BookStatisticsResponse;
 import com.example.library.service.BookService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -24,9 +25,9 @@ public class BookController {
 
     BookService bookService;
 
-    @PostMapping("/pagination")
+    @PostMapping(value = "/pagination", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponse<PageResponse<BookResponse>> getBooksPagination(
-            @ModelAttribute BookFilter filter,
+            @RequestBody BookFilter filter,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
@@ -94,9 +95,11 @@ public class BookController {
     }
 
     @GetMapping
-    public ApiResponse<List<BookResponse>> getBooks() {
+    public ApiResponse<List<BookResponse>> getBooks(
+            @RequestParam(required = false) String keyword
+    ) {
         return ApiResponse.success(
-                bookService.getBooks()
+                bookService.getBooks(keyword)
         );
     }
 
@@ -110,5 +113,11 @@ public class BookController {
         );
     }
 
+    @GetMapping("/statistics")
+    public ApiResponse<BookStatisticsResponse> getStatistics() {
+        return ApiResponse.success(
+                bookService.getStatistics()
+        );
+    }
 
 }

@@ -5,6 +5,7 @@ import com.example.library.common.PageResponse;
 import com.example.library.dto.book.request.BookFilter;
 import com.example.library.dto.book.request.BookRequest;
 import com.example.library.dto.book.response.BookResponse;
+import com.example.library.dto.book.response.BookStatisticsResponse;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface BookService {
 
     BookResponse getBook(String id);
 
-    List<BookResponse> getBooks();
+    List<BookResponse> getBooks(String keyword);
 
     BookResponse getBookDeleted(String id);
 
@@ -27,4 +28,6 @@ public interface BookService {
             int page,
             int size
     );
+
+    BookStatisticsResponse getStatistics();
 }

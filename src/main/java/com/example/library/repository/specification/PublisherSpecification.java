@@ -23,7 +23,7 @@ public class PublisherSpecification {
     private static Specification<Publisher> hasKeyword(String keyword) {
 
         if (keyword == null || keyword.isBlank()) {
-            return null;
+            return (root, query, cb) -> cb.conjunction();
         }
 
         String value = "%" + keyword.trim().toLowerCase() + "%";

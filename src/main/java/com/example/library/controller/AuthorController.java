@@ -65,7 +65,7 @@ public class AuthorController {
         );
     }
 
-    @GetMapping("/")
+    @GetMapping
     public ApiResponse<PageResponse<AuthorResponse>> getAuthorsPagination(
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "0") int page,

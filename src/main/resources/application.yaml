@@ -55,5 +55,5 @@ app:
     max-book-borrow: "MAX_BOOKS_BORROW"
     max-fine-before-block: "MAX_FINE_BEFORE_BLOCK"
     due-reminder-days: "DUE_REMINDER_DAYS"
-    member-payment-month: "MEMBER_PAYMENT_MONTH"
+    member-payment-month: "MEMBERSHIP_FEE"
     card-maker-fee: "CARD_MAKER_FEE"

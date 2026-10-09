@@ -3,6 +3,8 @@ package com.example.library.controller;
 import com.example.library.common.ApiResponse;
 import com.example.library.common.PageResponse;
 import com.example.library.dto.book.response.FineResponse;
+import com.example.library.exception.AppException;
+import com.example.library.exception.ErrorCode;
 import com.example.library.service.FineService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -51,8 +53,11 @@ public class FineController {
     @GetMapping("/total")
     @PreAuthorize("hasAuthority('FINE_READ')")
     public ApiResponse<BigDecimal> getTotalByUserId(
-            @RequestParam Long userId
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Long memberId
     ) {
-        return ApiResponse.success(fineService.getTotalByUserId(userId));
+        if(userId==null && memberId==null) throw new AppException(ErrorCode.INVALID_REQUEST);
+        if(userId != null) return ApiResponse.success(fineService.getTotalByUserId(userId));
+        return ApiResponse.success(fineService.getTotalByMember(memberId));
     }
 }

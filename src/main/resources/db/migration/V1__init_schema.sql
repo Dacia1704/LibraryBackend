@@ -81,6 +81,7 @@ CREATE TABLE members (
     card_status     VARCHAR(10)   NOT NULL CONSTRAINT DF_members_card_status DEFAULT 'ISSUED',
                                               -- ISSUED = da cap the, PENDING = doi cap the
     is_deleted      BIT           NOT NULL CONSTRAINT DF_members_deleted DEFAULT 0,
+    created_at      DATETIME2     NOT NULL CONSTRAINT DF_members_created_at DEFAULT SYSDATETIME(),
     CONSTRAINT FK_members_user FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT CK_members_card_status CHECK (card_status IN ('ISSUED','PENDING'))
 );

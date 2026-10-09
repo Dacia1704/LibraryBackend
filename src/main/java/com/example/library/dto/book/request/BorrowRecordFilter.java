@@ -1,5 +1,6 @@
 package com.example.library.dto.book.request;
 
+import com.example.library.dto.book.request.enum_request.BorrowRecordStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -11,7 +12,9 @@ import java.time.LocalDate;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BorrowRecordFilter {
-    Long memberId;
-    LocalDate borrowDate;
-    Long bookId;
+    String memberKeyword;
+    String bookKeyword;
+    LocalDate startBorrowDate;
+    LocalDate endBorrowDate;
+    BorrowRecordStatus status;
 }

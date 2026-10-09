@@ -191,6 +191,13 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
                         .getName()
         );
 
+        return getSummary(userId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BorrowDetailSummaryResponse getSummary(Long userId) {
+
         List<Object[]> rows = borrowDetailRepository.getMyBorrowSummary(userId);
 
         long total = 0L;
