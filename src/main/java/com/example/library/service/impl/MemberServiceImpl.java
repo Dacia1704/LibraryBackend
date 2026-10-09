@@ -439,25 +439,15 @@ public class MemberServiceImpl implements MemberService {
             int size
     ) {
 
-        if (page < 0) {
-            page = 0;
-        }
+        if (page < 0) {page = 0;}
 
-        if (size <= 0) {
-            size = 10;
-        }
+        if (size <= 0) {size = 10;}
 
-        Pageable pageable = PageRequest.of(
-                page,
-                size,
-                Sort.by(Sort.Direction.DESC, "id")
-        );
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
 
-        Specification<Member> specification =
-                MemberSpecification.filter(filter);
+        Specification<Member> specification = MemberSpecification.filter(filter);
 
-        Page<Member> memberPage =
-                memberRepository.findAll(specification, pageable);
+        Page<Member> memberPage = memberRepository.findAll(specification, pageable);
 
         List<MemberResponse> content = memberPage.getContent()
                 .stream()
