@@ -31,7 +31,7 @@ public class UserSpecification {
     private static Specification<User> hasKeyword(String keyword) {
 
         if (keyword == null || keyword.isBlank()) {
-            return null;
+            return (root, query, cb) -> cb.conjunction();
         }
 
         String value = "%" + keyword.trim().toLowerCase() + "%";
@@ -47,7 +47,7 @@ public class UserSpecification {
     private static Specification<User> hasEmail(String email) {
 
         if (email == null || email.isBlank()) {
-            return null;
+            return (root, query, cb) -> cb.conjunction();
         }
 
         return (root, query, cb) ->
@@ -60,7 +60,7 @@ public class UserSpecification {
     private static Specification<User> hasRoleId(Long roleId) {
 
         if (roleId == null) {
-            return null;
+            return (root, query, cb) -> cb.conjunction();
         }
 
         return (root, query, cb) ->
@@ -73,7 +73,7 @@ public class UserSpecification {
     private static Specification<User> hasIsMember(Boolean isMember) {
 
         if (isMember == null) {
-            return null;
+            return (root, query, cb) -> cb.conjunction();
         }
 
         return (root, query, cb) -> {
@@ -93,7 +93,7 @@ public class UserSpecification {
     private static Specification<User> hasPhone(String phone) {
 
         if (phone == null || phone.isBlank()) {
-            return null;
+            return (root, query, cb) -> cb.conjunction();
         }
 
         return (root, query, cb) -> {

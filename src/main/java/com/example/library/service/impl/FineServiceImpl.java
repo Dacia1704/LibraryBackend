@@ -128,25 +128,13 @@ public class FineServiceImpl implements FineService {
     @Override
     public BigDecimal getTotalByMember(Long id) {
 
-        BigDecimal totalFine =
-                fineRepository.getTotalFineByMember(id);
-
-        BigDecimal totalPayment =
-                finePaymentRepository.getTotalPaymentByMember(id);
-
-        return totalFine.subtract(totalPayment);
+        return fineRepository.getTotalFineByMember(id);
     }
 
     @Override
     public BigDecimal getTotalByUserId(Long userId) {
 
-        BigDecimal totalFine =
-                fineRepository.getTotalFineByUserId(userId);
-
-        BigDecimal totalPayment =
-                finePaymentRepository.getTotalPaymentByUserId(userId);
-
-        return totalFine.subtract(totalPayment);
+        return fineRepository.getTotalFineByUserId(userId);
     }
 
     @Override

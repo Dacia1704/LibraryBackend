@@ -59,7 +59,7 @@ public class CategoryController {
             @PathVariable String id
     ) {
         return ApiResponse.success(
-                categoryService.deleteCategory(id)
+                categoryService.deleteCategory(id)      
         );
     }
 

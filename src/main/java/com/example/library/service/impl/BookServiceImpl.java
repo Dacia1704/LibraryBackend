@@ -4,6 +4,7 @@ import com.example.library.common.PageResponse;
 import com.example.library.dto.book.request.BookFilter;
 import com.example.library.dto.book.request.BookRequest;
 import com.example.library.dto.book.response.BookResponse;
+import com.example.library.dto.book.response.BookStatisticsResponse;
 import com.example.library.entity.*;
 import com.example.library.exception.AppException;
 import com.example.library.exception.ErrorCode;
@@ -166,9 +167,21 @@ public class BookServiceImpl implements BookService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookResponse> getBooks() {
-        return bookRepository.findAllByIsDeletedFalse()
-                .stream()
+    public List<BookResponse> getBooks(String keyword) {
+        List<Book> books;
+        if (keyword != null && !keyword.isBlank()) {
+            String normalizedKeyword = TextUtils.removeAccent(keyword.toLowerCase().trim());
+            books = bookRepository.findAllByIsDeletedFalse().stream()
+                    .filter(book -> {
+                        String titleNoAccent = book.getNoAccent() != null ? book.getNoAccent().toLowerCase() : "";
+                        String isbn = book.getIsbn() != null ? book.getIsbn().toLowerCase() : "";
+                        return titleNoAccent.contains(normalizedKeyword) || isbn.contains(normalizedKeyword);
+                    })
+                    .toList();
+        } else {
+            books = bookRepository.findAllByIsDeletedFalse();
+        }
+        return books.stream()
                 .map(bookMapper::toBookResponse)
                 .toList();
     }
@@ -212,6 +225,17 @@ public class BookServiceImpl implements BookService {
 
     private String generateBookCode() {
         return TextUtils.generateCode("BK");
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public BookStatisticsResponse getStatistics() {
+        return BookStatisticsResponse.builder()
+                .totalTitles(bookRepository.countTotalTitles())
+                .totalCopies(bookRepository.sumTotalCopies())
+                .borrowedCopies(bookRepository.sumBorrowedCopies())
+                .outOfStockTitles(bookRepository.countOutOfStockTitles())
+                .build();
     }
 
 }

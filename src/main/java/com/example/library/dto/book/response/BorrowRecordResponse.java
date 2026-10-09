@@ -4,7 +4,9 @@ import com.example.library.dto.user.response.MemberResponse;
 import com.example.library.dto.user.response.UserResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -23,5 +25,7 @@ public class BorrowRecordResponse {
     LocalDate dueDate;
 
     String note;
+
+    List<BorrowDetailResponseForRecord> borrowDetails;
 
 }

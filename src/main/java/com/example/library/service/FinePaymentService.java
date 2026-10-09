@@ -23,6 +23,7 @@ public interface FinePaymentService {
     FinePaymentResponse create(FinePaymentRequest request);
 
     BigDecimal getTotalByUserId(Long userId);
+    BigDecimal getTotalByMemberId(Long memberId);
 
     BigDecimal getMyTotal();
 }

@@ -65,9 +65,11 @@ public class MemberController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('MEMBER_READ')")
-    public ApiResponse<List<MemberResponse>> getMembers() {
+    public ApiResponse<List<MemberResponse>> getMembers(
+            @RequestParam(required = false) String keyword
+    ) {
         return ApiResponse.success(
-                memberService.getMembers()
+                memberService.getMembers(keyword)
         );
     }
 

@@ -28,6 +28,8 @@ public interface BorrowDetailService {
     );
 
     BorrowDetailSummaryResponse getMySummary();
+    BorrowDetailSummaryResponse getSummary(Long userId);
+
 
     BorrowDetailResponse returnBook(String id, ReturnBookRequest request);
 }

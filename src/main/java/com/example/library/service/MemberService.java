@@ -26,7 +26,7 @@ public interface MemberService {
     MemberResponse getMember(String id);
     MemberResponse getMe();
 
-    List<MemberResponse> getMembers();
+    List<MemberResponse> getMembers(String keyword);
 
     PageResponse<MemberResponse> getMembersPagination(
             MemberFilter filter,

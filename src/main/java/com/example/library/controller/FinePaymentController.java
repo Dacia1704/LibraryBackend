@@ -4,6 +4,8 @@ import com.example.library.common.ApiResponse;
 import com.example.library.common.PageResponse;
 import com.example.library.dto.book.request.FinePaymentRequest;
 import com.example.library.dto.book.response.FinePaymentResponse;
+import com.example.library.exception.AppException;
+import com.example.library.exception.ErrorCode;
 import com.example.library.service.FinePaymentService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -65,12 +67,13 @@ public class FinePaymentController {
 
     @GetMapping("/total")
     @PreAuthorize("hasAuthority('FINE_PAYMENT_READ')")
-    public ApiResponse<BigDecimal> getTotalByUserId(
-            @RequestParam Long userId
+    public ApiResponse<BigDecimal> getTotalByUserIdOrMemberId(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Long memberId
     ) {
-        return ApiResponse.success(
-                finePaymentService.getTotalByUserId(userId)
-        );
+        if(userId==null && memberId==null) throw new AppException(ErrorCode.INVALID_REQUEST);
+        if(userId != null) return ApiResponse.success(finePaymentService.getTotalByUserId(userId));
+        return ApiResponse.success(finePaymentService.getTotalByMemberId(memberId));
     }
 
     @PostMapping

@@ -164,8 +164,12 @@ public class FinePaymentServiceImpl implements FinePaymentService {
 
     @Override
     public BigDecimal getTotalByUserId(Long userId) {
-
         return finePaymentRepository.getTotalPaymentByUserId(userId);
+    }
+
+    @Override
+    public BigDecimal getTotalByMemberId(Long memberId) {
+        return finePaymentRepository.getTotalPaymentByMember(memberId);
     }
 
     @Override

@@ -410,11 +410,23 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<MemberResponse> getMembers() {
-
-        return memberRepository
-                .findAllByIsDeletedFalse()
-                .stream()
+    public List<MemberResponse> getMembers(String keyword) {
+        List<Member> members;
+        if (keyword != null && !keyword.isBlank()) {
+            String normalizedKeyword = TextUtils.removeAccent(keyword.toLowerCase().trim());
+            members = memberRepository.findAllByIsDeletedFalse().stream()
+                    .filter(member -> {
+                        String fullName = member.getUser() != null && member.getUser().getNoAccent() != null 
+                                ? member.getUser().getNoAccent().toLowerCase() : "";
+                        String phone = member.getPhone() != null ? member.getPhone().toLowerCase() : "";
+                        String memberCode = member.getMemberCode() != null ? member.getMemberCode().toLowerCase() : "";
+                        return fullName.contains(normalizedKeyword) || phone.contains(normalizedKeyword) || memberCode.contains(normalizedKeyword);
+                    })
+                    .toList();
+        } else {
+            members = memberRepository.findAllByIsDeletedFalse();
+        }
+        return members.stream()
                 .map(memberMapper::toMemberResponse)
                 .toList();
     }

@@ -75,6 +75,14 @@ public class BorrowDetailController {
         );
     }
 
+    @GetMapping("/summary/{userId}")
+    @PreAuthorize("hasAuthority('BORROW_WRITE')")
+    public ApiResponse<BorrowDetailSummaryResponse> getSummary(@PathVariable String userId) {
+        return ApiResponse.success(
+                borrowDetailService.getSummary(Long.valueOf(userId))
+        );
+    }
+
     @PutMapping("/{id}/return")
     @PreAuthorize("hasAuthority('BORROW_WRITE')")
     public ApiResponse<BorrowDetailResponse> returnBook(
