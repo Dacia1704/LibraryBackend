@@ -13,6 +13,7 @@ import com.example.library.mapper.UserMapper;
 import com.example.library.repository.RoleRepository;
 import com.example.library.repository.UserRepository;
 import com.example.library.repository.specification.UserSpecification;
+import com.example.library.security.PasswordEncoderConfig;
 import com.example.library.service.UserService;
 import com.example.library.utils.TextUtils;
 import lombok.AccessLevel;
@@ -23,7 +24,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
 
     UserMapper userMapper;
 
-    PasswordEncoder passwordEncoder;
+    PasswordEncoderConfig passwordEncoderConfig;
 
     @Override
     @Transactional
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toUser(request);
 
         user.setPasswordHash(
-                passwordEncoder.encode(request.getPassword())
+                passwordEncoderConfig.passwordEncoder().encode(request.getPassword())
         );
 
         user.setNoAccent(
@@ -90,6 +90,8 @@ public class UserServiceImpl implements UserService {
 
         if (request.getIsActive() != null) {
             user.setIsActive(request.getIsActive());
+        } else {
+            user.setIsActive(true);
         }
 
         user.setIsDeleted(false);
@@ -170,7 +172,7 @@ public class UserServiceImpl implements UserService {
                 && !request.getPassword().isBlank()) {
 
             user.setPasswordHash(
-                    passwordEncoder.encode(
+                    passwordEncoderConfig.passwordEncoder().encode(
                             request.getPassword()
                     )
             );

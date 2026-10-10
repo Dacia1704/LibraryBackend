@@ -24,6 +24,7 @@ import com.example.library.repository.RoleRepository;
 import com.example.library.repository.SettingRepository;
 import com.example.library.repository.UserRepository;
 import com.example.library.repository.specification.MemberSpecification;
+import com.example.library.security.PasswordEncoderConfig;
 import com.example.library.service.MemberService;
 import com.example.library.utils.TextUtils;
 import lombok.AccessLevel;
@@ -36,7 +37,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,7 +68,7 @@ public class MemberServiceImpl implements MemberService {
 
     final MemberPaymentRepository memberPaymentRepository;
 
-    final PasswordEncoder passwordEncoder;
+    final PasswordEncoderConfig passwordEncoderConfig;
 
     @Value("${app.setting-key.member-payment-month}")
     String memberPaymentMonthKey;
@@ -154,7 +154,7 @@ public class MemberServiceImpl implements MemberService {
 
         // ===== 1. Tạo User =====
         User user = userMapper.toUser(request);
-        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setPasswordHash(passwordEncoderConfig.passwordEncoder().encode(request.getPassword()));
         user.setNoAccent(TextUtils.removeAccent(request.getFullName()));
         user.setRole(role);
         user.setIsActive(true);
@@ -298,7 +298,7 @@ public class MemberServiceImpl implements MemberService {
         }
 
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
-            user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+            user.setPasswordHash(passwordEncoderConfig.passwordEncoder().encode(request.getPassword()));
         }
 
         if (request.getFullName() != null) {
