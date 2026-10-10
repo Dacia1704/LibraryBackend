@@ -1,6 +1,7 @@
 package com.example.library.service;
 
 import com.example.library.common.PageResponse;
+import com.example.library.dto.user.request.UserActiveRequest;
 import com.example.library.dto.user.request.UserFilter;
 import com.example.library.dto.user.request.UserRequest;
 import com.example.library.dto.user.response.UserResponse;
@@ -24,4 +25,6 @@ public interface UserService {
     );
 
     UserResponse getUserDeleted(String id);
+
+    UserResponse setUserActive(Long id, UserActiveRequest request);
 }

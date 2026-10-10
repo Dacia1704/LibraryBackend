@@ -28,6 +28,4 @@ public class UserResponse {
     private LocalDateTime createdAt;
 
     private MemberResponse member;
-
-
 }

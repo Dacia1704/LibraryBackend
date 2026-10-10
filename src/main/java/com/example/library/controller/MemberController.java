@@ -6,7 +6,7 @@ import com.example.library.dto.user.request.CreateUserMemberRequest;
 import com.example.library.dto.user.request.MemberCreateRequest;
 import com.example.library.dto.user.request.MemberFilter;
 import com.example.library.dto.user.request.MemberRenewRequest;
-import com.example.library.dto.user.request.MemberRequest;
+import com.example.library.dto.user.request.MemberUpdateRequest;
 import com.example.library.dto.user.response.MemberResponse;
 import com.example.library.service.MemberService;
 import jakarta.validation.Valid;
@@ -125,7 +125,7 @@ public class MemberController {
     @PreAuthorize("hasAuthority('MEMBER_WRITE')")
     public ApiResponse<MemberResponse> updateMember(
             @PathVariable Long id,
-            @RequestBody @Valid MemberRequest request
+            @RequestBody @Valid MemberUpdateRequest request
     ) {
         return ApiResponse.success(
                 memberService.updateMember(

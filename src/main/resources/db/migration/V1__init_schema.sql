@@ -335,60 +335,114 @@ INSERT INTO roles (name, description) VALUES
  ('READER',    N'Độc giả (chưa có thẻ thành viên, chỉ xem)');
 
 -- ---------- PERMISSIONS ----------
+-- Moi tai nguyen co bo quyen READ / WRITE / DELETE.
+-- WRITE: tao/cap nhat/thuc hien thao tac ghi; DELETE: xoa mem/huy theo nghiep vu.
 INSERT INTO permissions (code, description) VALUES
- ('USER_READ',            N'Xem tài khoản người dùng'),
- ('USER_WRITE',           N'Quản lý tài khoản người dùng'),
- ('ROLE_MANAGE',          N'Quản lý role và permission'),
- ('BOOK_READ',            N'Xem và tìm kiếm sách, tác giả, thể loại, nhà xuất bản, kệ sách'),
- ('BOOK_WRITE',           N'Thêm, sửa, xóa sách, tác giả, thể loại, nhà xuất bản, kệ sách'),
- ('MEMBER_READ',          N'Xem danh sách thành viên'),
- ('MEMBER_WRITE',         N'Thêm, sửa, xóa thành viên'),
- ('BORROW_WRITE',         N'Lập phiếu mượn và ghi nhận trả sách'),
- ('BORROW_READ',          N'Xem phiếu mượn'),
- ('CATEGORY_MANAGE',      N'Quản lý danh mục'),
- ('AUTHOR_MANAGE',        N'Quản lý tác giả'),
- ('PUBLISHER_MANAGE',     N'Quản lý nhà xuất bản'),
- ('PERMISSION_MANAGE',    N'Quản lý quyền'),
- ('SETTING_MANAGE',       N'Quản lý cài đặt'),
- ('FINE_READ',            N'Xem thông tin phạt'),
- ('FINE_PAYMENT_READ',    N'Xem thông tin trả tiền phạt'),
- ('FINE_PAYMENT_WRITE',   N'Thu phạt'),
- ('MEMBER_PAYMENT_WRITE', N'Mở thành viên (thu phí thẻ)'),
- ('MEMBER_PAYMENT_READ',  N'Xem hóa đơn mở thành viên');
+ -- Tai khoan
+ ('USER_READ',             N'Xem tài khoản người dùng'),
+ ('USER_WRITE',            N'Tạo và cập nhật tài khoản người dùng'),
+ ('USER_DELETE',           N'Xóa mềm tài khoản người dùng'),
+ -- Vai trò và quyền
+ ('ROLE_READ',             N'Xem danh sách vai trò'),
+ ('ROLE_WRITE',            N'Tạo và cập nhật vai trò'),
+ ('ROLE_DELETE',           N'Xóa mềm vai trò'),
+ ('PERMISSION_READ',       N'Xem danh sách quyền'),
+ ('PERMISSION_WRITE',      N'Tạo và cập nhật quyền'),
+ ('PERMISSION_DELETE',     N'Xóa mềm quyền'),
+ -- Sách và các danh mục liên quan
+ ('BOOK_READ',             N'Xem và tìm kiếm sách'),
+ ('BOOK_WRITE',            N'Tạo và cập nhật sách'),
+ ('BOOK_DELETE',           N'Xóa mềm sách'),
+ ('CATEGORY_READ',         N'Xem thể loại sách'),
+ ('CATEGORY_WRITE',        N'Tạo và cập nhật thể loại sách'),
+ ('CATEGORY_DELETE',       N'Xóa mềm thể loại sách'),
+ ('AUTHOR_READ',           N'Xem tác giả'),
+ ('AUTHOR_WRITE',          N'Tạo và cập nhật tác giả'),
+ ('AUTHOR_DELETE',         N'Xóa mềm tác giả'),
+ ('PUBLISHER_READ',        N'Xem nhà xuất bản'),
+ ('PUBLISHER_WRITE',       N'Tạo và cập nhật nhà xuất bản'),
+ ('PUBLISHER_DELETE',      N'Xóa mềm nhà xuất bản'),
+ ('SHELF_READ',            N'Xem kệ sách'),
+ ('SHELF_WRITE',           N'Tạo và cập nhật kệ sách'),
+ ('SHELF_DELETE',          N'Xóa mềm kệ sách'),
+ -- Thành viên
+ ('MEMBER_READ',           N'Xem thông tin thành viên'),
+ ('MEMBER_WRITE',          N'Tạo và cập nhật thành viên'),
+ ('MEMBER_DELETE',         N'Xóa mềm thành viên'),
+ -- Mượn trả
+ ('BORROW_READ',           N'Xem phiếu mượn và chi tiết mượn'),
+ ('BORROW_WRITE',          N'Lập phiếu mượn, gia hạn và ghi nhận trả sách'),
+ ('BORROW_DELETE',         N'Hủy phiếu mượn theo quy định'),
+ -- Tiền phạt
+ ('FINE_READ',             N'Xem thông tin tiền phạt'),
+ ('FINE_WRITE',            N'Tạo và cập nhật khoản phạt'),
+ ('FINE_DELETE',           N'Hủy khoản phạt theo quy định'),
+ ('FINE_PAYMENT_READ',     N'Xem thông tin thanh toán tiền phạt'),
+ ('FINE_PAYMENT_WRITE',    N'Ghi nhận thanh toán tiền phạt'),
+ ('FINE_PAYMENT_DELETE',   N'Hủy giao dịch thanh toán tiền phạt theo quy định'),
+ -- Thanh toán thẻ thành viên
+ ('MEMBER_PAYMENT_READ',   N'Xem hóa đơn đăng ký và gia hạn thẻ'),
+ ('MEMBER_PAYMENT_WRITE',  N'Ghi nhận thanh toán phí thẻ thành viên'),
+ ('MEMBER_PAYMENT_DELETE', N'Hủy giao dịch thanh toán phí thẻ theo quy định'),
+ -- Cài đặt và thông báo
+ ('SETTING_READ',          N'Xem cài đặt hệ thống'),
+ ('SETTING_WRITE',         N'Tạo và cập nhật cài đặt hệ thống'),
+ ('SETTING_DELETE',        N'Xóa cài đặt hệ thống'),
+ ('NOTIFICATION_READ',     N'Xem thông báo'),
+ ('NOTIFICATION_WRITE',    N'Tạo thông báo hoặc đánh dấu đã đọc'),
+ ('NOTIFICATION_DELETE',   N'Xóa mềm thông báo');
 
 -- ---------- ROLE_PERMISSIONS ----------
--- ADMIN: toan bo permission
+-- ADMIN: toàn bộ permission
 INSERT INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id
 FROM roles r CROSS JOIN permissions p
 WHERE r.name = 'ADMIN';
 
--- LIBRARIAN
+-- LIBRARIAN: nghiệp vụ thư viện; chỉ xem ROLE_READ, không quản trị role/permission/cài đặt;
+--            không có USER_WRITE/USER_DELETE, FINE_PAYMENT_DELETE, MEMBER_PAYMENT_DELETE
 INSERT INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id
 FROM roles r
-JOIN permissions p ON p.code IN
- ('USER_READ', 'BOOK_READ', 'BOOK_WRITE', 'MEMBER_READ', 'MEMBER_WRITE',
-  'BORROW_WRITE', 'BORROW_READ', 'FINE_READ', 'FINE_PAYMENT_READ', 'FINE_PAYMENT_WRITE',
-  'MEMBER_PAYMENT_READ', 'MEMBER_PAYMENT_WRITE')
+JOIN permissions p ON p.code IN (
+ 'USER_READ',
+ 'ROLE_READ',
+ 'BOOK_READ', 'BOOK_WRITE', 'BOOK_DELETE', 'CATEGORY_READ', 'CATEGORY_WRITE', 'CATEGORY_DELETE', 'AUTHOR_READ', 'AUTHOR_WRITE', 'AUTHOR_DELETE', 'PUBLISHER_READ', 'PUBLISHER_WRITE', 'PUBLISHER_DELETE', 'SHELF_READ', 'SHELF_WRITE', 'SHELF_DELETE',
+ 'MEMBER_READ', 'MEMBER_WRITE', 'MEMBER_DELETE',
+ 'BORROW_READ', 'BORROW_WRITE', 'BORROW_DELETE',
+ 'FINE_READ', 'FINE_WRITE', 'FINE_DELETE', 'FINE_PAYMENT_READ', 'FINE_PAYMENT_WRITE',
+ 'MEMBER_PAYMENT_READ', 'MEMBER_PAYMENT_WRITE',
+ 'NOTIFICATION_READ', 'NOTIFICATION_WRITE'
+)
 WHERE r.name = 'LIBRARIAN';
 
--- MEMBER
+-- MEMBER: chỉ đọc dữ liệu liên quan và cập nhật thông tin tài khoản cá nhân
+-- API vẫn phải giới hạn dữ liệu theo user/member hiện tại, không chỉ dựa vào permission.
 INSERT INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id
 FROM roles r
-JOIN permissions p ON p.code IN
- ('USER_READ', 'USER_WRITE', 'BOOK_READ', 'BORROW_READ',
-  'FINE_READ', 'FINE_PAYMENT_READ', 'MEMBER_PAYMENT_READ')
+JOIN permissions p ON p.code IN (
+ 'USER_READ', 'USER_WRITE',
+ 'ROLE_READ',
+ 'BOOK_READ', 'CATEGORY_READ', 'AUTHOR_READ', 'PUBLISHER_READ', 'SHELF_READ',
+ 'BORROW_READ',
+ 'FINE_READ', 'FINE_PAYMENT_READ',
+ 'MEMBER_PAYMENT_READ',
+ 'NOTIFICATION_READ', 'NOTIFICATION_WRITE'
+)
 WHERE r.name = 'MEMBER';
 
--- READER: xem sach, xem phieu muon / tien phat / hoa don cua minh, quan ly tai khoan ca nhan
+-- READER: chỉ xem sách/danh mục và quản lý thông tin tài khoản cá nhân
+-- Các API USER_WRITE phải tự giới hạn chỉ sửa tài khoản của chính mình.
 INSERT INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id
 FROM roles r
-JOIN permissions p ON p.code IN
- ('USER_READ', 'USER_WRITE', 'BOOK_READ', 'BORROW_READ',
-  'FINE_READ', 'FINE_PAYMENT_READ', 'MEMBER_PAYMENT_READ')
+JOIN permissions p ON p.code IN (
+ 'USER_READ', 'USER_WRITE',
+ 'ROLE_READ',
+ 'BOOK_READ', 'CATEGORY_READ', 'AUTHOR_READ', 'PUBLISHER_READ', 'SHELF_READ',
+ 'NOTIFICATION_READ', 'NOTIFICATION_WRITE'
+)
 WHERE r.name = 'READER';
 
 -- ---------- USERS DEMO ----------

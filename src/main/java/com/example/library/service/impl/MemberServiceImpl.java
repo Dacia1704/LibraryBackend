@@ -5,7 +5,7 @@ import com.example.library.dto.user.request.CreateUserMemberRequest;
 import com.example.library.dto.user.request.MemberCreateRequest;
 import com.example.library.dto.user.request.MemberFilter;
 import com.example.library.dto.user.request.MemberRenewRequest;
-import com.example.library.dto.user.request.MemberRequest;
+import com.example.library.dto.user.request.MemberUpdateRequest;
 import com.example.library.dto.user.response.MemberResponse;
 import com.example.library.entity.Member;
 import com.example.library.entity.MemberPayment;
@@ -134,54 +134,28 @@ public class MemberServiceImpl implements MemberService {
 
         // Check username
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new AppException(
-                    ErrorCode.USER_EXISTED,
-                    String.format(
-                            "Username %s đã tồn tại",
-                            request.getUsername()
-                    )
-            );
+            throw new AppException(ErrorCode.USER_EXISTED, String.format("Username %s đã tồn tại", request.getUsername()));
         }
 
         // Check email
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new AppException(
-                    ErrorCode.EMAIL_EXISTED,
-                    String.format(
-                            "Email %s đã tồn tại",
-                            request.getEmail()
-                    )
-            );
+            throw new AppException(ErrorCode.EMAIL_EXISTED, String.format("Email %s đã tồn tại", request.getEmail()));
         }
 
         // Check phone đã tồn tại chưa
-        if (request.getPhone() != null
-                && !request.getPhone().isBlank()
-                && memberRepository.findByPhone(request.getPhone()).isPresent()) {
-            throw new AppException(
-                    ErrorCode.MEMBER_EXISTED,
-                    String.format(
-                            "Thành viên với số điện thoại %s đã tồn tại",
-                            request.getPhone()
-                    )
-            );
+        if (request.getPhone() != null && !request.getPhone().isBlank() && memberRepository.findByPhone(request.getPhone()).isPresent()) {
+            throw new AppException(ErrorCode.MEMBER_EXISTED, String.format("Thành viên với số điện thoại %s đã tồn tại", request.getPhone()));
         }
 
         // Tìm role mặc định là READER
         Role role = roleRepository
-                .findByNameAndIsDeletedFalse("READER")
-                .orElseThrow(() ->
-                        new AppException(ErrorCode.ROLE_NOT_FOUND)
-                );
+                .findByNameAndIsDeletedFalse("MEMBER")
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
 
         // ===== 1. Tạo User =====
         User user = userMapper.toUser(request);
-        user.setPasswordHash(
-                passwordEncoder.encode(request.getPassword())
-        );
-        user.setNoAccent(
-                TextUtils.removeAccent(request.getFullName())
-        );
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setNoAccent(TextUtils.removeAccent(request.getFullName()));
         user.setRole(role);
         user.setIsActive(true);
         user.setIsDeleted(false);
@@ -245,29 +219,18 @@ public class MemberServiceImpl implements MemberService {
             );
         }
 
-        Long userId = Long.valueOf(
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-                        .getName()
+        Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName()
         );
         User receiver = userRepository
                 .findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() ->
-                        new AppException(ErrorCode.USER_NOT_FOUND)
-                );
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         MemberPayment memberPayment = MemberPayment.builder()
                 .member(member)
                 .amount(request.getAmount())
                 .paymentType(PaymentType.REGISTER)
                 .receivedBy(receiver)
-                .note(
-                        String.format(
-                                "Đăng kí thành viên %d tháng",
-                                month
-                        )
-                )
+                .note(String.format("Đăng kí thành viên %d tháng", month))
                 .build();
         memberRepository.save(member);
         memberPaymentRepository.save(memberPayment);
@@ -314,56 +277,79 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public MemberResponse updateMember(
             Long id,
-            MemberRequest request
+            MemberUpdateRequest request
     ) {
 
         Member member = memberRepository
                 .findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
 
-        // Check member code
-        Optional<Member> memberExist =
-                memberRepository.findByMemberCode(
-                        request.getMemberCode()
-                );
+        User user = member.getUser();
 
-        if (memberExist.isPresent()
-                && !memberExist.get().getId().equals(id)) {
-
-            throw new AppException(
-                    ErrorCode.MEMBER_EXISTED,
-                    String.format("Mã thành viên %s đã tồn tại", request.getMemberCode()));
+        // Update user fields if provided
+        if (request.getUsername() != null && !request.getUsername().isBlank()) {
+            // Check username exists
+            Optional<User> existingUser = userRepository.findByUsername(request.getUsername());
+            if (existingUser.isPresent() && !existingUser.get().getId().equals(user.getId())) {
+                throw new AppException(ErrorCode.USER_EXISTED, 
+                        String.format("Username %s đã tồn tại", request.getUsername()));
+            }
+            user.setUsername(request.getUsername());
         }
 
-        User user = userRepository
-                .findByIdAndIsDeletedFalse(
-                        request.getUserId()
-                )
-                .orElseThrow(() ->
-                        new AppException(
-                                ErrorCode.USER_NOT_FOUND
-                        )
-                );
-
-        Optional<Member> userMember =
-                memberRepository.findByUserId(
-                        request.getUserId()
-                );
-
-        if (userMember.isPresent()
-                && !userMember.get().getId().equals(id)) {
-
-            throw new AppException(ErrorCode.MEMBER_EXISTED);
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         }
 
-        memberMapper.updateMember(
-                member,
-                request
-        );
+        if (request.getFullName() != null) {
+            user.setFullName(request.getFullName());
+            user.setNoAccent(TextUtils.removeAccent(request.getFullName()));
+        }
 
-        member.setUser(user);
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            // Check email exists
+            Optional<User> existingEmail = userRepository.findByEmail(request.getEmail());
+            if (existingEmail.isPresent() && !existingEmail.get().getId().equals(user.getId())) {
+                throw new AppException(ErrorCode.EMAIL_EXISTED, 
+                        String.format("Email %s đã tồn tại", request.getEmail()));
+            }
+            user.setEmail(request.getEmail());
+        }
 
-        memberRepository.save(member);
+        if (request.getAvatar() != null) {
+            user.setAvatar(request.getAvatar());
+        }
+
+        if (request.getRoleId() != null) {
+            Role role = roleRepository.findByIdAndIsDeletedFalse(request.getRoleId())
+                    .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+            user.setRole(role);
+        }
+
+        if (request.getIsActive() != null) {
+            user.setIsActive(request.getIsActive());
+        }
+
+//        userRepository.save(user);
+
+        // Update member fields
+        if (request.getIdentityNumber() != null) {
+            member.setIdentityNumber(request.getIdentityNumber());
+        }
+
+        if (request.getPhone() != null) {
+            member.setPhone(request.getPhone());
+        }
+
+        if (request.getCardStatus() != null) {
+            member.setCardStatus(request.getCardStatus());
+        }
+
+        if (request.getAddress() != null) {
+            member.setAddress(request.getAddress());
+        }
+
+//        memberRepository.save(member);
 
         return memberMapper.toMemberResponse(member);
     }

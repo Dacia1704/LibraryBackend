@@ -14,5 +14,4 @@ public class MemberFilter {
     Boolean hasCard;      // true/false
     String email;         // Lọc theo email
     String phone;         // Lọc theo SĐT
-    Boolean showDeleted;  // Hiển thị đã xóa
 }

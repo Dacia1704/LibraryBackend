@@ -18,19 +18,11 @@ public class MemberSpecification {
 
     public static Specification<Member> filter(MemberFilter filter) {
         return Specification
-                .where(showDeletedOrNot(filter))
-                .and(hasKeyword(filter.getKeyword()))
+                .where(hasKeyword(filter.getKeyword()))
                 .and(hasRole(filter.getRole()))
                 .and(hasCard(filter.getHasCard()))
                 .and(hasEmail(filter.getEmail()))
                 .and(hasPhone(filter.getPhone()));
-    }
-
-    private static Specification<Member> showDeletedOrNot(MemberFilter filter) {
-        if (filter.getShowDeleted() != null && filter.getShowDeleted()) {
-            return (root, query, cb) -> cb.conjunction();
-        }
-        return isNotDeleted();
     }
 
     private static Specification<Member> isNotDeleted() {

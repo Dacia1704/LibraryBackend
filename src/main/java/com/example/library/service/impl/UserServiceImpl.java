@@ -1,6 +1,7 @@
 package com.example.library.service.impl;
 
 import com.example.library.common.PageResponse;
+import com.example.library.dto.user.request.UserActiveRequest;
 import com.example.library.dto.user.request.UserFilter;
 import com.example.library.dto.user.request.UserRequest;
 import com.example.library.dto.user.response.UserResponse;
@@ -245,6 +246,8 @@ public class UserServiceImpl implements UserService {
                 .map(userMapper::toUserResponse)
                 .toList();
 
+
+
         return PageResponse.<UserResponse>builder()
                 .data(content)
                 .currentPage(userPage.getNumber())
@@ -263,6 +266,25 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() ->
                         new AppException(ErrorCode.USER_NOT_FOUND)
                 );
+
+        return userMapper.toUserResponse(user);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse setUserActive(Long id, UserActiveRequest request) {
+
+        User user = userRepository
+                .findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() ->
+                        new AppException(ErrorCode.USER_NOT_FOUND)
+                );
+
+        if (request.getIsActive() != null) {
+            user.setIsActive(request.getIsActive());
+        }
+
+        userRepository.save(user);
 
         return userMapper.toUserResponse(user);
     }
