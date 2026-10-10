@@ -2,6 +2,7 @@ package com.example.library.controller;
 
 import com.example.library.common.ApiResponse;
 import com.example.library.common.PageResponse;
+import com.example.library.dto.user.request.UserActiveRequest;
 import com.example.library.dto.user.request.UserFilter;
 import com.example.library.dto.user.request.UserRequest;
 import com.example.library.dto.user.response.UserResponse;
@@ -45,7 +46,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_WRITE')")
+    @PreAuthorize("hasAuthority('USER_DELETE')")
     public ApiResponse<UserResponse> deleteUser(
             @PathVariable String id
     ) {
@@ -90,6 +91,17 @@ public class UserController {
     ) {
         return ApiResponse.success(
                 userService.getUserDeleted(id)
+        );
+    }
+
+    @PutMapping("/{id}/active")
+    @PreAuthorize("hasAuthority('USER_WRITE')")
+    public ApiResponse<UserResponse> setUserActive(
+            @PathVariable Long id,
+            @RequestBody UserActiveRequest request
+    ) {
+        return ApiResponse.success(
+                userService.setUserActive(id, request)
         );
     }
 }

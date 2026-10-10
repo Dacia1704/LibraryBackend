@@ -26,6 +26,7 @@ public class BookController {
     BookService bookService;
 
     @PostMapping(value = "/pagination", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('BOOK_READ')")
     public ApiResponse<PageResponse<BookResponse>> getBooksPagination(
             @RequestBody BookFilter filter,
             @RequestParam(defaultValue = "0") int page,
@@ -76,7 +77,7 @@ public class BookController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('BOOK_WRITE') and hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('BOOK_DELETE')")
     public ApiResponse<BookResponse> deleteBook(
             @PathVariable String id
     ) {
@@ -86,6 +87,7 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('BOOK_READ')")
     public ApiResponse<BookResponse> getBook(
             @PathVariable String id
     ) {
@@ -95,6 +97,7 @@ public class BookController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('BOOK_READ')")
     public ApiResponse<List<BookResponse>> getBooks(
             @RequestParam(required = false) String keyword
     ) {
@@ -104,7 +107,7 @@ public class BookController {
     }
 
     @GetMapping("/deleted/{id}")
-    @PreAuthorize("hasAuthority('BOOK_WRITE')")
+    @PreAuthorize("hasAuthority('BOOK_READ')")
     public ApiResponse<BookResponse> getBookDeleted(
             @PathVariable String id
     ) {
@@ -114,6 +117,7 @@ public class BookController {
     }
 
     @GetMapping("/statistics")
+    @PreAuthorize("hasAuthority('BOOK_READ')")
     public ApiResponse<BookStatisticsResponse> getStatistics() {
         return ApiResponse.success(
                 bookService.getStatistics()

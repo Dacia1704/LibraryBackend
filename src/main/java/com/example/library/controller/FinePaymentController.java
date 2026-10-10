@@ -45,6 +45,7 @@ public class FinePaymentController {
     }
 
     @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
     public ApiResponse<PageResponse<FinePaymentResponse>> getMe(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -61,6 +62,7 @@ public class FinePaymentController {
     }
 
     @GetMapping("/total/me")
+    @PreAuthorize("isAuthenticated()")
     public ApiResponse<BigDecimal> getMyTotal() {
         return ApiResponse.success(finePaymentService.getMyTotal());
     }

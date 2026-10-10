@@ -8,7 +8,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {
+        MemberMapper.class
+})
 public interface UserMapper {
 
     @Mapping(target = "passwordHash", ignore = true)
@@ -33,11 +35,12 @@ public interface UserMapper {
     @Mapping(target = "refreshTokens", ignore = true)
     @Mapping(target = "member", ignore = true)
     @Mapping(target = "borrowRecords", ignore = true)
+    @Mapping(target = "isActive", ignore = true)
     User toUser(CreateUserMemberRequest request);
 
     @Mapping(target = "roleId", source = "role.id")
     @Mapping(target = "roleName", source = "role.name")
-    @Mapping(target= "member", ignore = true)
+    @Mapping(target = "member", source = "member", qualifiedByName = "toMemberResponseForUser")
     UserResponse toUserResponse(User user);
 
     @Mapping(target = "passwordHash", ignore = true)

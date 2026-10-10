@@ -23,30 +23,31 @@ public class PublisherController {
     PublisherService publisherService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('PUBLISHER_MANAGE')")
+    @PreAuthorize("hasAuthority('PUBLISHER_WRITE')")
     public ApiResponse<PublisherResponse> createPublisher(@RequestBody @Valid PublisherRequest request) {
         return ApiResponse.success(publisherService.createPublisher(request));
     }
 
     @PutMapping("/{id}/restore")
-    @PreAuthorize("hasAuthority('PUBLISHER_MANAGE')")
+    @PreAuthorize("hasAuthority('PUBLISHER_WRITE')")
     public ApiResponse<PublisherResponse> restorePublisher(@PathVariable Long id, @RequestBody @Valid PublisherRequest request) {
         return ApiResponse.success(publisherService.updatePublisher(id, request, true));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('PUBLISHER_MANAGE')")
+    @PreAuthorize("hasAuthority('PUBLISHER_WRITE')")
     public ApiResponse<PublisherResponse> updatePublisher(@PathVariable Long id, @RequestBody @Valid PublisherRequest request) {
         return ApiResponse.success(publisherService.updatePublisher(id, request, false));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('PUBLISHER_MANAGE')")
+    @PreAuthorize("hasAuthority('PUBLISHER_DELETE')")
     public ApiResponse<PublisherResponse> deletePublisher(@PathVariable String id) {
         return ApiResponse.success(publisherService.deletePublisher(id));
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasAuthority('PUBLISHER_READ')")
     public ApiResponse<List<PublisherResponse>> getPublishers(
             @RequestParam(required = false) String keyword
     ) {
@@ -61,6 +62,7 @@ public class PublisherController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('PUBLISHER_READ')")
     public ApiResponse<PageResponse<PublisherResponse>> getPublishers(
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "0") int page,

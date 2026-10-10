@@ -22,7 +22,7 @@ public class CategoryController {
     CategoryService categoryService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('CATEGORY_MANAGE')")
+    @PreAuthorize("hasAuthority('CATEGORY_WRITE')")
     public ApiResponse<CategoryResponse> createCategory(
             @RequestBody @Valid CategoryRequest request
     ) {
@@ -32,7 +32,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}/restore")
-    @PreAuthorize("hasAuthority('CATEGORY_MANAGE')")
+    @PreAuthorize("hasAuthority('CATEGORY_WRITE')")
     public ApiResponse<CategoryResponse> restoreCategory(
             @PathVariable String id,
             @RequestBody @Valid CategoryRequest request
@@ -43,7 +43,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('CATEGORY_MANAGE')")
+    @PreAuthorize("hasAuthority('CATEGORY_WRITE')")
     public ApiResponse<CategoryResponse> updateCategory(
             @PathVariable String id,
             @RequestBody @Valid CategoryRequest request
@@ -54,7 +54,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('CATEGORY_MANAGE')")
+    @PreAuthorize("hasAuthority('CATEGORY_DELETE')")
     public ApiResponse<CategoryResponse> deleteCategory(
             @PathVariable String id
     ) {
@@ -64,6 +64,7 @@ public class CategoryController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('CATEGORY_READ')")
     public ApiResponse<List<CategoryResponse>> getCategories() {
         return ApiResponse.success(categoryService.getCategories());
     }

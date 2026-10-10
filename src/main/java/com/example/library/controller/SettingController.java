@@ -22,7 +22,7 @@ public class SettingController {
     SettingService settingService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('SETTING_MANAGE')")
+    @PreAuthorize("hasAuthority('SETTING_WRITE')")
     public ApiResponse<SettingResponse> create(
             @RequestBody @Valid SettingRequest request
     ) {
@@ -33,7 +33,7 @@ public class SettingController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('SETTING_MANAGE')")
+    @PreAuthorize("hasAuthority('SETTING_WRITE')")
     public ApiResponse<SettingResponse> update(
             @PathVariable Long id,
             @RequestBody @Valid SettingRequest request
@@ -45,7 +45,7 @@ public class SettingController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('SETTING_MANAGE')")
+    @PreAuthorize("hasAuthority('SETTING_DELETE')")
     public ApiResponse<SettingResponse> delete(
             @PathVariable Long id
     ) {
@@ -56,7 +56,7 @@ public class SettingController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('SETTING_MANAGE')")
+    @PreAuthorize("hasAuthority('SETTING_READ')")
     public ApiResponse<SettingResponse> getById(
             @PathVariable Long id
     ) {
@@ -67,6 +67,7 @@ public class SettingController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('SETTING_READ')")
     public ApiResponse<List<SettingResponse>> getAll() {
 
         return ApiResponse.<List<SettingResponse>>builder()

@@ -7,7 +7,7 @@ import com.example.library.dto.user.request.CreateUserMemberRequest;
 import com.example.library.dto.user.request.MemberCreateRequest;
 import com.example.library.dto.user.request.MemberFilter;
 import com.example.library.dto.user.request.MemberRenewRequest;
-import com.example.library.dto.user.request.MemberRequest;
+import com.example.library.dto.user.request.MemberUpdateRequest;
 import com.example.library.dto.user.response.MemberResponse;
 
 import java.math.BigDecimal;
@@ -19,7 +19,7 @@ public interface MemberService {
     MemberResponse createUserAndMember(CreateUserMemberRequest request);
     MemberResponse renewMember(Long id,MemberRenewRequest request);
 
-    MemberResponse updateMember(Long id, MemberRequest request);
+    MemberResponse updateMember(Long id, MemberUpdateRequest request);
 
     MemberResponse deleteMember(String id);
 

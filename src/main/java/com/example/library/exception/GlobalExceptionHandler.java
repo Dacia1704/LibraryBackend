@@ -1,12 +1,14 @@
 package com.example.library.exception;
 
 import com.example.library.common.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -53,6 +55,7 @@ public class GlobalExceptionHandler {
     // 3. Bắt toàn bộ các lỗi hệ thống không lường trước được (tránh sập app)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleGeneralException(Exception ex) {
+        log.error("Unhandled exception", ex);
         ApiResponse<Object> response =
                 ApiResponse.builder()
                         .code(HttpStatus.INTERNAL_SERVER_ERROR.value())

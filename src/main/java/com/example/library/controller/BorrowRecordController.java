@@ -48,7 +48,7 @@ public class BorrowRecordController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('BORROW_WRITE') and hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('BORROW_DELETE')")
     public ApiResponse<BorrowRecordResponse> deleteBorrowRecord(
             @PathVariable String id
     ) {
@@ -58,6 +58,7 @@ public class BorrowRecordController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('BORROW_READ')")
     public ApiResponse<BorrowRecordResponse> getBorrowRecord(
             @PathVariable String id
     ) {
@@ -67,6 +68,7 @@ public class BorrowRecordController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('BORROW_READ')")
     public ApiResponse<List<BorrowRecordResponse>> getBorrowRecords() {
         return ApiResponse.success(
                 borrowRecordService.getBorrowRecords()
@@ -74,6 +76,7 @@ public class BorrowRecordController {
     }
 
     @GetMapping("/pagination")
+    @PreAuthorize("hasAuthority('BORROW_READ')")
     public ApiResponse<PageResponse<BorrowRecordResponse>> getPagination(
             @ModelAttribute BorrowRecordFilter filter,
             @RequestParam(defaultValue = "0") int page,
