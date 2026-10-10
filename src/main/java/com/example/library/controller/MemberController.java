@@ -59,6 +59,7 @@ public class MemberController {
 
 
     @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
     public ApiResponse<MemberResponse> getMe() {
         return ApiResponse.success(memberService.getMe());
     }
@@ -92,7 +93,7 @@ public class MemberController {
     }
 
     @GetMapping("/deleted/{id}")
-    @PreAuthorize("hasRole('MEMBER_READ')")
+    @PreAuthorize("hasAuthority('MEMBER_READ')")
     public ApiResponse<MemberResponse> getMemberDeleted(
             @PathVariable String id
     ) {
@@ -112,7 +113,7 @@ public class MemberController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('MEMBER_WRITE')")
+    @PreAuthorize("hasAuthority('MEMBER_DELETE')")
     public ApiResponse<MemberResponse> deleteMember(
             @PathVariable String id
     ) {

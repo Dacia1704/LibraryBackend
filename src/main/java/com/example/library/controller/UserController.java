@@ -46,7 +46,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_WRITE')")
+    @PreAuthorize("hasAuthority('USER_DELETE')")
     public ApiResponse<UserResponse> deleteUser(
             @PathVariable String id
     ) {

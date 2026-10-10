@@ -56,6 +56,7 @@ public class JwtAuthenticationFilter
                             .map(SimpleGrantedAuthority::new)
                             .toList();
 
+
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
                             username,

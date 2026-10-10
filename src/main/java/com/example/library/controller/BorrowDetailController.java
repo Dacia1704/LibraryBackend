@@ -25,6 +25,7 @@ public class BorrowDetailController {
     BorrowDetailService borrowDetailService;
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('BORROW_READ')")
     public ApiResponse<BorrowDetailResponse> getBorrowDetail(
             @PathVariable String id
     ) {
@@ -34,11 +35,13 @@ public class BorrowDetailController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('BORROW_READ')")
     public ApiResponse<List<BorrowDetailResponse>> getBorrowDetails() {
         return ApiResponse.success(borrowDetailService.getBorrowDetails());
     }
 
     @GetMapping("/pagination")
+    @PreAuthorize("hasAuthority('BORROW_READ')")
     public ApiResponse<PageResponse<BorrowDetailResponse>> getPagination(
             @ModelAttribute BorrowDetailFilter filter,
             @RequestParam(defaultValue = "1") int page,
@@ -51,6 +54,7 @@ public class BorrowDetailController {
     }
 
     @GetMapping("/pagination/me")
+    @PreAuthorize("isAuthenticated()")
     public ApiResponse<PageResponse<BorrowDetailResponse>> getMyPagination(
             @ModelAttribute BorrowDetailFilter filter,
             @RequestParam(defaultValue = "1") int page,
@@ -69,6 +73,7 @@ public class BorrowDetailController {
     }
 
     @GetMapping("/summary/me")
+    @PreAuthorize("isAuthenticated()")
     public ApiResponse<BorrowDetailSummaryResponse> getMySummary() {
         return ApiResponse.success(
                 borrowDetailService.getMySummary()
@@ -76,7 +81,7 @@ public class BorrowDetailController {
     }
 
     @GetMapping("/summary/{userId}")
-    @PreAuthorize("hasAuthority('BORROW_WRITE')")
+    @PreAuthorize("hasAuthority('BORROW_READ')")
     public ApiResponse<BorrowDetailSummaryResponse> getSummary(@PathVariable String userId) {
         return ApiResponse.success(
                 borrowDetailService.getSummary(Long.valueOf(userId))

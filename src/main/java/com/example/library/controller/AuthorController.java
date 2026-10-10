@@ -23,7 +23,7 @@ public class AuthorController {
     AuthorService authorService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('AUTHOR_MANAGE')")
+    @PreAuthorize("hasAuthority('AUTHOR_WRITE')")
     public ApiResponse<AuthorResponse> createAuthor(
             @RequestBody @Valid AuthorRequest request
     ) {
@@ -33,7 +33,7 @@ public class AuthorController {
     }
 
     @PutMapping("/{id}/restore")
-    @PreAuthorize("hasAuthority('AUTHOR_MANAGE')")
+    @PreAuthorize("hasAuthority('AUTHOR_WRITE')")
     public ApiResponse<AuthorResponse> restoreAuthor(
             @PathVariable Long id,
             @RequestBody @Valid AuthorRequest request
@@ -41,7 +41,7 @@ public class AuthorController {
         return ApiResponse.success(authorService.updateAuthor(id, request, true));
     }
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('AUTHOR_MANAGE')")
+    @PreAuthorize("hasAuthority('AUTHOR_WRITE')")
     public ApiResponse<AuthorResponse> updateAuthor(
             @PathVariable Long id,
             @RequestBody @Valid AuthorRequest request
@@ -51,7 +51,7 @@ public class AuthorController {
 
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('AUTHOR_MANAGE')")
+    @PreAuthorize("hasAuthority('AUTHOR_DELETE')")
     public ApiResponse<AuthorResponse> deleteAuthor(
             @PathVariable String id
     ) {
@@ -59,6 +59,7 @@ public class AuthorController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasAuthority('AUTHOR_READ')")
     public ApiResponse<List<AuthorResponse>> getAuthors() {
         return ApiResponse.success(
                 authorService.getAuthors()
@@ -66,6 +67,7 @@ public class AuthorController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('AUTHOR_READ')")
     public ApiResponse<PageResponse<AuthorResponse>> getAuthorsPagination(
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "0") int page,

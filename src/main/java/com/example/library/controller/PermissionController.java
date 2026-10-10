@@ -22,25 +22,25 @@ public class PermissionController {
     PermissionService permissionService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('PERMISSION_MANAGE')")
+    @PreAuthorize("hasAuthority('PERMISSION_WRITE')")
     public ApiResponse<PermissionResponse> createPermission(@RequestBody @Valid PermissionRequest request) {
         return ApiResponse.success(permissionService.createPermission(request));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('PERMISSION_MANAGE')")
+    @PreAuthorize("hasAuthority('PERMISSION_WRITE')")
     public ApiResponse<PermissionResponse> updatePermission(@PathVariable String id,@RequestBody @Valid PermissionRequest request) {
         return ApiResponse.success(permissionService.updatePermission(id,request));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('PERMISSION_MANAGE')")
+    @PreAuthorize("hasAuthority('PERMISSION_DELETE')")
     public ApiResponse<PermissionResponse> deletePermission(@PathVariable String id) {
         return ApiResponse.success(permissionService.deletePermission(id));
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('PERMISSION_MANAGE')")
+    @PreAuthorize("hasAuthority('PERMISSION_READ')")
     public ApiResponse<List<PermissionResponse>> getPermissions() {
         return ApiResponse.success(permissionService.getPermissions());
     }
