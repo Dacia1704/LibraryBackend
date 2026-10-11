@@ -32,7 +32,8 @@ public enum ErrorCode {
     CANT_BORROW(HttpStatus.BAD_REQUEST, "Không thể mượn sách"),
     MEMBER_EXISTED(HttpStatus.BAD_REQUEST, "User này đã có thông tin Member"),
     PAYMENT_AMOUNT_NOT_ENOUGH(HttpStatus.BAD_REQUEST, "Số tiền thanh toán không đủ"),
-    INVALID_REQUEST(HttpStatus.BAD_REQUEST, "Yêu cầu không hợp lệ");
+    INVALID_REQUEST(HttpStatus.BAD_REQUEST, "Yêu cầu không hợp lệ"),
+    NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy tài nguyên");
 
 
 

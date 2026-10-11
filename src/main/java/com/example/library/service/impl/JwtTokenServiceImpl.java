@@ -123,4 +123,10 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
         return authorities;
     }
+
+    @Override
+    public Long getUserId(String token) {
+        Claims claims = validateToken(token);
+        return Long.parseLong(claims.getSubject());
+    }
 }

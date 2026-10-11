@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: library
+  shell:
+    interactive:
+      enabled: true
 
   datasource:
     url: jdbc:sqlserver://localhost:1433;databaseName=library_db;encrypt=true;trustServerCertificate=true
@@ -35,6 +38,10 @@ spring:
     port: 5672
     username: admin
     password: admin123
+    listener:
+      simple:
+        retry: { enabled: true, max-attempts: 3, initial-interval: 2000 }
+        default-requeue-rejected: false
 logging:
   level:
     org.springframework.web: DEBUG
