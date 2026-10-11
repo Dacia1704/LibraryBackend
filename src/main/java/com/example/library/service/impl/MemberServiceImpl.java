@@ -18,6 +18,7 @@ import com.example.library.exception.AppException;
 import com.example.library.exception.ErrorCode;
 import com.example.library.mapper.MemberMapper;
 import com.example.library.mapper.UserMapper;
+import com.example.library.messaging.NotificationProducer;
 import com.example.library.repository.MemberPaymentRepository;
 import com.example.library.repository.MemberRepository;
 import com.example.library.repository.RoleRepository;
@@ -70,6 +71,8 @@ public class MemberServiceImpl implements MemberService {
 
     final PasswordEncoderConfig passwordEncoderConfig;
 
+    final NotificationProducer notificationProducer;
+
     @Value("${app.setting-key.member-payment-month}")
     String memberPaymentMonthKey;
 
@@ -81,6 +84,52 @@ public class MemberServiceImpl implements MemberService {
     public MemberResponse createMember(
             MemberCreateRequest request
     ) {
+
+        // Lấy số tháng, mặc định 1 nếu null
+        int month = request.getMonthRequest() != null ? request.getMonthRequest() : 1;
+
+        // ===== VALIDATE AMOUNT =====
+        List<String> settingKeys = List.of(
+                memberPaymentMonthKey,
+                cardMakerFeeKey
+        );
+
+        Map<String, BigDecimal> paymentSetting = settingRepository
+                .findAllBySettingKeyInAndIsDeletedFalse(settingKeys)
+                .stream()
+                .collect(Collectors.toMap(
+                        Setting::getSettingKey,
+                        setting -> new BigDecimal(setting.getSettingValue())
+                ));
+
+        BigDecimal memberPaymentMonth = paymentSetting.get(memberPaymentMonthKey);
+        BigDecimal cardMakerFee = paymentSetting.get(cardMakerFeeKey);
+
+        if (memberPaymentMonth == null || cardMakerFee == null) {
+            throw new AppException(
+                    ErrorCode.SETTING_NOT_FOUND,
+                    "Không tìm thấy cấu hình phí thành viên hoặc phí làm thẻ"
+            );
+        }
+
+        BigDecimal requiredAmount = memberPaymentMonth
+                .multiply(BigDecimal.valueOf(month))
+                .add(cardMakerFee);
+
+        if (request.getAmount() == null
+                || request.getAmount().compareTo(requiredAmount) < 0) {
+            throw new AppException(
+                    ErrorCode.PAYMENT_AMOUNT_NOT_ENOUGH,
+                    String.format(
+                            "Số tiền thanh toán không đủ. Cần tối thiểu %s (tháng đăng ký %s * %s + phí làm thẻ %s)",
+                            requiredAmount,
+                            month,
+                            memberPaymentMonth,
+                            cardMakerFee
+                    )
+            );
+        }
+        // ===== END VALIDATE AMOUNT =====
 
         // Check member
         if (memberRepository.findByPhone(request.getPhone()).isPresent()) {
@@ -109,19 +158,23 @@ public class MemberServiceImpl implements MemberService {
         member.setUser(user);
         member.setIsDeleted(false);
         member.setMemberCode(generateMemberCode());
-        member.setCardExpiry(LocalDate.now().plusMonths(1));
+        member.setCardExpiry(LocalDate.now().plusMonths(month));
 
         MemberPayment memberPayment = MemberPayment.builder()
                 .member(member)
                 .amount(request.getAmount())
                 .paymentType(PaymentType.REGISTER)
                 .receivedBy(receiver)
-                .note("Đăng kí thành viên 1 tháng")
+                .note(String.format("Đăng kí thành viên %d tháng", month))
                 .build();
         memberPaymentRepository.save(memberPayment);
 
 
         memberRepository.save(member);
+
+        // Gửi thông báo cho người đăng ký
+        notificationProducer.send(member.getId(),
+                String.format("Tạo thẻ thành viên %d tháng thành công! Chào mừng bạn đến với thư viện.", month));
 
         return memberMapper.toMemberResponse(member);
     }
@@ -235,6 +288,9 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(member);
         memberPaymentRepository.save(memberPayment);
 
+        // Gửi thông báo cho người đăng ký
+        notificationProducer.send(member.getId(),
+                String.format("Tạo thẻ thành viên %d tháng thành công! Chào mừng bạn đến với thư viện.", month));
 
         return memberMapper.toMemberResponse(member);
     }
@@ -254,7 +310,46 @@ public class MemberServiceImpl implements MemberService {
                 ? member.getCardExpiry()
                 : today;
 
-        member.setCardExpiry(startDate.plusMonths(1));
+        // Lấy số tháng từ request, mặc định 1 nếu null
+        int month = request.getMonthRequest() != null ? request.getMonthRequest() : 1;
+
+        // ===== VALIDATE AMOUNT =====
+        List<String> settingKeys = List.of(memberPaymentMonthKey);
+
+        Map<String, BigDecimal> paymentSetting = settingRepository
+                .findAllBySettingKeyInAndIsDeletedFalse(settingKeys)
+                .stream()
+                .collect(Collectors.toMap(
+                        Setting::getSettingKey,
+                        setting -> new BigDecimal(setting.getSettingValue())
+                ));
+
+        BigDecimal memberPaymentMonth = paymentSetting.get(memberPaymentMonthKey);
+
+        if (memberPaymentMonth == null) {
+            throw new AppException(
+                    ErrorCode.SETTING_NOT_FOUND,
+                    "Không tìm thấy cấu hình phí thành viên"
+            );
+        }
+
+        BigDecimal requiredAmount = memberPaymentMonth.multiply(BigDecimal.valueOf(month));
+
+        if (request.getAmount() == null
+                || request.getAmount().compareTo(requiredAmount) < 0) {
+            throw new AppException(
+                    ErrorCode.PAYMENT_AMOUNT_NOT_ENOUGH,
+                    String.format(
+                            "Số tiền thanh toán không đủ. Cần tối thiểu %s (%s tháng * %s/tháng)",
+                            requiredAmount,
+                            month,
+                            memberPaymentMonth
+                    )
+            );
+        }
+        // ===== END VALIDATE AMOUNT =====
+
+        member.setCardExpiry(startDate.plusMonths(month));
 
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         User receiver = userRepository.findByIdAndIsDeletedFalse(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -264,11 +359,15 @@ public class MemberServiceImpl implements MemberService {
                 .amount(request.getAmount())
                 .paymentType(PaymentType.RENEW)
                 .receivedBy(receiver)
-                .note("Gia hạn thành viên 1 tháng")
+                .note(String.format("Gia hạn thành viên %d tháng", month))
                 .build();
         memberPaymentRepository.save(memberPayment);
 
         memberRepository.save(member);
+
+        // Gửi thông báo cho người gia hạn
+        notificationProducer.send(member.getId(),
+                String.format("Gia hạn thẻ thành viên %d tháng thành công! Cảm ơn bạn đã tiếp tục đồng hành cùng thư viện.", month));
 
         return memberMapper.toMemberResponse(member);
     }
