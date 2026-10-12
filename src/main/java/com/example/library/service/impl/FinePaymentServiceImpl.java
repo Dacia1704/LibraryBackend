@@ -166,11 +166,11 @@ public class FinePaymentServiceImpl implements FinePaymentService {
         // Gửi thông báo cho người trả phạt
         BigDecimal remainingFine = fineRepository.getTotalFineByMember(member.getId());
         if (remainingFine.compareTo(BigDecimal.ZERO) > 0) {
-            notificationProducer.send(member.getId(),
+            notificationProducer.send(member.getUser().getId(),
                     String.format("Bạn đã trả %,.0f VNĐ tiền phạt thành công. Hiện bạn còn %,.0f VNĐ tiền phạt.", 
                             request.getAmount(), remainingFine));
         } else {
-            notificationProducer.send(member.getId(),
+            notificationProducer.send(member.getUser().getId(),
                     String.format("Bạn đã thanh toán toàn bộ tiền phạt (%,.0f VNĐ). Cố giữ vững quy định của thư viện nhé!", 
                             request.getAmount()));
         }

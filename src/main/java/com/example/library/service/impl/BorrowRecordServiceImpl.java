@@ -159,7 +159,7 @@ public class BorrowRecordServiceImpl
         String bookTitles = books.stream()
                 .map(Book::getTitle)
                 .collect(Collectors.joining(", "));
-        notificationProducer.send(member.getId(),
+        notificationProducer.send(member.getUser().getId(),
                 String.format("Phiếu mượn đã được tạo gồm các ấn phẩm: %s. Vui lòng trả sau %d ngày.", 
                         bookTitles, request.getDayBorrow()));
 

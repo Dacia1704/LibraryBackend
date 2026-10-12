@@ -29,9 +29,7 @@ public class SecurityConfig {
             "/api/auth/login",
             "/api/auth/register",
             "/api/auth/introspect",
-            "/api/auth/logout",
             "/api/auth/refresh",
-            "/api/settings",
             "/ws/**"
     };
 

@@ -68,6 +68,10 @@ public class User {
     @Builder.Default
     private Set<BorrowRecord> borrowRecords = new HashSet<>();
 
+    @OneToMany(mappedBy = "user")
+    @Builder.Default
+    private Set<Notification> notifications = new HashSet<>();
+
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {

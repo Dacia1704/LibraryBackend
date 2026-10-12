@@ -351,11 +351,11 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
         // Gửi thông báo cho người trả sách
         BigDecimal totalFineAmount = borrowDetail.getFineAmount();
         if (totalFineAmount.compareTo(BigDecimal.ZERO) > 0) {
-            notificationProducer.send(member.getId(),
+            notificationProducer.send(member.getUser().getId(),
                     String.format("Sách \"%s\" đã được trả và ghi nhận phạt %,.0f VNĐ. Vui lòng trả sớm!", 
                             book.getTitle(), totalFineAmount));
         } else {
-            notificationProducer.send(member.getId(),
+            notificationProducer.send(member.getUser().getId(),
                     String.format("Sách \"%s\" đã được trả thành công. Cảm ơn bạn!", book.getTitle()));
         }
 

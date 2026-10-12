@@ -21,9 +21,9 @@ public class NotificationSpecification {
                 return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
             }
 
-            // Lọc theo memberId
-            if (filter.getMemberId() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("member").get("id"), filter.getMemberId()));
+            // Lọc theo userId
+            if (filter.getUserId() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("user").get("id"), filter.getUserId()));
             }
 
             // Lọc theo isRead

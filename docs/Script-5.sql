@@ -707,19 +707,20 @@ WHERE b.is_deleted = 0;
 -- =====================================================================
 
 -- 6.1 Dong phi dang ky / gia han the
-INSERT INTO notifications (member_id, content, is_read, created_at)
-SELECT mp.member_id,
+INSERT INTO notifications (user_id, content, is_read, created_at)
+SELECT m.user_id,
        CONCAT(N'Bạn đã thanh toán ', FORMAT(mp.amount, 'N0', 'vi-VN'), N' VNĐ phí ',
               CASE mp.payment_type WHEN 'REGISTER' THEN N'đăng ký' WHEN 'RENEW' THEN N'gia hạn' ELSE N'cấp lại' END,
               N' thẻ thành viên.'),
        CASE WHEN mp.paid_at < DATEADD(DAY, -7, SYSDATETIME()) THEN 1 ELSE 0 END,
        mp.paid_at
 FROM member_payments mp
+JOIN members m ON m.id = mp.member_id
 WHERE mp.is_deleted = 0;
 
 -- 6.2 Bi phat
-INSERT INTO notifications (member_id, content, is_read, created_at)
-SELECT br.member_id,
+INSERT INTO notifications (user_id, content, is_read, created_at)
+SELECT m.user_id,
        CONCAT(N'Bạn bị phạt ', FORMAT(f.amount, 'N0', 'vi-VN'), N' VNĐ ',
               CASE f.reason
                    WHEN 'OVERDUE' THEN CONCAT(N'do trả sách trễ ', f.overdue_days, N' ngày')
@@ -732,28 +733,31 @@ SELECT br.member_id,
        f.created_at
 FROM fines f
 JOIN borrow_records br ON br.id = f.borrow_id
+JOIN members m ON m.id = br.member_id
 LEFT JOIN borrow_details bd ON bd.id = f.borrow_detail_id
 LEFT JOIN books bk ON bk.id = bd.book_id
 WHERE f.is_deleted = 0;
 
 -- 6.3 Da nop tien phat
-INSERT INTO notifications (member_id, content, is_read, created_at)
-SELECT fp.member_id,
+INSERT INTO notifications (user_id, content, is_read, created_at)
+SELECT m.user_id,
        CONCAT(N'Thư viện đã ghi nhận bạn nộp ', FORMAT(fp.amount, 'N0', 'vi-VN'), N' VNĐ tiền phạt.'),
        CASE WHEN fp.paid_at < DATEADD(DAY, -7, SYSDATETIME()) THEN 1 ELSE 0 END,
        fp.paid_at
 FROM fine_payments fp
+JOIN members m ON m.id = fp.member_id
 WHERE fp.is_deleted = 0;
 
 -- 6.4 Nhac han tra: gui truoc han DUE_REMINDER_DAYS ngay (settings), cho moi cuon CHUA TRA
 --     (BORROWING hoac OVERDUE) ma moc nhac da toi. Thoi diem tao = 08:00 cua ngay nhac.
-INSERT INTO notifications (member_id, content, is_read, created_at)
-SELECT br.member_id,
+INSERT INTO notifications (user_id, content, is_read, created_at)
+SELECT m.user_id,
        CONCAT(N'Sách "', bk.title, N'" sẽ đến hạn trả vào ngày ',
               CONVERT(NVARCHAR(10), br.due_date, 103), N'. Vui lòng trả sách đúng hạn.'),
        CASE WHEN rm.remind_at < DATEADD(DAY, -7, SYSDATETIME()) THEN 1 ELSE 0 END,
        rm.remind_at
 FROM borrow_records br
+JOIN members m ON m.id = br.member_id
 JOIN borrow_details bd ON bd.borrow_id = br.id AND bd.is_deleted = 0 AND bd.status IN ('BORROWING','OVERDUE')
 JOIN books bk ON bk.id = bd.book_id
 CROSS APPLY (SELECT DATEADD(HOUR, 8, CAST(DATEADD(DAY, -@remind_days, br.due_date) AS DATETIME2)) AS remind_at) rm
@@ -761,8 +765,8 @@ WHERE br.is_deleted = 0
   AND rm.remind_at <= SYSDATETIME();
 
 -- 6.5 Qua han (tam tinh tien phat theo settings) - theo tung cuon OVERDUE
-INSERT INTO notifications (member_id, content, is_read, created_at)
-SELECT br.member_id,
+INSERT INTO notifications (user_id, content, is_read, created_at)
+SELECT m.user_id,
        CONCAT(N'Sách "', bk.title, N'" đã quá hạn ', DATEDIFF(DAY, br.due_date, @today),
               N' ngày (hạn trả ', CONVERT(NVARCHAR(10), br.due_date, 103),
               N'). Tiền phạt tạm tính: ',
@@ -771,14 +775,15 @@ SELECT br.member_id,
        0,
        @morning
 FROM borrow_records br
+JOIN members m ON m.id = br.member_id
 JOIN borrow_details bd ON bd.borrow_id = br.id AND bd.is_deleted = 0 AND bd.status = 'OVERDUE'
 JOIN books bk ON bk.id = bd.book_id
 JOIN settings sp ON sp.setting_key = 'FINE_OVERDUE_PER_DAY' AND sp.is_deleted = 0
 WHERE br.is_deleted = 0;
 
 -- 6.6 The thanh vien het han
-INSERT INTO notifications (member_id, content, is_read, created_at)
-SELECT m.id,
+INSERT INTO notifications (user_id, content, is_read, created_at)
+SELECT m.user_id,
        CONCAT(N'Thẻ thành viên của bạn đã hết hạn từ ngày ', CONVERT(NVARCHAR(10), m.card_expiry, 103),
               N'. Vui lòng gia hạn để tiếp tục mượn sách.'),
        0,
@@ -787,8 +792,8 @@ FROM members m
 WHERE m.is_deleted = 0 AND m.card_status = 'ISSUED' AND m.card_expiry < @today;
 
 -- 6.6b The dang doi cap
-INSERT INTO notifications (member_id, content, is_read, created_at)
-SELECT m.id,
+INSERT INTO notifications (user_id, content, is_read, created_at)
+SELECT m.user_id,
        N'Bạn đã đóng phí đăng ký thẻ thành viên. Thẻ đang chờ thư viện cấp, vui lòng đến quầy thủ thư để nhận thẻ trước khi mượn sách.',
        0,
        DATEADD(MINUTE, 5, mp.paid_at)
@@ -797,8 +802,8 @@ JOIN member_payments mp ON mp.member_id = m.id AND mp.payment_type = 'REGISTER' 
 WHERE m.is_deleted = 0 AND m.card_status = 'PENDING';
 
 -- 6.7 No phat vuot nguong -> bi chan muon them
-INSERT INTO notifications (member_id, content, is_read, created_at)
-SELECT m.id,
+INSERT INTO notifications (user_id, content, is_read, created_at)
+SELECT m.user_id,
        CONCAT(N'Tổng tiền phạt còn nợ của bạn là ', FORMAT(d.debt, 'N0', 'vi-VN'),
               N' VNĐ, vượt mức cho phép ', FORMAT(CAST(s.setting_value AS DECIMAL(10,2)), 'N0', 'vi-VN'),
               N' VNĐ. Bạn không thể mượn thêm sách cho đến khi thanh toán phần còn nợ.'),

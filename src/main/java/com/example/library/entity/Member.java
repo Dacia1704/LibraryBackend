@@ -57,10 +57,6 @@ public class Member {
     @Builder.Default
     private Set<BorrowRecord> borrowRecords = new HashSet<>();
 
-    @OneToMany(mappedBy = "member")
-    @Builder.Default
-    private Set<Notification> notifications = new HashSet<>();
-
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {

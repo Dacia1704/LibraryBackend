@@ -11,13 +11,13 @@ import org.mapstruct.MappingTarget;
 public interface NotificationMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "member", ignore = true)
+    @Mapping(target = "user", ignore = true)
     @Mapping(target = "isRead", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "isDeleted", ignore = true)
     Notification toNotification(NotificationRequest request);
 
-    @Mapping(target = "memberId", source = "member.id")
+    @Mapping(target = "userId", source = "user.id")
     NotificationResponse toNotificationResponse(Notification notification);
 
     void updateNotification(

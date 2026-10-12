@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class NotificationFilter {
-    Long memberId;       // Lọc theo member
+    Long userId;         // Lọc theo user
     Boolean isRead;      // Lọc theo trạng thái đã đọc/chưa đọc
     String keyword;      // Tìm kiếm trong content
 }

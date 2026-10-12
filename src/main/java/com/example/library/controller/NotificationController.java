@@ -62,13 +62,13 @@ public class NotificationController {
     @PostMapping("/send")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Void> sendNotification(
-            @RequestParam Long memberId,
+            @RequestParam Long userId,
             @RequestParam String content
     ) {
-        notificationProducer.send(memberId, content);
+        notificationProducer.send(userId, content);
         return ApiResponse.<Void>builder()
                 .code(200)
-                .message(String.format("Đã gửi thông báo đến memberId=%d", memberId))
+                .message(String.format("Đã gửi thông báo đến userId=%d", userId))
                 .build();
     }
 
@@ -79,14 +79,14 @@ public class NotificationController {
     @PostMapping("/broadcast")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Void> broadcastNotification(
-            @RequestParam String memberIds,  // format: "1,2,3"
+            @RequestParam String userIds,  // format: "1,2,3"
             @RequestParam String content
     ) {
-        String[] ids = memberIds.split(",");
+        String[] ids = userIds.split(",");
         for (String id : ids) {
             try {
-                Long memberId = Long.parseLong(id.trim());
-                notificationProducer.send(memberId, content);
+                Long userId = Long.parseLong(id.trim());
+                notificationProducer.send(userId, content);
             } catch (NumberFormatException ignored) {}
         }
         return ApiResponse.<Void>builder()
