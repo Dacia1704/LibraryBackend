@@ -16,6 +16,7 @@ import com.example.library.messaging.NotificationProducer;
 import com.example.library.repository.BorrowDetailRepository;
 import com.example.library.repository.FineRepository;
 import com.example.library.repository.SettingRepository;
+import com.example.library.repository.UserRepository;
 import com.example.library.repository.specification.BorrowDetailSpecification;
 import com.example.library.service.BorrowDetailService;
 import lombok.AccessLevel;
@@ -55,6 +56,7 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
     final SettingRepository settingRepository;
 
     final NotificationProducer notificationProducer;
+    final UserRepository userRepository;
 
     @Value("${app.setting-key.fine-overdue-per-day}")
     String fine_overdue_per_day;
@@ -70,6 +72,9 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
 
     @Value("${app.setting-key.fine-damaged-heavy-irreparable-rate}")
     String fine_damaged_heavy_irrepairable_rate;
+
+    @Value("${app.setting-key.max-fine-before-block}")
+    String max_fine_before_block;
 
     @Override
     @Transactional(readOnly = true)
@@ -259,7 +264,8 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
                 fine_lost_rate,
                 fine_damaged_light_rate,
                 fine_damaged_heavy_repairable_rate,
-                fine_damaged_heavy_irrepairable_rate
+                fine_damaged_heavy_irrepairable_rate,
+                max_fine_before_block
         );
 
         Map<String, BigDecimal> fineRates = settingRepository
@@ -345,12 +351,28 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
 
         book.setAvailable(book.getAvailable() + 1);
 
-    fineRepository.saveAll(newFines);
+        fineRepository.saveAll(newFines);
         borrowDetailRepository.save(borrowDetail);
+
+        BigDecimal total = fineRepository.getTotalFineByMember(member.getId());
+        if(total.compareTo(fineRates.get(max_fine_before_block)) > 0) {
+            User user = member.getUser();
+            user.setIsActive(false);
+            userRepository.save(user);
+        }
 
         // Gửi thông báo cho người trả sách
         BigDecimal totalFineAmount = borrowDetail.getFineAmount();
         if (totalFineAmount.compareTo(BigDecimal.ZERO) > 0) {
+            if(total.compareTo(fineRates.get(max_fine_before_block)) > 0) {
+                notificationProducer.send(member.getUser().getId(),
+                        String.format("Sách \"%s\" đã được trả và ghi nhận phạt %,.0f VNĐ. Hiện số tiền phạt của bạn là %,.0f VNĐ. Đã quá mức độ phạt cao nhất cho phép (%.0f VNĐ). Tài khoản của bạn sẽ bị khóa cho đến khi bạn đóng phạt về lại trước mức độ phạt cao nhất cho phép",
+                                book.getTitle(), totalFineAmount, total, fineRates.get(max_fine_before_block)));
+            } else {
+                notificationProducer.send(member.getUser().getId(),
+                        String.format("Sách \"%s\" đã được trả và ghi nhận phạt %,.0f VNĐ. Vui lòng trả sớm!",
+                                book.getTitle(), totalFineAmount));
+            }
             notificationProducer.send(member.getUser().getId(),
                     String.format("Sách \"%s\" đã được trả và ghi nhận phạt %,.0f VNĐ. Vui lòng trả sớm!", 
                             book.getTitle(), totalFineAmount));

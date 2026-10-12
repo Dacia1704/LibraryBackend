@@ -52,10 +52,8 @@ logging:
 app:
   jwt:
     secret: "3pHoX9WySmdbsP4vnkuM4o+Lrd/n5ejYcDYOBufMGXEVLABgSWU/TFAwYBanP6VywMIb6B/Px4KIZ/4xXmflyg=="
-#    access-expiration-ms: 1800000      # 30 phút
-#    refresh-expiration-ms: 604800000   # 7 ngày
-    access-expiration-ms: 5000      # 30 phút
-    refresh-expiration-ms: 1800000   # 7 ngày
+    access-expiration-ms: 1800000      # 30 phút
+    refresh-expiration-ms: 604800000   # 7 ngày
   setting-key:
     fine-overdue-per-day: "FINE_OVERDUE_PER_DAY"
     fine-lost-rate: "FINE_LOST_RATE"
