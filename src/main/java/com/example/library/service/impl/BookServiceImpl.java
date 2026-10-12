@@ -187,9 +187,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookResponse getBookDeleted(String id) {
+    public BookResponse getBookDeleted(String isbn) {
         Book book = bookRepository
-                .findById(Long.valueOf(id))
+                .findByIsbn(isbn)
                 .orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
         return bookMapper.toBookResponse(book);
     }

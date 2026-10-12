@@ -39,7 +39,7 @@ public class BookRequest {
 
     Integer pages;
 
-    String sysnopsis;
+    String synopsis;
 
     Language language;
 
