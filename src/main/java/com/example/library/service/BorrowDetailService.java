@@ -7,6 +7,7 @@ import com.example.library.dto.book.request.ReturnBookRequest;
 import com.example.library.dto.book.response.BorrowDetailResponse;
 import com.example.library.dto.book.response.BorrowDetailSummaryResponse;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface BorrowDetailService {
@@ -30,6 +31,7 @@ public interface BorrowDetailService {
     BorrowDetailSummaryResponse getMySummary();
     BorrowDetailSummaryResponse getSummary(Long userId);
 
+    BigDecimal calculateOverdueFine(Long memberId);
 
     BorrowDetailResponse returnBook(String id, ReturnBookRequest request);
 }

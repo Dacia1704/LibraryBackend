@@ -5,17 +5,22 @@ import com.example.library.dto.book.request.FinePaymentRequest;
 import com.example.library.dto.book.response.FinePaymentResponse;
 import com.example.library.entity.FinePayment;
 import com.example.library.entity.Member;
+import com.example.library.entity.Setting;
 import com.example.library.entity.User;
+import com.example.library.entity.enums.BorrowStatus;
 import com.example.library.mapper.FinePaymentMapper;
 import com.example.library.messaging.NotificationProducer;
+import com.example.library.repository.BorrowDetailRepository;
 import com.example.library.repository.FinePaymentRepository;
 import com.example.library.repository.FineRepository;
 import com.example.library.repository.MemberRepository;
+import com.example.library.repository.SettingRepository;
 import com.example.library.repository.UserRepository;
 import com.example.library.service.FinePaymentService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,15 +35,20 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class FinePaymentServiceImpl implements FinePaymentService {
 
-    FinePaymentRepository finePaymentRepository;
-    MemberRepository memberRepository;
-    UserRepository userRepository;
-    FinePaymentMapper finePaymentMapper;
-    NotificationProducer notificationProducer;
-    FineRepository fineRepository;
+    final FinePaymentRepository finePaymentRepository;
+    final MemberRepository memberRepository;
+    final UserRepository userRepository;
+    final FinePaymentMapper finePaymentMapper;
+    final NotificationProducer notificationProducer;
+    final FineRepository fineRepository;
+    final BorrowDetailRepository borrowDetailRepository;
+    final SettingRepository settingRepository;
+
+    @Value("${app.setting-key.max-fine-before-block}")
+    String maxFineBeforeBlockKey;
 
     @Override
     @Transactional(readOnly = true)
@@ -153,6 +163,34 @@ public class FinePaymentServiceImpl implements FinePaymentService {
                 .orElseThrow(() ->
                         new IllegalArgumentException("User not found"));
 
+        // Validate: chỉ thanh toán được số tiền phạt chính thức còn lại trong bảng Fine
+        BigDecimal recordedFines = fineRepository.getTotalFineByMember(member.getId());
+        if (recordedFines == null) {
+            recordedFines = BigDecimal.ZERO;
+        }
+        System.out.println(recordedFines);
+
+        BigDecimal payments = finePaymentRepository.getTotalPaymentByMember(member.getId());
+        if (payments == null) {
+            payments = BigDecimal.ZERO;
+        }
+        System.out.println(payments);
+
+        BigDecimal remainingOfficialFines = recordedFines.subtract(payments);
+        if (remainingOfficialFines.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Không có khoản phạt chính thức nào cần thanh toán.");
+        }
+
+        if (request.getAmount().compareTo(remainingOfficialFines) > 0) {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "Số tiền thanh toán (%,.0f VNĐ) vượt quá số tiền phạt chính thức còn lại (%,.0f VNĐ).",
+                            request.getAmount(),
+                            remainingOfficialFines
+                    )
+            );
+        }
+
         FinePayment payment = FinePayment.builder()
                 .member(member)
                 .amount(request.getAmount())
@@ -162,17 +200,69 @@ public class FinePaymentServiceImpl implements FinePaymentService {
                 .build();
 
         payment = finePaymentRepository.save(payment);
+        recordedFines = fineRepository.getTotalFineByMember(member.getId());
+        payments = finePaymentRepository.getTotalPaymentByMember(member.getId());
 
-        // Gửi thông báo cho người trả phạt
-        BigDecimal remainingFine = fineRepository.getTotalFineByMember(member.getId());
-        if (remainingFine.compareTo(BigDecimal.ZERO) > 0) {
-            notificationProducer.send(member.getUser().getId(),
-                    String.format("Bạn đã trả %,.0f VNĐ tiền phạt thành công. Hiện bạn còn %,.0f VNĐ tiền phạt.", 
-                            request.getAmount(), remainingFine));
+
+        BigDecimal overdueTemp = borrowDetailRepository.sumOverdueFineAmountByMember(
+                member.getId(),
+                BorrowStatus.OVERDUE
+        );
+        if (overdueTemp == null) {
+            overdueTemp = BigDecimal.ZERO;
+        }
+
+        BigDecimal totalDebt = overdueTemp.add(recordedFines).subtract(payments);
+
+        BigDecimal maxFineBeforeBlock = settingRepository
+                .findBySettingKeyAndIsDeletedFalse(maxFineBeforeBlockKey)
+                .map(Setting::getSettingValue)
+                .map(BigDecimal::new)
+                .orElseThrow(() -> new IllegalStateException("Missing setting: " + maxFineBeforeBlockKey));
+
+        User memberUser = member.getUser();
+        boolean unlocked = false;
+        if (totalDebt.compareTo(maxFineBeforeBlock) <= 0
+                && memberUser != null
+                && Boolean.FALSE.equals(memberUser.getIsActive())) {
+            memberUser.setIsActive(true);
+            userRepository.save(memberUser);
+            unlocked = true;
+        }
+
+
+
+        BigDecimal stillOfficial = remainingOfficialFines.subtract(request.getAmount());
+        BigDecimal stillOverdue = overdueTemp;
+
+        if (stillOfficial.compareTo(BigDecimal.ZERO) > 0 || stillOverdue.compareTo(BigDecimal.ZERO) > 0) {
+            StringBuilder message = new StringBuilder();
+            message.append(String.format(
+                    "Bạn đã trả %,.0f VNĐ tiền phạt thành công. ",
+                    request.getAmount()
+            ));
+            boolean first = true;
+            if (stillOfficial.compareTo(BigDecimal.ZERO) > 0) {
+                message.append(String.format("Phạt ghi nhận còn lại: %,.0f VNĐ.", stillOfficial));
+                first = false;
+            }
+            if (stillOverdue.compareTo(BigDecimal.ZERO) > 0) {
+                if (!first) message.append(" ");
+                message.append(String.format("Phạt quá hạn (chưa ghi nhận) còn: %,.0f VNĐ.", stillOverdue));
+            }
+            if (unlocked) {
+                message.append(" Tài khoản của bạn đã được mở khóa lại.");
+            }
+            notificationProducer.send(memberUser.getId(), message.toString());
         } else {
-            notificationProducer.send(member.getUser().getId(),
-                    String.format("Bạn đã thanh toán toàn bộ tiền phạt (%,.0f VNĐ). Cố giữ vững quy định của thư viện nhé!", 
-                            request.getAmount()));
+            String message = String.format(
+                    "Bạn đã thanh toán toàn bộ tiền phạt (%,.0f VNĐ). Cố giữ vững quy định của thư viện nhé!",
+                    request.getAmount()
+            );
+            if (unlocked) {
+                message += " Tài khoản của bạn đã được mở khóa lại.";
+            }
+            notificationProducer.send(memberUser.getId(), message);
         }
 
         return finePaymentMapper.toResponse(payment);

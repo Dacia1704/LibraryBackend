@@ -72,12 +72,16 @@ public class BorrowRecordServiceImpl
     ) {
 
         // 1. Tìm Member
-        Member member = memberRepository.findById(Long.valueOf(request.getMemberId()))
+        Member member = memberRepository.findByIdAndIsDeletedFalse(Long.valueOf(request.getMemberId()))
                         .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+        User user = member.getUser();
+        if(!user.getIsActive()) {
+            throw new AppException(ErrorCode.CANT_BORROW, "Không thể mượn do tài khoản người mượn đang bị khóa");
+        }
 
         // 2. Tìm Librarian
         User librarian =
-                userRepository.findById(Long.valueOf(request.getLibrarianId()))
+                userRepository.findByIdAndIsDeletedFalse(Long.valueOf(request.getLibrarianId()))
                         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         List<String> settingKeys = List.of(
@@ -98,10 +102,6 @@ public class BorrowRecordServiceImpl
         }
         if(request.getBookIds().size() > borrowSetting.get(max_book_borrow)) {
             throw new AppException(ErrorCode.CANT_BORROW_OVER_DAY_IN_SETTING, String.format("Không thể mượn quá số sách quy định. Số ngày quy định hiện tại là %s", borrowSetting.get(max_book_borrow)));
-        }
-        BigDecimal totleFine = fineService.getTotalByMember(Long.parseLong(request.getMemberId()));
-        if(totleFine.compareTo(new BigDecimal(borrowSetting.get(max_fine_before_block))) > 0) {
-            throw new AppException(ErrorCode.CANT_BORROW, String.format("Không thể mượn sách do hiện tại bạn đang nơ tiền phạt quá mức quy định: %s/%s",totleFine, borrowSetting.get(max_fine_before_block)));
         }
 
         // 3. Tạo BorrowRecord

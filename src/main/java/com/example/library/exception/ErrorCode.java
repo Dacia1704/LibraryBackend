@@ -12,6 +12,7 @@ public enum ErrorCode {
     EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "Email google chưa được xác minh"),
     UNAUTHENTICATED(HttpStatus.UNAUTHORIZED, "Xác minh người dùng thất bại"),
     USER_NOT_ACTIVE(HttpStatus.BAD_REQUEST, "Tài khoản người dùng không hoạt động"),
+    USER_DELETED(HttpStatus.BAD_REQUEST, "Tài khoản người dùng đã bị xóa"),
     ROLE_NOT_FOUND(HttpStatus.NOT_FOUND, "Role không tồn tại"),
     SETTING_NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy cài đặt"),
     PERMISSION_NOT_FOUND(HttpStatus.NOT_FOUND, "Quyền ko tồn tại"),

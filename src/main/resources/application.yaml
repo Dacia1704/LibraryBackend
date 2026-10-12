@@ -66,3 +66,7 @@ app:
     due-reminder-days: "DUE_REMINDER_DAYS"
     member-payment-month: "MEMBERSHIP_FEE"
     card-maker-fee: "CARD_MAKER_FEE"
+  jobs:
+    overdue-fine-block:
+      cron: "0 0 1 * * *"
+      zone: "Asia/Ho_Chi_Minh"

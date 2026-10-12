@@ -14,6 +14,7 @@ import com.example.library.exception.ErrorCode;
 import com.example.library.mapper.BorrowDetailMapper;
 import com.example.library.messaging.NotificationProducer;
 import com.example.library.repository.BorrowDetailRepository;
+import com.example.library.repository.FinePaymentRepository;
 import com.example.library.repository.FineRepository;
 import com.example.library.repository.SettingRepository;
 import com.example.library.repository.UserRepository;
@@ -52,6 +53,8 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
     final BorrowDetailMapper borrowDetailMapper;
 
     final FineRepository fineRepository;
+
+    final FinePaymentRepository finePaymentRepository;
 
     final SettingRepository settingRepository;
 
@@ -239,6 +242,15 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
     }
 
     @Override
+    public BigDecimal calculateOverdueFine(Long memberId) {
+        BigDecimal overdue = borrowDetailRepository.sumOverdueFineAmountByMember(
+                memberId,
+                BorrowStatus.OVERDUE
+        );
+        return overdue != null ? overdue : BigDecimal.ZERO;
+    }
+
+    @Override
     @Transactional
     public BorrowDetailResponse returnBook(String id, ReturnBookRequest request) {
 
@@ -354,8 +366,26 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
         fineRepository.saveAll(newFines);
         borrowDetailRepository.save(borrowDetail);
 
-        BigDecimal total = fineRepository.getTotalFineByMember(member.getId());
-        if(total.compareTo(fineRates.get(max_fine_before_block)) > 0) {
+        BigDecimal overdueTemp = borrowDetailRepository.sumOverdueFineAmountByMember(
+                member.getId(),
+                BorrowStatus.OVERDUE
+        );
+        if (overdueTemp == null) {
+            overdueTemp = BigDecimal.ZERO;
+        }
+
+        BigDecimal recordedFines = fineRepository.getTotalFineByMember(member.getId());
+        if (recordedFines == null) {
+            recordedFines = BigDecimal.ZERO;
+        }
+
+        BigDecimal payments = finePaymentRepository.getTotalPaymentByMember(member.getId());
+        if (payments == null) {
+            payments = BigDecimal.ZERO;
+        }
+
+        BigDecimal total = overdueTemp.add(recordedFines).subtract(payments);
+        if (total.compareTo(fineRates.get(max_fine_before_block)) > 0) {
             User user = member.getUser();
             user.setIsActive(false);
             userRepository.save(user);
@@ -364,7 +394,7 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
         // Gửi thông báo cho người trả sách
         BigDecimal totalFineAmount = borrowDetail.getFineAmount();
         if (totalFineAmount.compareTo(BigDecimal.ZERO) > 0) {
-            if(total.compareTo(fineRates.get(max_fine_before_block)) > 0) {
+            if (total.compareTo(fineRates.get(max_fine_before_block)) > 0) {
                 notificationProducer.send(member.getUser().getId(),
                         String.format("Sách \"%s\" đã được trả và ghi nhận phạt %,.0f VNĐ. Hiện số tiền phạt của bạn là %,.0f VNĐ. Đã quá mức độ phạt cao nhất cho phép (%.0f VNĐ). Tài khoản của bạn sẽ bị khóa cho đến khi bạn đóng phạt về lại trước mức độ phạt cao nhất cho phép",
                                 book.getTitle(), totalFineAmount, total, fineRates.get(max_fine_before_block)));
@@ -373,9 +403,6 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
                         String.format("Sách \"%s\" đã được trả và ghi nhận phạt %,.0f VNĐ. Vui lòng trả sớm!",
                                 book.getTitle(), totalFineAmount));
             }
-            notificationProducer.send(member.getUser().getId(),
-                    String.format("Sách \"%s\" đã được trả và ghi nhận phạt %,.0f VNĐ. Vui lòng trả sớm!", 
-                            book.getTitle(), totalFineAmount));
         } else {
             notificationProducer.send(member.getUser().getId(),
                     String.format("Sách \"%s\" đã được trả thành công. Cảm ơn bạn!", book.getTitle()));

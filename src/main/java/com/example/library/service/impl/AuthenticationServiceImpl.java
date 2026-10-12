@@ -41,7 +41,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 userRepository
                         .findByEmailAndIsDeletedFalse(request.getEmail())
                         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        if (Boolean.FALSE.equals(user.getIsActive())) throw new AppException(ErrorCode.USER_NOT_ACTIVE);
+        if (Boolean.TRUE.equals(user.getIsDeleted())) throw new AppException(ErrorCode.USER_DELETED);
         boolean authenticated =
                 passwordEncoderConfig
                         .passwordEncoder()
@@ -77,8 +77,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         RefreshToken refreshToken = refreshTokenRepository.findByTokenAndRevokedFalse(request.getRefreshToken()).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
         if(Boolean.TRUE.equals(refreshToken.getRevoked())) throw new AppException(ErrorCode.UNAUTHENTICATED);
         User user = refreshToken.getUser();
-        if(Boolean.FALSE.equals(user.getIsActive())) throw new AppException(ErrorCode.USER_NOT_ACTIVE);
-        if(Boolean.TRUE.equals(user.getIsDeleted())) throw new AppException(ErrorCode.USER_NOT_FOUND);
+        if(Boolean.TRUE.equals(user.getIsDeleted())) throw new AppException(ErrorCode.USER_DELETED);
 
         refreshToken.setRevoked(true);
         refreshTokenRepository.save(refreshToken);
