@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class JwtTokenServiceImpl implements JwtTokenService {
@@ -48,6 +49,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
                         String.join(" ", authorities)
                 )
                 .claim("type", "access")
+                .claim("jti", UUID.randomUUID().toString())
                 .issuer("library")
                 .issuedAt(now)
                 .expiration(expiration)
@@ -68,6 +70,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         return Jwts.builder()
                 .subject(user.getId().toString())
                 .claim("type", "refresh")
+                .claim("jti", UUID.randomUUID().toString())
                 .issuer("library")
                 .issuedAt(now)
                 .expiration(expiration)
@@ -122,5 +125,11 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         }
 
         return authorities;
+    }
+
+    @Override
+    public Long getUserId(String token) {
+        Claims claims = validateToken(token);
+        return Long.parseLong(claims.getSubject());
     }
 }

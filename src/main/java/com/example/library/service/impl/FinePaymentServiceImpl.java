@@ -7,7 +7,9 @@ import com.example.library.entity.FinePayment;
 import com.example.library.entity.Member;
 import com.example.library.entity.User;
 import com.example.library.mapper.FinePaymentMapper;
+import com.example.library.messaging.NotificationProducer;
 import com.example.library.repository.FinePaymentRepository;
+import com.example.library.repository.FineRepository;
 import com.example.library.repository.MemberRepository;
 import com.example.library.repository.UserRepository;
 import com.example.library.service.FinePaymentService;
@@ -35,6 +37,8 @@ public class FinePaymentServiceImpl implements FinePaymentService {
     MemberRepository memberRepository;
     UserRepository userRepository;
     FinePaymentMapper finePaymentMapper;
+    NotificationProducer notificationProducer;
+    FineRepository fineRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -158,6 +162,18 @@ public class FinePaymentServiceImpl implements FinePaymentService {
                 .build();
 
         payment = finePaymentRepository.save(payment);
+
+        // Gửi thông báo cho người trả phạt
+        BigDecimal remainingFine = fineRepository.getTotalFineByMember(member.getId());
+        if (remainingFine.compareTo(BigDecimal.ZERO) > 0) {
+            notificationProducer.send(member.getId(),
+                    String.format("Bạn đã trả %,.0f VNĐ tiền phạt thành công. Hiện bạn còn %,.0f VNĐ tiền phạt.", 
+                            request.getAmount(), remainingFine));
+        } else {
+            notificationProducer.send(member.getId(),
+                    String.format("Bạn đã thanh toán toàn bộ tiền phạt (%,.0f VNĐ). Cố giữ vững quy định của thư viện nhé!", 
+                            request.getAmount()));
+        }
 
         return finePaymentMapper.toResponse(payment);
     }

@@ -50,13 +50,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         var accessToken = jwtTokenService.generateAccessToken(user);
         var rawRefreshToken = jwtTokenService.generateRefreshToken(user);
-        refreshTokenRepository.save(RefreshToken.builder()
-                .token(rawRefreshToken)
-                .user(user)
-                .expiresAt(
-                        LocalDateTime.now().plus(Duration.ofMillis(refresh_expiration))
-                )
-                .build());
+
+        // Idempotency: check if token already exists before saving
+        if (!refreshTokenRepository.existsByToken(rawRefreshToken)) {
+            refreshTokenRepository.save(RefreshToken.builder()
+                    .token(rawRefreshToken)
+                    .user(user)
+                    .expiresAt(
+                            LocalDateTime.now().plus(Duration.ofMillis(refresh_expiration))
+                    )
+                    .build());
+        }
         return LoginResponse.builder()
                 .id(user.getId())
                 .email(user.getEmail())
@@ -81,13 +85,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         var accessToken = jwtTokenService.generateAccessToken(user);
         var rawRefreshToken = jwtTokenService.generateRefreshToken(user);
-        refreshTokenRepository.save(RefreshToken.builder()
-                .token(rawRefreshToken)
-                .user(user)
-                .expiresAt(
-                        LocalDateTime.now().plus(Duration.ofMillis(refresh_expiration))
-                )
-                .build());
+
+        // Idempotency: check if token already exists before saving
+        if (!refreshTokenRepository.existsByToken(rawRefreshToken)) {
+            refreshTokenRepository.save(RefreshToken.builder()
+                    .token(rawRefreshToken)
+                    .user(user)
+                    .expiresAt(
+                            LocalDateTime.now().plus(Duration.ofMillis(refresh_expiration))
+                    )
+                    .build());
+        }
 
         return RefreshTokenResponse.builder().accessToken(accessToken).refreshToken(rawRefreshToken).build();
     }

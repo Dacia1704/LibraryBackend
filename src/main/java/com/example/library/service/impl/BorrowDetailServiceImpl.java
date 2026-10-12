@@ -6,15 +6,13 @@ import com.example.library.dto.book.request.FineRequest;
 import com.example.library.dto.book.request.ReturnBookRequest;
 import com.example.library.dto.book.response.BorrowDetailResponse;
 import com.example.library.dto.book.response.BorrowDetailSummaryResponse;
-import com.example.library.entity.Book;
-import com.example.library.entity.BorrowDetail;
-import com.example.library.entity.Fine;
-import com.example.library.entity.Setting;
+import com.example.library.entity.*;
 import com.example.library.entity.enums.BorrowStatus;
 import com.example.library.entity.enums.FineReason;
 import com.example.library.exception.AppException;
 import com.example.library.exception.ErrorCode;
 import com.example.library.mapper.BorrowDetailMapper;
+import com.example.library.messaging.NotificationProducer;
 import com.example.library.repository.BorrowDetailRepository;
 import com.example.library.repository.FineRepository;
 import com.example.library.repository.SettingRepository;
@@ -55,6 +53,8 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
     final FineRepository fineRepository;
 
     final SettingRepository settingRepository;
+
+    final NotificationProducer notificationProducer;
 
     @Value("${app.setting-key.fine-overdue-per-day}")
     String fine_overdue_per_day;
@@ -244,7 +244,7 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
 
         Book book = borrowDetail.getBook();
 
-        if (borrowDetail.getReturnDate() != null) {
+        if (borrowDetail.getStatus() == BorrowStatus.RETURNED && borrowDetail.getReturnDate() != null) {
             throw new AppException(ErrorCode.BOOK_ALREADY_RETURNED);
         }
 
@@ -270,7 +270,7 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
                         setting -> new BigDecimal(setting.getSettingValue())
                 ));
         List<Fine> newFines = new ArrayList<>();
-        // đi muộn
+        // trả muộn
         LocalDate dueDate = borrowDetail.getBorrowRecord().getDueDate();
         if (returnDate.isAfter(dueDate)) {
 
@@ -299,7 +299,7 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
                     throw new AppException(ErrorCode.FILE_UPLOAD_FAILED);
                 }
             }
-            BigDecimal fineAmount = null;
+            BigDecimal fineAmount = BigDecimal.ZERO;
 
             Fine fine = Fine.builder()
                     .borrowRecord(borrowDetail.getBorrowRecord())
@@ -333,16 +333,31 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
                 }
             }
 
-            borrowDetail.setFineAmount(fineAmount);
-            fine.setAmount(fineAmount);
-            newFines.add(fine);
-
+            if (fineAmount != null && fineAmount.compareTo(BigDecimal.ZERO) > 0) {
+                BigDecimal currentFine = borrowDetail.getFineAmount();
+                borrowDetail.setFineAmount(currentFine != null ? currentFine.add(fineAmount) : fineAmount);
+                fine.setAmount(fineAmount);
+                newFines.add(fine);
+            }
         }
+
+        Member member = borrowDetail.getBorrowRecord().getMember();
 
         book.setAvailable(book.getAvailable() + 1);
 
-        fineRepository.saveAll(newFines);
+    fineRepository.saveAll(newFines);
         borrowDetailRepository.save(borrowDetail);
+
+        // Gửi thông báo cho người trả sách
+        BigDecimal totalFineAmount = borrowDetail.getFineAmount();
+        if (totalFineAmount.compareTo(BigDecimal.ZERO) > 0) {
+            notificationProducer.send(member.getId(),
+                    String.format("Sách \"%s\" đã được trả và ghi nhận phạt %,.0f VNĐ. Vui lòng trả sớm!", 
+                            book.getTitle(), totalFineAmount));
+        } else {
+            notificationProducer.send(member.getId(),
+                    String.format("Sách \"%s\" đã được trả thành công. Cảm ơn bạn!", book.getTitle()));
+        }
 
         return borrowDetailMapper.toBorrowDetailResponse(borrowDetail);
     }

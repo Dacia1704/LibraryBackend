@@ -9,6 +9,7 @@ import com.example.library.entity.enums.BorrowStatus;
 import com.example.library.exception.AppException;
 import com.example.library.exception.ErrorCode;
 import com.example.library.mapper.BorrowRecordMapper;
+import com.example.library.messaging.NotificationProducer;
 import com.example.library.repository.*;
 import com.example.library.repository.specification.BorrowRecordSpecification;
 import com.example.library.service.BorrowRecordService;
@@ -52,6 +53,8 @@ public class BorrowRecordServiceImpl
      final SettingRepository settingRepository;
 
      final FineService fineService;
+
+     final NotificationProducer notificationProducer;
 
     @Value("${app.setting-key.max-borrow-days}")
     String max_borrow_days;
@@ -112,14 +115,15 @@ public class BorrowRecordServiceImpl
 
         borrowRecordRepository.save(borrowRecord);
 
-        // 4. Tìm Book
+        // 4. Tìm Book với PESSIMISTIC_WRITE lock để tránh race condition
         List<Long> bookIds =
                 request.getBookIds()
                         .stream()
                         .map(Long::valueOf)
                         .toList();
 
-        List<Book> books = bookRepository.findAllByIdInAndIsDeletedFalse(bookIds);
+        // Sử dụng lock để đảm bảo không có ai khác cùng mượn sách này
+        List<Book> books = bookRepository.findAllByIdInWithLock(bookIds);
 
         if (books.size() != bookIds.size()) throw new AppException(ErrorCode.BOOK_NOT_FOUND);
 
@@ -150,6 +154,14 @@ public class BorrowRecordServiceImpl
         bookRepository.saveAll(books);
 
         borrowRecord.setBorrowDetails(borrowDetails);
+
+        // Gửi thông báo cho người mượn
+        String bookTitles = books.stream()
+                .map(Book::getTitle)
+                .collect(Collectors.joining(", "));
+        notificationProducer.send(member.getId(),
+                String.format("Phiếu mượn đã được tạo gồm các ấn phẩm: %s. Vui lòng trả sau %d ngày.", 
+                        bookTitles, request.getDayBorrow()));
 
         return borrowRecordMapper.toBorrowRecordResponse(borrowRecord);
     }

@@ -16,4 +16,6 @@ public interface JwtTokenService {
     List<String> getAuthorities(Claims claims);
 
     List<String> buildAuthorities(User user);
+
+    Long getUserId(String token);
 }
