@@ -267,16 +267,20 @@ public class BorrowRecordSpecification {
                                 cb.isFalse(
                                         detailRoot.get("isDeleted")
                                 ),
-                                cb.equal(
-                                        detailRoot.get("status"),
-                                        BorrowStatus.BORROWING
+                                cb.or(
+                                        cb.equal(
+                                                detailRoot.get("status"),
+                                                BorrowStatus.BORROWING
+                                        ),
+                                        cb.equal(
+                                                detailRoot.get("status"),
+                                                BorrowStatus.OVERDUE
+                                        )
                                 )
                         )
                 );
 
-                return cb.not(
-                        cb.exists(subquery)
-                );
+                return cb.not(cb.exists(subquery));
             };
 
             /**
@@ -292,19 +296,13 @@ public class BorrowRecordSpecification {
 
                 query.distinct(true);
 
-                LocalDate today = LocalDate.now();
-
                 return cb.and(
                         cb.isFalse(
                                 borrowDetails.get("isDeleted")
                         ),
                         cb.equal(
                                 borrowDetails.get("status"),
-                                BorrowStatus.BORROWING
-                        ),
-                        cb.lessThan(
-                                root.get("dueDate"),
-                                today
+                                BorrowStatus.OVERDUE
                         )
                 );
             };
