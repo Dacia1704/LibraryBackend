@@ -13,11 +13,7 @@ import com.example.library.exception.AppException;
 import com.example.library.exception.ErrorCode;
 import com.example.library.mapper.BorrowDetailMapper;
 import com.example.library.messaging.NotificationProducer;
-import com.example.library.repository.BorrowDetailRepository;
-import com.example.library.repository.FinePaymentRepository;
-import com.example.library.repository.FineRepository;
-import com.example.library.repository.SettingRepository;
-import com.example.library.repository.UserRepository;
+import com.example.library.repository.*;
 import com.example.library.repository.specification.BorrowDetailSpecification;
 import com.example.library.service.BorrowDetailService;
 import lombok.AccessLevel;
@@ -60,6 +56,7 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
 
     final NotificationProducer notificationProducer;
     final UserRepository userRepository;
+    final MemberRepository memberRepository;
 
     @Value("${app.setting-key.fine-overdue-per-day}")
     String fine_overdue_per_day;
@@ -239,6 +236,18 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
         if (value == null) return 0L;
         if (value instanceof Number number) return number.longValue();
         return Long.parseLong(value.toString());
+    }
+
+    @Override
+    public BigDecimal calculateMyOverdueFine() {
+        Long userId = Long.valueOf(
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName()
+        );
+        Member member = memberRepository.findByUserIdAndIsDeletedFalse(userId).orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+        return calculateOverdueFine(member.getId());
     }
 
     @Override

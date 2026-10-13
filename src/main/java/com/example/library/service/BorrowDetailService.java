@@ -31,6 +31,7 @@ public interface BorrowDetailService {
     BorrowDetailSummaryResponse getMySummary();
     BorrowDetailSummaryResponse getSummary(Long userId);
 
+    BigDecimal calculateMyOverdueFine();
     BigDecimal calculateOverdueFine(Long memberId);
 
     BorrowDetailResponse returnBook(String id, ReturnBookRequest request);

@@ -89,6 +89,14 @@ public class BorrowDetailController {
         );
     }
 
+    @GetMapping("/overdue-fine/me")
+    @PreAuthorize("isAuthenticated()")
+    public ApiResponse<BigDecimal> getMyOverdueFine() {
+        return ApiResponse.success(
+                borrowDetailService.calculateMyOverdueFine()
+        );
+    }
+
     @GetMapping("/overdue-fine/{memberId}")
     @PreAuthorize("hasAuthority('BORROW_READ')")
     public ApiResponse<BigDecimal> getOverdueFine(@PathVariable String memberId) {

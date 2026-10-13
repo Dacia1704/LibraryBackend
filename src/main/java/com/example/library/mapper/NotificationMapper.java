@@ -18,6 +18,7 @@ public interface NotificationMapper {
     Notification toNotification(NotificationRequest request);
 
     @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "read", source = "isRead")
     NotificationResponse toNotificationResponse(Notification notification);
 
     void updateNotification(

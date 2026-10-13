@@ -17,6 +17,7 @@ public interface MemberRepository
     Optional<Member> findByPhone(String phone);
 
     Optional<Member> findByUserId(Long userId);
+    Optional<Member> findByUserIdAndIsDeletedFalse(Long userId);
 
     Optional<Member> findByIdAndIsDeletedFalse(Long id);
     Optional<Member> findByPhoneAndIsDeletedFalse(Long phone);

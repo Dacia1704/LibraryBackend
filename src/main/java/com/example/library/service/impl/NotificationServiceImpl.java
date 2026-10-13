@@ -32,9 +32,9 @@ public class NotificationServiceImpl implements NotificationService {
         List<Notification> notifications;
 
         if (isRead != null) {
-            notifications = notificationRepository.findByUserIdAndIsReadAndIsDeletedFalse(userId, isRead);
+            notifications = notificationRepository.findByUserIdAndIsReadAndIsDeletedFalseOrderByCreatedAtDesc(userId, isRead);
         } else {
-            notifications = notificationRepository.findByUserIdAndIsDeletedFalse(userId);
+            notifications = notificationRepository.findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(userId);
         }
 
         return notifications.stream()

@@ -349,7 +349,13 @@ public class MemberServiceImpl implements MemberService {
         }
         // ===== END VALIDATE AMOUNT =====
 
+        Role role = roleRepository.findByNameAndIsDeletedFalse("MEMBER").orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+        User user = member.getUser();
+        user.setRole(role);
+        userRepository.save(user);
+
         member.setCardExpiry(startDate.plusMonths(month));
+
 
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         User receiver = userRepository.findByIdAndIsDeletedFalse(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));

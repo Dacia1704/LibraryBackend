@@ -123,6 +123,12 @@ public class BookServiceImpl implements BookService {
             book.setPublishers(new HashSet<>(publishers));
         }
 
+        if(request.getShelfId() != null) {
+            Shelf shelf = shelfRepository.findByIdAndIsDeletedFalse(request.getShelfId()).orElseThrow(() ->  new AppException(ErrorCode.SHELF_NOT_FOUND));
+            book.setShelf(shelf);
+        }
+
+
         if (request.getCover() != null && !request.getCover().isEmpty()) {
             try {
                 book.setCover(Base64.getEncoder().encodeToString(request.getCover().getBytes()));

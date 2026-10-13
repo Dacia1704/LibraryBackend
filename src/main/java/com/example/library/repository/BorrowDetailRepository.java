@@ -72,4 +72,21 @@ public interface BorrowDetailRepository
             @Param("memberId") Long memberId,
             @Param("status") BorrowStatus status
     );
+
+    @Query("""
+        SELECT bd
+        FROM BorrowDetail bd
+        JOIN FETCH bd.borrowRecord br
+        JOIN FETCH br.member m
+        JOIN FETCH m.user u
+        JOIN FETCH bd.book
+        WHERE bd.isDeleted = false
+          AND br.isDeleted = false
+          AND m.isDeleted = false
+          AND u.isDeleted = false
+          AND bd.status = :status
+        """)
+    List<BorrowDetail> findAllByStatusWithDetails(
+            @Param("status") BorrowStatus status
+    );
 }

@@ -70,3 +70,9 @@ app:
     overdue-fine-block:
       cron: "0 0 1 * * *"
       zone: "Asia/Ho_Chi_Minh"
+    member-card-expiry:
+      cron: "0 0 1 * * *"
+      zone: "Asia/Ho_Chi_Minh"
+    due-reminder:
+      cron: "0 0 1 * * *"
+      zone: "Asia/Ho_Chi_Minh"
