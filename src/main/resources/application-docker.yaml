@@ -1,0 +1,83 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: library
+  shell:
+    interactive:
+      enabled: false  # Disable shell in Docker for cleaner logs
+
+  datasource:
+    url: jdbc:sqlserver://sqlserver:1433;databaseName=library_db;encrypt=false;trustServerCertificate=true
+    username: sa
+    password: ${DB_PASSWORD:Library@12345}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    flyway:
+      enabled: true
+      locations: classpath:db/migration
+      baseline-on-migrate: false
+
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password: redis123
+      timeout: 2s
+
+  web:
+    pageable:
+      default-page-size: 10
+      max-page-size: 100
+
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: admin
+    password: admin123
+    listener:
+      simple:
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 2000
+        default-requeue-rejected: false
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.security: WARN
+    com.example.library: DEBUG
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:3pHoX9WySmdbsP4vnkuM4o+Lrd/n5ejYcDYOBufMGXEVLABgSWU/TFAwYBanP6VywMIb6B/Px4KIZ/4xXmflyg==}
+    access-expiration-ms: 1800000
+    refresh-expiration-ms: 604800000
+  setting-key:
+    fine-overdue-per-day: "FINE_OVERDUE_PER_DAY"
+    fine-lost-rate: "FINE_LOST_RATE"
+    fine-damaged-light-rate: "FINE_DAMAGED_LIGHT_RATE"
+    fine-damaged-heavy-repairable-rate: "FINE_DAMAGED_HEAVY_REPAIRABLE_RATE"
+    fine-damaged-heavy-irreparable-rate: "FINE_DAMAGED_HEAVY_IRREPARABLE_RATE"
+    max-borrow-days: "MAX_BORROW_DAYS"
+    max-book-borrow: "MAX_BOOKS_BORROW"
+    max-fine-before-block: "MAX_FINE_BEFORE_BLOCK"
+    due-reminder-days: "DUE_REMINDER_DAYS"
+    member-payment-month: "MEMBERSHIP_FEE"
+    card-maker-fee: "CARD_MAKER_FEE"
+  jobs:
+    overdue-fine-block:
+      cron: "0 0 1 * * *"
+      zone: "Asia/Ho_Chi_Minh"
+    member-card-expiry:
+      cron: "0 0 1 * * *"
+      zone: "Asia/Ho_Chi_Minh"
+    due-reminder:
+      cron: "0 0 1 * * *"
+      zone: "Asia/Ho_Chi_Minh"
