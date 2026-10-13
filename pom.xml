@@ -157,6 +157,25 @@
             <artifactId>spring-shell-starter</artifactId>
             <version>3.4.1</version>
         </dependency>
+
+		<!-- Jasper export -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>6.20.6</version>
+		</dependency>
+		<!-- Cần nếu dùng font/PDF nâng cao -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-fonts</artifactId>
+			<version>6.20.6</version>
+		</dependency>
+		<!-- Font extension for JasperReports -->
+		<dependency>
+			<groupId>de.rototor.jasperreports</groupId>
+			<artifactId>jasperreports-fonts-tavana</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

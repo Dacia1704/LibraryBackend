@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 7.0.8.final using JasperReports Library version 6.20.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Statistic" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="993e26b6-8240-4704-9771-5ac536d57ba1">
+	<style name="Default" isDefault="true" fontName="DejaVu Sans" fontSize="11" pdfEncoding="Identity-H" isPdfEmbedded="true"/>
+	<style name="SectionTitle" style="Default" mode="Opaque" forecolor="#FFFFFF" backcolor="#1F4E79" hTextAlign="Center" vTextAlign="Middle" fontSize="14" isBold="true"/>
+	<style name="SubTitle" style="Default" mode="Opaque" forecolor="#1F4E79" backcolor="#D9E2F3" vTextAlign="Middle" fontSize="11" isBold="true">
+		<box leftPadding="6"/>
+	</style>
+	<style name="Label" style="Default" vTextAlign="Middle">
+		<box leftPadding="8">
+			<pen lineWidth="0.5" lineColor="#999999"/>
+		</box>
+	</style>
+	<style name="Value" style="Default" hTextAlign="Right" vTextAlign="Middle" isBold="true">
+		<box rightPadding="8">
+			<pen lineWidth="0.5" lineColor="#999999"/>
+		</box>
+	</style>
+	<parameter name="title" class="java.lang.String"/>
+	<parameter name="generatedDate" class="java.util.Date"/>
+	<field name="totalBorrowRecords" class="java.lang.Long"/>
+	<field name="borrowingRecords" class="java.lang.Long"/>
+	<field name="returnedRecords" class="java.lang.Long"/>
+	<field name="overdueRecords" class="java.lang.Long"/>
+	<field name="totalBorrowDetails" class="java.lang.Long"/>
+	<field name="returnedBorrowDetails" class="java.lang.Long"/>
+	<field name="notReturnedBorrowDetails" class="java.lang.Long"/>
+	<field name="totalFines" class="java.lang.Long"/>
+	<field name="unpaidFines" class="java.lang.Long"/>
+	<field name="totalFinePayments" class="java.lang.Long"/>
+	<field name="totalBooks" class="java.lang.Long"/>
+	<field name="totalBookCopies" class="java.lang.Long"/>
+	<field name="availableBookCopies" class="java.lang.Long"/>
+	<field name="borrowedBookCopies" class="java.lang.Long"/>
+	<field name="totalAuthors" class="java.lang.Long"/>
+	<field name="totalCategories" class="java.lang.Long"/>
+	<field name="totalShelves" class="java.lang.Long"/>
+	<field name="totalPublishers" class="java.lang.Long"/>
+	<field name="totalReaders" class="java.lang.Long"/>
+	<field name="activeReaders" class="java.lang.Long"/>
+	<field name="inactiveReaders" class="java.lang.Long"/>
+	<field name="totalMembers" class="java.lang.Long"/>
+	<field name="activeMembers" class="java.lang.Long"/>
+	<field name="expiredMembers" class="java.lang.Long"/>
+	<field name="totalLibrarians" class="java.lang.Long"/>
+	<field name="activeLibrarians" class="java.lang.Long"/>
+	<field name="inactiveLibrarians" class="java.lang.Long"/>
+	<field name="totalFineAmount" class="java.math.BigDecimal"/>
+	<field name="totalPaidAmount" class="java.math.BigDecimal"/>
+	<field name="totalRemainingAmount" class="java.math.BigDecimal"/>
+	<pageHeader>
+		<band height="60">
+			<textField>
+				<reportElement x="0" y="0" width="555" height="30" forecolor="#1F4E79" uuid="885e8fbd-91b3-4481-902e-cdd48f76d7ad"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{title} != null ? $P{title} : "BÁO CÁO THỐNG KÊ THƯ VIỆN"]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy HH:mm" isBlankWhenNull="true">
+				<reportElement x="0" y="32" width="555" height="18" uuid="4b2c384b-2cfa-4a60-8801-57e381f25287"/>
+				<textElement textAlignment="Center">
+					<font size="9" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Ngày xuất: " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format($P{generatedDate} != null ? $P{generatedDate} : new java.util.Date())]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="650">
+			<staticText>
+				<reportElement style="SectionTitle" x="0" y="10" width="555" height="32" uuid="57426e5f-3b8e-4dcb-95ea-55d4a656c5bb"/>
+				<text><![CDATA[THỐNG KÊ MƯỢN TRẢ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="SubTitle" x="0" y="56" width="555" height="24" uuid="57b0742c-aadc-416d-b2fa-b0f6d4226dcb"/>
+				<text><![CDATA[1. Phiếu mượn (Borrow Record)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Label" x="0" y="86" width="380" height="26" uuid="8ce56d11-81c3-4269-9670-24a98e7ebcef"/>
+				<text><![CDATA[Tổng số phiếu mượn]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="86" width="175" height="26" uuid="0fa546a7-a0ae-4006-bb70-721345557103"/>
+				<textFieldExpression><![CDATA[$F{totalBorrowRecords}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="112" width="380" height="26" uuid="06858b19-f0ee-411e-820e-85f94ac8fcee"/>
+				<text><![CDATA[Đang mượn]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="112" width="175" height="26" uuid="b2213d8e-45b6-494e-ad57-d4f282a61bce"/>
+				<textFieldExpression><![CDATA[$F{borrowingRecords}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="138" width="380" height="26" uuid="de2e475c-b846-4b4c-af0e-8649f5513282"/>
+				<text><![CDATA[Đã trả]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="138" width="175" height="26" uuid="669df78d-1252-4500-af12-313cead7eed4"/>
+				<textFieldExpression><![CDATA[$F{returnedRecords}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="164" width="380" height="26" uuid="1f7d5f48-96a5-43fa-b532-e3b6f55a18f0"/>
+				<text><![CDATA[Quá hạn]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="164" width="175" height="26" uuid="49e80551-e3e4-4d98-a0db-926812d919fd"/>
+				<textFieldExpression><![CDATA[$F{overdueRecords}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="SubTitle" x="0" y="212" width="555" height="24" uuid="2d123b40-83fd-4bac-831b-f06392da9351"/>
+				<text><![CDATA[2. Chi tiết mượn (Borrow Detail)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Label" x="0" y="242" width="380" height="26" uuid="e291670b-254d-4562-908b-727017a6356f"/>
+				<text><![CDATA[Tổng số lượt sách được mượn]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="242" width="175" height="26" uuid="4f19af61-50a2-444f-a5cd-426f3ac74574"/>
+				<textFieldExpression><![CDATA[$F{totalBorrowDetails}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="268" width="380" height="26" uuid="5e237d03-4366-463a-9a49-c251dea04420"/>
+				<text><![CDATA[Số sách đã trả]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="268" width="175" height="26" uuid="80b37681-12f1-40b6-82c8-bbc52b32a229"/>
+				<textFieldExpression><![CDATA[$F{returnedBorrowDetails}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="294" width="380" height="26" uuid="73cb3f04-0c5b-404c-a45a-2e6526045925"/>
+				<text><![CDATA[Số sách chưa trả]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="294" width="175" height="26" uuid="0b3fa6de-8130-46ef-8725-17ab065ea9a5"/>
+				<textFieldExpression><![CDATA[$F{notReturnedBorrowDetails}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="SubTitle" x="0" y="342" width="555" height="24" uuid="5d43566e-8248-40df-86de-b9f10e04b6a9"/>
+				<text><![CDATA[3. Tiền phạt (Fine)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Label" x="0" y="372" width="380" height="26" uuid="b171787a-5c70-40f2-b072-44ab78245782"/>
+				<text><![CDATA[Tổng số phiếu phạt]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="372" width="175" height="26" uuid="4a04736e-3859-405d-a0ad-ba5a2e0023fb"/>
+				<textFieldExpression><![CDATA[$F{totalFines}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="398" width="380" height="26" uuid="bce560b0-8ddb-4c8b-a70c-9ecc9f5b772b"/>
+				<text><![CDATA[Phiếu phạt chưa thanh toán]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="398" width="175" height="26" uuid="df63025c-4cdb-4b97-b7a1-47ead1935a83"/>
+				<textFieldExpression><![CDATA[$F{unpaidFines}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="424" width="380" height="26" uuid="3d8e9b4c-dee6-45b5-9751-ea7571ce7c64"/>
+				<text><![CDATA[Tổng tiền phạt]]></text>
+			</staticText>
+			<textField pattern="#,##0 &quot;đ&quot;" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="424" width="175" height="26" uuid="2a87d944-2699-49c8-9022-c8d699453b22"/>
+				<textFieldExpression><![CDATA[$F{totalFineAmount}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="SubTitle" x="0" y="472" width="555" height="24" uuid="05b59965-6071-4de8-95bd-ba778c4f95c0"/>
+				<text><![CDATA[4. Thanh toán phạt (Fine Payment)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Label" x="0" y="502" width="380" height="26" uuid="881dc2bc-2cb5-4a59-90d3-66321649e025"/>
+				<text><![CDATA[Tổng số lần thanh toán]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="502" width="175" height="26" uuid="ebad308a-c073-42d4-adfc-b39589331421"/>
+				<textFieldExpression><![CDATA[$F{totalFinePayments}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="528" width="380" height="26" uuid="054aaafd-635f-4afd-bdbf-c53bdbed9449"/>
+				<text><![CDATA[Tổng tiền đã thanh toán]]></text>
+			</staticText>
+			<textField pattern="#,##0 &quot;đ&quot;" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="528" width="175" height="26" uuid="dd1c0226-83dc-4ce7-a7c2-688402c8af3c"/>
+				<textFieldExpression><![CDATA[$F{totalPaidAmount}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="554" width="380" height="26" uuid="5a328a1d-b0aa-4d68-9e29-7a4f26534a00"/>
+				<text><![CDATA[Tổng tiền còn nợ]]></text>
+			</staticText>
+			<textField pattern="#,##0 &quot;đ&quot;" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="554" width="175" height="26" uuid="16b579dc-08fa-4ced-93c1-2ffd9d192d45"/>
+				<textFieldExpression><![CDATA[$F{totalRemainingAmount}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="650">
+			<break>
+				<reportElement x="0" y="0" width="555" height="1" uuid="bb82f0d6-d686-4e71-bdf4-295fc3c04c49"/>
+			</break>
+			<staticText>
+				<reportElement style="SectionTitle" x="0" y="10" width="555" height="32" uuid="db707ed6-5f64-4d28-a5ca-bd36515ef554"/>
+				<text><![CDATA[THỐNG KÊ KHO SÁCH]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="SubTitle" x="0" y="56" width="555" height="24" uuid="a3cae9c5-5baf-4b9c-b673-da397d3b7f02"/>
+				<text><![CDATA[1. Sách (Book)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Label" x="0" y="86" width="380" height="26" uuid="3c3f9163-7d5d-4d79-b59d-b815536ad835"/>
+				<text><![CDATA[Tổng số đầu sách]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="86" width="175" height="26" uuid="0c05fc95-8633-4796-8fea-4fe696ffe20b"/>
+				<textFieldExpression><![CDATA[$F{totalBooks}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="112" width="380" height="26" uuid="d197895e-7b81-438b-b4eb-a9e549f2899c"/>
+				<text><![CDATA[Tổng số bản sách (copies)]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="112" width="175" height="26" uuid="b28202ff-59c2-46de-94a1-079041c1e23a"/>
+				<textFieldExpression><![CDATA[$F{totalBookCopies}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="138" width="380" height="26" uuid="c72329a2-6127-4683-b50b-9f903812ca80"/>
+				<text><![CDATA[Số bản sách đang có sẵn]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="138" width="175" height="26" uuid="97020830-6ef6-4e76-921c-132eaf965fa9"/>
+				<textFieldExpression><![CDATA[$F{availableBookCopies}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="164" width="380" height="26" uuid="7488d2b6-234f-4edc-a597-2becd4887a95"/>
+				<text><![CDATA[Số bản sách đang được mượn]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="164" width="175" height="26" uuid="c61521b2-1be9-4531-bd73-21774d39fc43"/>
+				<textFieldExpression><![CDATA[$F{borrowedBookCopies}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="SubTitle" x="0" y="212" width="555" height="24" uuid="b6b25054-2fbe-4203-9a6c-b050da6e93f7"/>
+				<text><![CDATA[2. Tác giả (Author)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Label" x="0" y="242" width="380" height="26" uuid="60d16a41-aa5b-49cc-a993-1a5183523aa7"/>
+				<text><![CDATA[Tổng số tác giả]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="242" width="175" height="26" uuid="287a2a41-9a70-4d45-b23d-b6ebdbe97894"/>
+				<textFieldExpression><![CDATA[$F{totalAuthors}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="SubTitle" x="0" y="290" width="555" height="24" uuid="9f61e7a7-cf26-4c7d-a097-206ee5a70af5"/>
+				<text><![CDATA[3. Thể loại (Category)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Label" x="0" y="320" width="380" height="26" uuid="d0ccd9b4-207a-4b8b-a848-6512ff777211"/>
+				<text><![CDATA[Tổng số thể loại]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="320" width="175" height="26" uuid="3f74bea1-a078-4c88-b550-4c752ff7dc43"/>
+				<textFieldExpression><![CDATA[$F{totalCategories}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="SubTitle" x="0" y="368" width="555" height="24" uuid="d09c3639-b125-4440-8da6-403d22fb6dfd"/>
+				<text><![CDATA[4. Kệ sách (Shelf)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Label" x="0" y="398" width="380" height="26" uuid="292c7cfe-b5f3-4523-bcc7-6805659a255a"/>
+				<text><![CDATA[Tổng số kệ sách]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="398" width="175" height="26" uuid="9eb918c6-9be9-43af-9128-15dc5c02e6ed"/>
+				<textFieldExpression><![CDATA[$F{totalShelves}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="SubTitle" x="0" y="446" width="555" height="24" uuid="5f78da7a-0135-48a3-a380-d4676b9f1559"/>
+				<text><![CDATA[5. Nhà xuất bản (Publisher)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Label" x="0" y="476" width="380" height="26" uuid="8e1e9c97-9ff8-4f41-a12c-99a643395163"/>
+				<text><![CDATA[Tổng số nhà xuất bản]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="476" width="175" height="26" uuid="091142f8-97fb-47e5-82be-0cb08155ae14"/>
+				<textFieldExpression><![CDATA[$F{totalPublishers}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="650">
+			<break>
+				<reportElement x="0" y="0" width="555" height="1" uuid="a07d7f9c-a06a-4c91-91a7-897ce07495f8"/>
+			</break>
+			<staticText>
+				<reportElement style="SectionTitle" x="0" y="10" width="555" height="32" uuid="a2f674dd-bb97-4609-8115-058cd7b1ada1"/>
+				<text><![CDATA[THỐNG KÊ NGƯỜI DÙNG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="SubTitle" x="0" y="56" width="555" height="24" uuid="59f63517-c5dc-4430-acec-4720e65ee011"/>
+				<text><![CDATA[1. Độc giả (Reader)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Label" x="0" y="86" width="380" height="26" uuid="d9453247-0d36-4584-b441-d4fc9972a619"/>
+				<text><![CDATA[Tổng số độc giả]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="86" width="175" height="26" uuid="1361d51f-781a-45ca-a64c-4b6002f0bfb1"/>
+				<textFieldExpression><![CDATA[$F{totalReaders}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="112" width="380" height="26" uuid="809c5b24-a881-4464-97a9-ee03ef810bf5"/>
+				<text><![CDATA[Độc giả đang hoạt động]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="112" width="175" height="26" uuid="cd5c2c66-7d5c-460b-acec-683f2b9f905f"/>
+				<textFieldExpression><![CDATA[$F{activeReaders}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="138" width="380" height="26" uuid="f8556123-f021-4d4f-88b6-8e3bf89dcb29"/>
+				<text><![CDATA[Độc giả bị khóa / ngừng hoạt động]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="138" width="175" height="26" uuid="f5d27929-34e5-4267-85f4-3c0fc6a62b9a"/>
+				<textFieldExpression><![CDATA[$F{inactiveReaders}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="SubTitle" x="0" y="186" width="555" height="24" uuid="b90d13a5-f337-4d71-b3b4-9c7760bb7fd4"/>
+				<text><![CDATA[2. Thẻ thành viên (Member)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Label" x="0" y="216" width="380" height="26" uuid="b7768f84-7e91-40e7-88b6-2d3d2886c072"/>
+				<text><![CDATA[Tổng số thẻ thành viên]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="216" width="175" height="26" uuid="463482c4-c9ed-4945-9871-27fe47ded12b"/>
+				<textFieldExpression><![CDATA[$F{totalMembers}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="242" width="380" height="26" uuid="fe061c7c-f282-4615-a563-f7c5159ec6ae"/>
+				<text><![CDATA[Thẻ còn hiệu lực]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="242" width="175" height="26" uuid="eb794ebc-e189-4828-a510-ea2f02468542"/>
+				<textFieldExpression><![CDATA[$F{activeMembers}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="268" width="380" height="26" uuid="3ac8447a-8395-4f9b-94cd-5aabdfab60ca"/>
+				<text><![CDATA[Thẻ hết hạn]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="268" width="175" height="26" uuid="c4d8dae0-1735-4a0d-81e5-dcaf014eb94c"/>
+				<textFieldExpression><![CDATA[$F{expiredMembers}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="SubTitle" x="0" y="316" width="555" height="24" uuid="8783a3a1-743e-43cf-b033-40fd286f5fd9"/>
+				<text><![CDATA[3. Thủ thư (Librarian)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Label" x="0" y="346" width="380" height="26" uuid="ccf49efc-d4dc-4654-ae4c-7d7b29a9c5c0"/>
+				<text><![CDATA[Tổng số thủ thư]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="346" width="175" height="26" uuid="d16b5c16-5f88-4baf-8c01-2c638d60312a"/>
+				<textFieldExpression><![CDATA[$F{totalLibrarians}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="372" width="380" height="26" uuid="8dec63ca-a6b3-4fcb-95bc-7aefcf03ed65"/>
+				<text><![CDATA[Thủ thư đang làm việc]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="372" width="175" height="26" uuid="997a577c-d1ac-4b3c-a81e-1d6214517756"/>
+				<textFieldExpression><![CDATA[$F{activeLibrarians}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Label" x="0" y="398" width="380" height="26" uuid="2e969482-181e-4449-9061-67be98132a9b"/>
+				<text><![CDATA[Thủ thư đã nghỉ]]></text>
+			</staticText>
+			<textField pattern="#,##0" isBlankWhenNull="true">
+				<reportElement style="Value" x="380" y="398" width="175" height="26" uuid="d9e04ac7-f7e0-4f1c-83e7-2a929011c6cd"/>
+				<textFieldExpression><![CDATA[$F{inactiveLibrarians}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="25">
+			<textField>
+				<reportElement x="400" y="5" width="100" height="18" uuid="67ac6b7f-ec24-41f5-9ddb-845755101463"/>
+				<textElement textAlignment="Right">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Trang " + $V{PAGE_NUMBER} + " / "]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="500" y="5" width="55" height="18" uuid="db93a977-757e-440d-9025-9b51e659f3a2"/>
+				<textElement textAlignment="Left">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

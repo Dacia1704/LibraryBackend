@@ -390,7 +390,9 @@ INSERT INTO permissions (code, description) VALUES
  ('SETTING_DELETE',        N'Xóa cài đặt hệ thống'),
  ('NOTIFICATION_READ',     N'Xem thông báo'),
  ('NOTIFICATION_WRITE',    N'Tạo thông báo hoặc đánh dấu đã đọc'),
- ('NOTIFICATION_DELETE',   N'Xóa mềm thông báo');
+ ('NOTIFICATION_DELETE',   N'Xóa mềm thông báo'),
+ -- Báo cáo
+ ('REPORT_READ',          N'Xem báo cáo thống kê');
 
 -- ---------- ROLE_PERMISSIONS ----------
 -- ADMIN: toàn bộ permission
@@ -412,7 +414,7 @@ JOIN permissions p ON p.code IN (
  'BORROW_READ', 'BORROW_WRITE', 'BORROW_DELETE',
  'FINE_READ', 'FINE_WRITE', 'FINE_DELETE', 'FINE_PAYMENT_READ', 'FINE_PAYMENT_WRITE',
  'MEMBER_PAYMENT_READ', 'MEMBER_PAYMENT_WRITE',
- 'NOTIFICATION_READ', 'NOTIFICATION_WRITE'
+ 'NOTIFICATION_READ', 'NOTIFICATION_WRITE', 'SETTING_READ'
 )
 WHERE r.name = 'LIBRARIAN';
 
@@ -428,7 +430,7 @@ JOIN permissions p ON p.code IN (
  'BORROW_READ',
  'FINE_READ', 'FINE_PAYMENT_READ',
  'MEMBER_PAYMENT_READ',
- 'NOTIFICATION_READ', 'NOTIFICATION_WRITE'
+ 'NOTIFICATION_READ', 'NOTIFICATION_WRITE', 'SETTING_READ'
 )
 WHERE r.name = 'MEMBER';
 
@@ -441,7 +443,7 @@ JOIN permissions p ON p.code IN (
  'USER_READ', 'USER_WRITE',
  'ROLE_READ',
  'BOOK_READ', 'CATEGORY_READ', 'AUTHOR_READ', 'PUBLISHER_READ', 'SHELF_READ',
- 'NOTIFICATION_READ', 'NOTIFICATION_WRITE'
+ 'NOTIFICATION_READ', 'NOTIFICATION_WRITE', 'SETTING_READ'
 )
 WHERE r.name = 'READER';
 
