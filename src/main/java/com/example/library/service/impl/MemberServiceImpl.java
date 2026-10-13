@@ -173,7 +173,7 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(member);
 
         // Gửi thông báo cho người đăng ký
-        notificationProducer.send(member.getId(),
+        notificationProducer.send(member.getUser().getId(),
                 String.format("Tạo thẻ thành viên %d tháng thành công! Chào mừng bạn đến với thư viện.", month));
 
         return memberMapper.toMemberResponse(member);
@@ -287,9 +287,9 @@ public class MemberServiceImpl implements MemberService {
                 .build();
         memberRepository.save(member);
         memberPaymentRepository.save(memberPayment);
-
+        
         // Gửi thông báo cho người đăng ký
-        notificationProducer.send(member.getId(),
+        notificationProducer.send(member.getUser().getId(),
                 String.format("Tạo thẻ thành viên %d tháng thành công! Chào mừng bạn đến với thư viện.", month));
 
         return memberMapper.toMemberResponse(member);
@@ -349,7 +349,13 @@ public class MemberServiceImpl implements MemberService {
         }
         // ===== END VALIDATE AMOUNT =====
 
+        Role role = roleRepository.findByNameAndIsDeletedFalse("MEMBER").orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+        User user = member.getUser();
+        user.setRole(role);
+        userRepository.save(user);
+
         member.setCardExpiry(startDate.plusMonths(month));
+
 
         Long userId = Long.valueOf(SecurityContextHolder.getContext().getAuthentication().getName());
         User receiver = userRepository.findByIdAndIsDeletedFalse(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -366,7 +372,7 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(member);
 
         // Gửi thông báo cho người gia hạn
-        notificationProducer.send(member.getId(),
+        notificationProducer.send(member.getUser().getId(),
                 String.format("Gia hạn thẻ thành viên %d tháng thành công! Cảm ơn bạn đã tiếp tục đồng hành cùng thư viện.", month));
 
         return memberMapper.toMemberResponse(member);

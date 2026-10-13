@@ -106,13 +106,13 @@ public class BookController {
         );
     }
 
-    @GetMapping("/deleted/{id}")
+    @PostMapping(value = "/deleted", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('BOOK_READ')")
     public ApiResponse<BookResponse> getBookDeleted(
-            @PathVariable String id
+            @RequestBody String isbn
     ) {
         return ApiResponse.success(
-                bookService.getBookDeleted(id)
+                bookService.getBookDeleted(isbn)
         );
     }
 

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class NotificationResponse {
     Long id;
-    Long memberId;
+    Long userId;
     String content;
     boolean read;
     LocalDateTime createdAt;

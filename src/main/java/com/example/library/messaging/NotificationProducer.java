@@ -12,8 +12,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 public class NotificationProducer {
     private final RabbitTemplate rabbitTemplate;
 
-    public void send(Long memberId, String content) {
-        var msg = new NotificationMessage(memberId, content);
+    public void send(Long userId, String content) {
+        var msg = new NotificationMessage(userId, content);
         Runnable publish = () ->
             rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.ROUTING_KEY, msg);
 

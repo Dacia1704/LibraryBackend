@@ -14,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -85,6 +86,22 @@ public class BorrowDetailController {
     public ApiResponse<BorrowDetailSummaryResponse> getSummary(@PathVariable String userId) {
         return ApiResponse.success(
                 borrowDetailService.getSummary(Long.valueOf(userId))
+        );
+    }
+
+    @GetMapping("/overdue-fine/me")
+    @PreAuthorize("isAuthenticated()")
+    public ApiResponse<BigDecimal> getMyOverdueFine() {
+        return ApiResponse.success(
+                borrowDetailService.calculateMyOverdueFine()
+        );
+    }
+
+    @GetMapping("/overdue-fine/{memberId}")
+    @PreAuthorize("hasAuthority('BORROW_READ')")
+    public ApiResponse<BigDecimal> getOverdueFine(@PathVariable String memberId) {
+        return ApiResponse.success(
+                borrowDetailService.calculateOverdueFine(Long.valueOf(memberId))
         );
     }
 

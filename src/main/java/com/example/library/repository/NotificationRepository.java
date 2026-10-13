@@ -11,9 +11,11 @@ import java.util.Optional;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long>, JpaSpecificationExecutor<Notification> {
 
-    List<Notification> findByMemberIdAndIsDeletedFalse(Long memberId);
+    List<Notification> findByUserIdAndIsDeletedFalse(Long userId);
 
-    List<Notification> findByMemberIdAndIsReadAndIsDeletedFalse(Long memberId, Boolean isRead);
+    List<Notification> findByUserIdAndIsReadAndIsDeletedFalseOrderByCreatedAtDesc(Long userId, Boolean isRead);
+    List<Notification> findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(Long userId);
+    List<Notification> findByUserIdAndIsReadAndIsDeletedFalse(Long userId, Boolean isRead);
 
     Optional<Notification> findByIdAndIsDeletedFalse(Long id);
 }

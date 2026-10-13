@@ -46,6 +46,8 @@ logging:
   level:
     org.springframework.web: DEBUG
     org.springframework.security: DEBUG
+    org.springframework.security.authorization: TRACE
+    org.springframework.security.access: TRACE
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
 app:
   jwt:
@@ -64,3 +66,13 @@ app:
     due-reminder-days: "DUE_REMINDER_DAYS"
     member-payment-month: "MEMBERSHIP_FEE"
     card-maker-fee: "CARD_MAKER_FEE"
+  jobs:
+    overdue-fine-block:
+      cron: "0 0 1 * * *"
+      zone: "Asia/Ho_Chi_Minh"
+    member-card-expiry:
+      cron: "0 0 1 * * *"
+      zone: "Asia/Ho_Chi_Minh"
+    due-reminder:
+      cron: "0 0 1 * * *"
+      zone: "Asia/Ho_Chi_Minh"

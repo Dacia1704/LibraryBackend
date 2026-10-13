@@ -59,7 +59,7 @@ CREATE INDEX IX_users_no_accent ON users(no_accent);
 CREATE TABLE refresh_tokens (
     id         BIGINT IDENTITY(1,1) PRIMARY KEY,
     user_id    BIGINT       NOT NULL,
-    token      VARCHAR(255) NOT NULL,
+    token      VARCHAR(2000) NOT NULL,
     expires_at DATETIME2    NOT NULL,
     revoked    BIT          NOT NULL CONSTRAINT DF_rt_revoked DEFAULT 0,
     CONSTRAINT UQ_refresh_tokens_token UNIQUE (token),
@@ -287,14 +287,14 @@ CREATE INDEX IX_fp_received_by ON fine_payments(received_by);
 -- =====================================================================
 CREATE TABLE notifications (
     id         BIGINT IDENTITY(1,1) PRIMARY KEY,
-    member_id  BIGINT        NOT NULL,
+    user_id    BIGINT        NOT NULL,
     content    NVARCHAR(500) NOT NULL,
     is_read    BIT           NOT NULL CONSTRAINT DF_nt_read    DEFAULT 0,
     created_at DATETIME2     NOT NULL CONSTRAINT DF_nt_created DEFAULT SYSDATETIME(),
     is_deleted BIT           NOT NULL CONSTRAINT DF_nt_deleted DEFAULT 0,
-    CONSTRAINT FK_nt_member FOREIGN KEY (member_id) REFERENCES members(id)
+    CONSTRAINT FK_nt_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
-CREATE INDEX IX_nt_member_read ON notifications(member_id, is_read);
+CREATE INDEX IX_nt_user_read ON notifications(user_id, is_read);
 
 -- =====================================================================
 -- 7. SETTINGS (KEY - VALUE)
