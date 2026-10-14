@@ -11,7 +11,7 @@ spring:
     name: library
   shell:
     interactive:
-      enabled: false
+      enabled: true
 
   datasource:
     url: jdbc:sqlserver://sqlserver:1433;databaseName=library_db;encrypt=false;trustServerCertificate=true
