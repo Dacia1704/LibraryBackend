@@ -317,54 +317,56 @@ public class BorrowDetailServiceImpl implements BorrowDetailService {
             borrowDetail.setFineAmount(BigDecimal.ZERO);
         }
 
-        for(FineRequest fineRequest: request.getFineRequests()) {
-            String attachment = null;
-            if (fineRequest.getAttachment() != null && !fineRequest.getAttachment().isEmpty()) {
-                try {
-                    attachment = Base64.getEncoder().encodeToString(fineRequest.getAttachment().getBytes());
-                } catch (IOException e) {
-                    throw new AppException(ErrorCode.FILE_UPLOAD_FAILED);
+        if (request.getFineRequests() != null && !request.getFineRequests().isEmpty()) {
+            for(FineRequest fineRequest: request.getFineRequests()) {
+                String attachment = null;
+                if (fineRequest.getAttachment() != null && !fineRequest.getAttachment().isEmpty()) {
+                    try {
+                        attachment = Base64.getEncoder().encodeToString(fineRequest.getAttachment().getBytes());
+                    } catch (IOException e) {
+                        throw new AppException(ErrorCode.FILE_UPLOAD_FAILED);
+                    }
                 }
-            }
-            BigDecimal fineAmount = BigDecimal.ZERO;
+                BigDecimal fineAmount = BigDecimal.ZERO;
 
-            Fine fine = Fine.builder()
-                    .borrowRecord(borrowDetail.getBorrowRecord())
-                    .borrowDetail(borrowDetail)
-                    .amount(fineAmount)
-                    .attachment(attachment)
-                    .reason(FineReason.LOST)
-                    .note(String.format("Tiền phạt mất sách %s. Mã mượn %s",borrowDetail.getBook().getTitle(), borrowDetail.getId()))
-                    .build();
+                Fine fine = Fine.builder()
+                        .borrowRecord(borrowDetail.getBorrowRecord())
+                        .borrowDetail(borrowDetail)
+                        .amount(fineAmount)
+                        .attachment(attachment)
+                        .reason(FineReason.LOST)
+                        .note(String.format("Tiền phạt mất sách %s. Mã mượn %s",borrowDetail.getBook().getTitle(), borrowDetail.getId()))
+                        .build();
 
-            switch (fineRequest.getReason()) {
-                case FineReason.LOST -> {
-                    fineAmount = book.getPrice().multiply(fineRates.get(fine_lost_rate));
-                    fine.setNote(String.format("Tiền phạt mất sách %s. Mã mượn %s",borrowDetail.getBook().getTitle(), borrowDetail.getId()));
-                    fine.setReason(FineReason.LOST);
+                switch (fineRequest.getReason()) {
+                    case FineReason.LOST -> {
+                        fineAmount = book.getPrice().multiply(fineRates.get(fine_lost_rate));
+                        fine.setNote(String.format("Tiền phạt mất sách %s. Mã mượn %s",borrowDetail.getBook().getTitle(), borrowDetail.getId()));
+                        fine.setReason(FineReason.LOST);
+                    }
+                    case FineReason.DAMAGED_LIGHT -> {
+                        fineAmount = book.getPrice().multiply(fineRates.get(fine_damaged_light_rate));
+                        fine.setNote(String.format("Tiền phạt làm hỏng sách %s (mức độ nhẹ). Mã mượn %s",borrowDetail.getBook().getTitle(), borrowDetail.getId()));
+                        fine.setReason(FineReason.DAMAGED_LIGHT);
+                    }
+                    case FineReason.DAMAGED_HEAVY_REPAIRABLE -> {
+                        fineAmount = book.getPrice().multiply(fineRates.get(fine_damaged_heavy_repairable_rate));
+                        fine.setNote(String.format("Tiền phạt làm hỏng sách %s (mức độ nặng - có thể sửa chữa và tiếp tục sử dụng). Mã mượn %s",borrowDetail.getBook().getTitle(), borrowDetail.getId()));
+                        fine.setReason(FineReason.DAMAGED_HEAVY_REPAIRABLE);
+                    }
+                    case FineReason.DAMAGED_HEAVY_IRREPARABLE -> {
+                        fineAmount = book.getPrice().multiply(fineRates.get(fine_damaged_heavy_irrepairable_rate));
+                        fine.setNote(String.format("Tiền phạt làm hỏng sách %s (mức độ nặng - không thể tiếp tục sử dụng). Mã mượn %s",borrowDetail.getBook().getTitle(), borrowDetail.getId()));
+                        fine.setReason(FineReason.DAMAGED_HEAVY_IRREPARABLE);
+                    }
                 }
-                case FineReason.DAMAGED_LIGHT -> {
-                    fineAmount = book.getPrice().multiply(fineRates.get(fine_damaged_light_rate));
-                    fine.setNote(String.format("Tiền phạt làm hỏng sách %s (mức độ nhẹ). Mã mượn %s",borrowDetail.getBook().getTitle(), borrowDetail.getId()));
-                    fine.setReason(FineReason.DAMAGED_LIGHT);
-                }
-                case FineReason.DAMAGED_HEAVY_REPAIRABLE -> {
-                    fineAmount = book.getPrice().multiply(fineRates.get(fine_damaged_heavy_repairable_rate));
-                    fine.setNote(String.format("Tiền phạt làm hỏng sách %s (mức độ nặng - có thể sửa chữa và tiếp tục sử dụng). Mã mượn %s",borrowDetail.getBook().getTitle(), borrowDetail.getId()));
-                    fine.setReason(FineReason.DAMAGED_HEAVY_REPAIRABLE);
-                }
-                case FineReason.DAMAGED_HEAVY_IRREPARABLE -> {
-                    fineAmount = book.getPrice().multiply(fineRates.get(fine_damaged_heavy_irrepairable_rate));
-                    fine.setNote(String.format("Tiền phạt làm hỏng sách %s (mức độ nặng - không thể tiếp tục sử dụng). Mã mượn %s",borrowDetail.getBook().getTitle(), borrowDetail.getId()));
-                    fine.setReason(FineReason.DAMAGED_HEAVY_IRREPARABLE);
-                }
-            }
 
-            if (fineAmount != null && fineAmount.compareTo(BigDecimal.ZERO) > 0) {
-                BigDecimal currentFine = borrowDetail.getFineAmount();
-                borrowDetail.setFineAmount(currentFine != null ? currentFine.add(fineAmount) : fineAmount);
-                fine.setAmount(fineAmount);
-                newFines.add(fine);
+                if (fineAmount != null && fineAmount.compareTo(BigDecimal.ZERO) > 0) {
+                    BigDecimal currentFine = borrowDetail.getFineAmount();
+                    borrowDetail.setFineAmount(currentFine != null ? currentFine.add(fineAmount) : fineAmount);
+                    fine.setAmount(fineAmount);
+                    newFines.add(fine);
+                }
             }
         }
 

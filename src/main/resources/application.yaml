@@ -6,7 +6,7 @@ spring:
     name: library
   shell:
     interactive:
-      enabled: false  # Disable shell in production for cleaner logs
+      enabled: true  # Disable shell in production for cleaner logs
   
   datasource:
     url: jdbc:sqlserver://${DB_HOST:localhost}:${DB_PORT:1433};databaseName=${DB_NAME:library_db};encrypt=true;trustServerCertificate=true
