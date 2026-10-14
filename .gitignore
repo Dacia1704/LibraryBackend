@@ -4,6 +4,19 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Sensitive Files ###
+.env
+.env.local
+.env.*.local
+.env.docker
+.env.production
+
+# Application configs with secrets
+src/main/resources/application-docker.yaml
+
+# Docker compose
+docker-compose.yaml
+
 ### STS ###
 .apt_generated
 .classpath
@@ -31,3 +44,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# IDE password files
+*.jks
+*.keystore
+*.pem
+*.key

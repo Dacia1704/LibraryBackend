@@ -170,12 +170,6 @@
 			<artifactId>jasperreports-fonts</artifactId>
 			<version>6.20.6</version>
 		</dependency>
-		<!-- Font extension for JasperReports -->
-		<dependency>
-			<groupId>de.rototor.jasperreports</groupId>
-			<artifactId>jasperreports-fonts-tavana</artifactId>
-			<version>1.0.0</version>
-		</dependency>
 	</dependencies>
 
 	<build>

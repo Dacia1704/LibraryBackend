@@ -1,0 +1,26 @@
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yaml
+.env.docker
+
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**
+!.mvn/wrapper/
+!.mvn/
+# Keep Maven wrapper files for Docker build
+# mvnw
+# mvnw.cmd
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.class
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
